@@ -1,0 +1,33 @@
+/*! \mainpage OfficeGenerator
+
+Introduction
+============
+
+OfficeGenerator is a python module to read and write LibreOffice and MS Office files.
+
+The main web page is located <a src="https://officegenerator.sourceforge.io/">here</a>
+
+Development
+===========
+- Turulomio (Idea y development)
+
+Sourceforge
+===========
+This project is hosted in SourceForge, so you can use the next services:
+
+- <a href="https://sourceforge.net/p/officegenerator/tickets/" target="_blank">Tickets</a>
+
+Software used to develop OfficeGenerator
+========================================
+
+<a target="_blank" href="https://eric-ide.python-projects.org/index.html">Eric</a> is used as the main IDE
+
+OfficeGenerator depends on the following software:
+- <a target="_blank" href="https://www.python.org/">Python3</a>, as the main programming language.
+- <a target="_blank" href="https://pypi.org/project/colorama/">Colorama</a>, to give color to console output.
+
+
+
+
+
+*/

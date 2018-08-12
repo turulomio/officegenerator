@@ -1,0 +1,3 @@
+include GPL-3.txt *.py
+prune __pycache__
+global-exclude *.pyc

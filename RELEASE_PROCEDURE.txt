@@ -1,0 +1,9 @@
+Nueva release
+=============
+1) Cambiar la versión y la fecha en __init__.py
+2) Modificar el Changelog en el fichero README
+4) python3 setup.py doxygen
+5) python setup.py sdist upload -r pypi        Para subirlo a python
+6) Subir versión al subversion
+6) Crear un nuevo ebuild con la nueva versión
+8) Subirlo al subversion del portage
