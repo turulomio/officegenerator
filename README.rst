@@ -15,9 +15,9 @@ GPL-3
 
 Dependencies
 ============
-  * <a target="_blank" href="https://www.python.org/">Python3</a>, as the main programming language.
-  * <a target="_blank" href="https://pypi.org/project/odfpy/">odfpy</a>, to generate LibreOffice documents.
-  * <a target="_blank" href="https://pypi.org/project/odfpy/">openpyxl</a>, to generate MS Office XLSX/XLSM  documents.
+  * https://www.python.org/, as the main programming language.
+  * https://pypi.org/project/odfpy/, to generate LibreOffice documents.
+  * https://pypi.org/project/odfpy/, to generate MS Office XLSX/XLSM  documents.
 
 Usage
 =====
