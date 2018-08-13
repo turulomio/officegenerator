@@ -25,6 +25,8 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+X.X.X
+  * Now officegenerator_demo can delete example files with --remove parameter
 0.2.0
   * Added officegenerator_demo to view basic examples and code
 0.1.0
