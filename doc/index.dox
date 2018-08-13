@@ -13,9 +13,16 @@ Development
 
 Sourceforge
 ===========
-This project is hosted in SourceForge, so you can use the next services:
+This project is hosted in <a href="https://officegenerator.sourceforge.io">SourceForge</a>, so you can use the next services:
 
 - <a href="https://sourceforge.net/p/officegenerator/tickets/" target="_blank">Tickets</a>
+
+You can also visit the <a href="http://turulomio.users.sourceforge.net">main developer web page</a>
+
+Pypi
+====
+The project uses setuptools distribution system and it's also hosted in <a href="https://pypi.org/project/officegenerator/">https://pypi.org/project/officegenerator/</a>
+
 
 Software used to develop OfficeGenerator
 ========================================
@@ -24,7 +31,8 @@ Software used to develop OfficeGenerator
 
 OfficeGenerator depends on the following software:
 - <a target="_blank" href="https://www.python.org/">Python3</a>, as the main programming language.
-- <a target="_blank" href="https://pypi.org/project/colorama/">Colorama</a>, to give color to console output.
+- <a target="_blank" href="https://pypi.org/project/odfpy/">odfpy</a>, to generate LibreOffice documents.
+- <a target="_blank" href="https://pypi.org/project/odfpy/">openpyxl</a>, to generate MS Office XLSX/XLSM  documents.
 
 
 
