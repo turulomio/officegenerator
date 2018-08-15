@@ -61,7 +61,7 @@ setup(name='officegenerator',
      entry_points = {'console_scripts': ['officegenerator_demo=officegenerator.demo:main',
                                         ],
                     },
-     data_files=[ ('/usr/share/officegenerator/images/', ['images/crown.png']),
+     data_files=[ ('images', ['images/crown.png']),
                 ],
      cmdclass={
         'doxygen': Doxygen,
