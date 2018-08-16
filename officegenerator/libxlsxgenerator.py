@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-## @package libxlsxgenerator
+## @namespace officegenerator.libxlsxgenerator
 ## @brief Este módulo permite la lectura y escritura de ficheros xlsx de Microsoft Excel
 ## En el caso de que sea necesaria la modificación de este módulo deberá realizarse en el proyecto Xulpymoney y ser luego copiado al proyecto en el que se necesite
 

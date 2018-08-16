@@ -1,4 +1,4 @@
-## @package libodfgenerator
+## @namespace officegenerator.libodfgenerator
 ## @brief Package that allows to read and write Libreoffice ods and odt files
 ## This file is from the Xulpymoney project. If you want to change it. Ask for project administrator
 

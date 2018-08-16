@@ -1,3 +1,6 @@
+## @package officegenerator
+## @brief Generate office files
+
 import datetime
 from .libodfgenerator import *
 from .libxlsxgenerator import *

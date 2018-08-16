@@ -1,3 +1,8 @@
+## @namespace officegenerator.demo
+## @brief Generate ODF example files
+##
+## Prueba
+
 import argparse
 import datetime
 import os
