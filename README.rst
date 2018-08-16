@@ -25,6 +25,8 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+0.3.1
+  * Solved bug with image path in demo.py
 0.3.0
   * Now officegenerator_demo can delete example files with --remove parameter
   * Added officegenerator_odf2xml to convert odf files to indented xml
