@@ -17,7 +17,7 @@ Dependencies
 ============
   * https://www.python.org/, as the main programming language.
   * https://pypi.org/project/odfpy/, to generate LibreOffice documents.
-  * https://pypi.org/project/odfpy/, to generate MS Office XLSX/XLSM  documents.
+  * https://pypi.org/project/openpyxl/, to generate MS Office XLSX/XLSM  documents.
 
 Usage
 =====
