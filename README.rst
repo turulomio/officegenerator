@@ -25,8 +25,9 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
-X.X.X
+0.3.0
   * Now officegenerator_demo can delete example files with --remove parameter
+  * Added officegenerator_odf2xml to convert odf files to indented xml
 0.2.0
   * Added officegenerator_demo to view basic examples and code
 0.1.0
