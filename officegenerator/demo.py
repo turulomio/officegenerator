@@ -12,6 +12,10 @@ from .libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, O
 from odf.text import P
 
 def main():
+
+    imagepath=(os.path.dirname(__file__)+"/../images/")
+    #print(imagepath)
+
     parser=argparse.ArgumentParser(prog='officegenerator', description='Create example files using officegenerator module', epilog="Developed by Mariano Muñoz 2018-{}".format(__versiondate__.year), formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=__version__)
     group= parser.add_mutually_exclusive_group(required=True)
@@ -117,7 +121,7 @@ def main():
         doc.simpleParagraph("Con libodfgenerator podemos")
         doc.simpleParagraph("This library create several default styles for writing ODT files:")
         doc.list(["Title: Generates a title with 18pt and bold font", "Header1: Generates a Level 1 header"], style="BulletList")
-        doc.addImage("/usr/share/officegenerator/images/crown.png","images/crown.png")
+        doc.addImage(imagepath + "crown.png","images/crown.png")
         p = P(stylename="Standard")
         p.addText("Este es un ejemplo de imagen as char: ")
         p.addElement(doc.image("images/crown.png", "3cm", "3cm"))
@@ -138,6 +142,5 @@ def main():
         doc.header("ODS Reading", 1)
         doc.save()
         print("ODT Generated")
-
 if __name__ == "__main__":
     main()
