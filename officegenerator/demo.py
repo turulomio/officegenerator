@@ -6,6 +6,7 @@
 import argparse
 import datetime
 import os
+import pkg_resources
 
 from .__init__ import __version__, __versiondate__
 from .libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd, columnAdd
@@ -13,7 +14,7 @@ from odf.text import P
 
 def main():
 
-    imagepath=(os.path.dirname(__file__)+"/../images/")
+    #imagepath=(os.path.dirname(__file__)+"/../images/")
     #print(imagepath)
 
     parser=argparse.ArgumentParser(prog='officegenerator', description='Create example files using officegenerator module', epilog="Developed by Mariano Muñoz 2018-{}".format(__versiondate__.year), formatter_class=argparse.RawTextHelpFormatter)
@@ -121,7 +122,10 @@ def main():
         doc.simpleParagraph("Con libodfgenerator podemos")
         doc.simpleParagraph("This library create several default styles for writing ODT files:")
         doc.list(["Title: Generates a title with 18pt and bold font", "Header1: Generates a Level 1 header"], style="BulletList")
-        doc.addImage(imagepath + "crown.png","images/crown.png")
+        #crown_png=pkg_resources.resource_filename(
+        #pngfile = pkg_resources.resource_string(__name__, 'images/crown.png')
+        pngfile = pkg_resources.resource_filename(__name__, 'images/crown.png')
+        doc.addImage(pngfile,"images/crown.png")
         p = P(stylename="Standard")
         p.addText("Este es un ejemplo de imagen as char: ")
         p.addElement(doc.image("images/crown.png", "3cm", "3cm"))

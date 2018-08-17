@@ -62,11 +62,10 @@ setup(name='officegenerator',
                                          'officegenerator_odf2xml=officegenerator.odf2xml:main',
                                         ],
                     },
-     data_files=[ ('images', ['images/crown.png']),
-                ],
      cmdclass={
         'doxygen': Doxygen,
         'uninstall':Uninstall, 
              },
-      zip_safe=False
+      zip_safe=False,
+      include_package_data=True
      )
