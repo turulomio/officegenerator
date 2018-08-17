@@ -7,7 +7,7 @@ Web page main developer
 
 Description
 ===========
-Python module to quickly generate office documents with especific styles
+Python module to quickly generate office documents with specific styles
 
 License
 =======
@@ -25,6 +25,9 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+0.4.0
+  * Added pkg_resources support
+  * Moved images directory to package
 0.3.1
   * Solved bug with image path in demo.py
 0.3.0
