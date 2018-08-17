@@ -1,0 +1,5 @@
+include LICENSE.txt  *.py
+recursive-include officegenerator *.py
+recursive-include officegenerator/images *.png
+prune __pycache__
+global-exclude *.pyc
