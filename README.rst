@@ -18,6 +18,7 @@ Dependencies
   * https://www.python.org/, as the main programming language.
   * https://pypi.org/project/odfpy/, to generate LibreOffice documents.
   * https://pypi.org/project/openpyxl/, to generate MS Office XLSX/XLSM  documents.
+  * http://xmlsoft.org/, to execute xmllint in officegenerator_odf2xml
 
 Usage
 =====
@@ -25,6 +26,9 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+X.X.X
+  * [#5] officegenerartor_odf2xml require --file parameter
+  * [#6] Show alerts in Windows if can't be executed
 0.4.0
   * Added pkg_resources support
   * Moved images directory to package

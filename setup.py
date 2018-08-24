@@ -4,6 +4,7 @@ from setuptools import setup, Command
 import datetime
 import gettext
 import os
+import platform
 import site
 
 class Doxygen(Command):
@@ -34,7 +35,11 @@ class Uninstall(Command):
         pass
 
     def run(self):
-        os.system("rm -Rf {}/officegenerator*".format(site.getsitepackages()[0]))
+        if platform.system()=="Linux":
+            os.system("rm -Rf {}/officegenerator*".format(site.getsitepackages()[0]))
+            os.system("rm /usr/bin/officegenerator*")
+        else:
+            print ("Uninstall only works in Linux")
 
 ########################################################################
 
