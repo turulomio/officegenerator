@@ -5,12 +5,20 @@
 
 import argparse
 import datetime
+import gettext
 import os
 import pkg_resources
 
 from .__init__ import __version__, __versiondate__
 from .libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd, columnAdd
 from odf.text import P
+
+try:
+    t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
+    _=t.gettext
+except:
+    _=str
+
 
 def main():
 

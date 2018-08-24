@@ -3,8 +3,10 @@
 ## This file is from the Xulpymoney project. If you want to change it. Ask for project administrator
 
 import datetime
+import gettext
 import logging
 import os
+import pkg_resources
 import sys
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load,  __version__
 from odf.style import Footer, FooterStyle, GraphicProperties, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
@@ -18,6 +20,13 @@ from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, Con
 from odf.office import Annotation
 
 from decimal import Decimal
+
+
+try:
+    t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
+    _=t.gettext
+except:
+    _=str
 
 class ODF:
     def __init__(self, filename):

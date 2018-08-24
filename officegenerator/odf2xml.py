@@ -10,20 +10,28 @@
 
 import argparse
 import datetime
+import gettext
 import os
+import pkg_resources
 import platform
 import subprocess
 
 from .__init__ import __version__, __versiondate__
 
+try:
+    t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
+    _=t.gettext
+except:
+    _=str
+
 def main():
-    parser=argparse.ArgumentParser(prog='officegenerator', description='Convert a ODF file into an indented xml', epilog="Developed by Mariano Muñoz 2018-{}".format(__versiondate__.year), formatter_class=argparse.RawTextHelpFormatter)
+    parser=argparse.ArgumentParser(prog='officegenerator', description=_('Convert a ODF file into an indented xml'), epilog=_("Developed by Mariano Muñoz 2018-{}").format(__versiondate__.year), formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('--file', action='store', help='Odf file to convert', required=True)
+    parser.add_argument('--file', action='store', help=_('Odf file to convert'), required=True)
     args=parser.parse_args()
 
     if platform.system()!="Linux":
-        print("officegenerator_odf2xml only works on Linux")
+        print(_("officegenerator_odf2xml only works on Linux"))
         sys.exit(1)
 
     p=subprocess.run(["odf2xml", "-o", args.file + ".xml", args.file], stdout=subprocess.PIPE)

@@ -30,6 +30,7 @@ X.X.X
   * [#1] Added dependencies in setup.py
   * [#5] officegenerartor_odf2xml require --file parameter
   * [#6] Show alerts in Windows if can't be executed
+  * Added internationalization infrastructure
 0.4.0
   * Added pkg_resources support
   * Moved images directory to package

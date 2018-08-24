@@ -4,6 +4,7 @@
 ## En el caso de que sea necesaria la modificación de este módulo deberá realizarse en el proyecto Xulpymoney y ser luego copiado al proyecto en el que se necesite
 
 import datetime
+import gettext
 import openpyxl
 import openpyxl.comments
 import openpyxl.cell
@@ -11,9 +12,17 @@ import openpyxl.styles
 import openpyxl.worksheet
 import openpyxl.formatting.rule
 import os
+import pkg_resources
 import platform
 
 from .libodfgenerator import columnAdd, makedirs, rowAdd
+
+
+try:
+    t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
+    _=t.gettext
+except:
+    _=str
 
 class OpenPyXL:
     def __init__(self,filename,template=None):

@@ -7,6 +7,23 @@ import os
 import platform
 import site
 
+class Doc(Command):
+    description = "Update translations"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        #es
+        os.system("xgettext -L Python --no-wrap --no-location --from-code='UTF-8' -o locale/officegenerator.pot *.py officegenerator/*.py")
+        os.system("msgmerge -N --no-wrap -U locale/es.po locale/officegenerator.pot")
+        os.system("msgfmt -cv -o officegenerator/locale/es/LC_MESSAGES/officegenerator.mo locale/es.po")
+
+
 class Doxygen(Command):
     description = "Create/update doxygen documentation in doc/html"
     user_options = []
@@ -68,10 +85,10 @@ setup(name='officegenerator',
                                          'officegenerator_odf2xml=officegenerator.odf2xml:main',
                                         ],
                     },
-     cmdclass={
-        'doxygen': Doxygen,
-        'uninstall':Uninstall, 
-             },
-      zip_safe=False,
-      include_package_data=True
-     )
+     cmdclass={'doxygen': Doxygen,
+               'uninstall':Uninstall, 
+               'doc': Doc,
+              },
+     zip_safe=False,
+     include_package_data=True
+)
