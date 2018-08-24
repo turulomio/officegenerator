@@ -26,7 +26,7 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
-X.X.X
+0.5.0
   * [#1] Added dependencies in setup.py
   * [#5] officegenerartor_odf2xml require --file parameter
   * [#6] Show alerts in Windows if can't be executed

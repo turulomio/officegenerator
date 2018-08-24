@@ -1,4 +1,3 @@
-## @namespace officegenerator.demo
 ## @brief Generate ODF example files
 ##
 ## Prueba
