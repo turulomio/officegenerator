@@ -37,6 +37,7 @@ class Doxygen(Command):
     def run(self):
         print("Creating Doxygen Documentation")
         os.chdir("doc")
+        os.system("rm -Rf doc/html")
         os.system("doxygen Doxyfile")
         os.system("rsync -avzP -e 'ssh -l turulomio' html/ frs.sourceforge.net:/home/users/t/tu/turulomio/userweb/htdocs/doxygen/officegenerator/ --delete-after")
         os.chdir("..")
