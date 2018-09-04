@@ -1,5 +1,26 @@
+## @namespace officegenerator.commons
+## @brief Common code to odfpy and openpyxl wrappers
+import datetime
+import gettext
 import os
-from odf.opendocument import  __version__
+import pkg_resources
+from odf.opendocument import  __version__ as __odfpy_version__
+
+__version__ = '0.7.0'
+__versiondate__=datetime.date(2018,9,4)
+
+try:
+    t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
+    _=t.gettext
+except:
+    _=str
+
+## Function used in argparse_epilog
+## @return String
+def argparse_epilog():
+    return _("Developed by Mariano Muñoz 2015-{}").format(__versiondate__.year)
+
+
 ## Allows to operate with columns letter names
 ## @param letter String with the column name. For example A or AA...
 ## @param number Columns to move
@@ -65,4 +86,4 @@ def makedirs(dir):
         pass
 
 def ODFPYversion():
-    return __version__.split("/")[1]
+    return __odfpy_version__.split("/")[1]

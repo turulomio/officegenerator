@@ -7,16 +7,14 @@
 ## cat "$1.no.xml" | xmllint --format -
 ## @endcode
 
-
 import argparse
-import datetime
 import gettext
-import os
 import pkg_resources
 import platform
 import subprocess
+import sys
 
-from .__init__ import __version__, __versiondate__
+from officegenerator.commons import argparse_epilog,  __version__
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -25,7 +23,7 @@ except:
     _=str
 
 def main():
-    parser=argparse.ArgumentParser(prog='officegenerator', description=_('Convert a ODF file into an indented xml'), epilog=_("Developed by Mariano Muñoz 2018-{}").format(__versiondate__.year), formatter_class=argparse.RawTextHelpFormatter)
+    parser=argparse.ArgumentParser(prog='officegenerator', description=_('Convert a ODF file into an indented xml'), epilog=argparse_epilog(), formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('--file', action='store', help=_('Odf file to convert'), required=True)
     args=parser.parse_args()
@@ -36,7 +34,7 @@ def main():
 
     p=subprocess.run(["odf2xml", "-o", args.file + ".xml", args.file], stdout=subprocess.PIPE)
     q=subprocess.run(['xmllint', '--format', args.file +".xml"], stdout=subprocess.PIPE, input=p.stdout)
-    r=subprocess.run(['rm', args.file + ".xml"])
+    subprocess.run(['rm', args.file + ".xml"])
     print(q.stdout.decode('UTF-8'))
 
 if __name__ == "__main__":

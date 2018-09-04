@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-04 20:52+0200\n"
+"POT-Creation-Date: 2018-09-04 22:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,24 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "Developed by Mariano Muñoz 2015-{}"
+msgstr ""
+
+msgid "Create example files using officegenerator module"
+msgstr ""
+
+msgid "ODS Generated"
+msgstr ""
+
+msgid "ODS Readed and regenerated"
+msgstr ""
+
+msgid "ODT Generated"
+msgstr ""
+
+msgid "XLSX Generated"
+msgstr ""
 
 msgid "Styles"
 msgstr ""
@@ -50,10 +68,10 @@ msgstr ""
 msgid "This is a custom cell"
 msgstr ""
 
-msgid "Convert a ODF file into an indented xml"
+msgid "*** ERROR: File wasn't generated ***"
 msgstr ""
 
-msgid "Developed by Mariano Muñoz 2018-{}"
+msgid "Convert a ODF file into an indented xml"
 msgstr ""
 
 msgid "Odf file to convert"

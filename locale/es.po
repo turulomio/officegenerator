@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-04 20:50+0200\n"
+"POT-Creation-Date: 2018-09-04 22:17+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -17,6 +17,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Developed by Mariano Muñoz 2015-{}"
+msgstr "Desarrollado por Mariano Muñoz 2015-{}"
+
+msgid "Create example files using officegenerator module"
+msgstr "Crea ficheros de ejemplo usando el módulo officegenerator"
+
+msgid "ODS Generated"
+msgstr "ODS generado"
+
+msgid "ODS Readed and regenerated"
+msgstr "ODS leído y regenerado"
+
+msgid "ODT Generated"
+msgstr "ODT generado"
+
+msgid "XLSX Generated"
+msgstr "XLSX generado"
 
 msgid "Styles"
 msgstr "Estilos"
@@ -51,17 +69,20 @@ msgstr "Esto es un comentario"
 msgid "This is a custom cell"
 msgstr "Esto es una celda modificada"
 
+msgid "*** ERROR: File wasn't generated ***"
+msgstr "*** ERROR: El fichero no ha sido generado ***"
+
 msgid "Convert a ODF file into an indented xml"
 msgstr "Convierte un fichero ODF en un xml indentado"
-
-msgid "Developed by Mariano Muñoz 2018-{}"
-msgstr "Desarrollado por Mariano Muñoz 2018-{}"
 
 msgid "Odf file to convert"
 msgstr "Fichero ODF a convertir"
 
 msgid "officegenerator_odf2xml only works on Linux"
 msgstr "officegenerator_odf2xml solo funciona en Linux"
+
+#~ msgid "Developed by Mariano Muñoz 2018-{}"
+#~ msgstr "Desarrollado por Mariano Muñoz 2018-{}"
 
 #~ msgid "Uninstall command only works in Linux"
 #~ msgstr "El comando 'uninstall' solo funciona en Linux"

@@ -7,9 +7,10 @@ import gettext
 import os
 import pkg_resources
 
-from officegenerator.__init__ import __version__, __versiondate__
+from officegenerator.commons import __version__
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd
 from officegenerator.libxlsxgenerator import OpenPyXL
+from officegenerator.commons import argparse_epilog
 from odf.text import P
 import openpyxl.styles
 
@@ -21,7 +22,7 @@ except:
 
 
 def main():
-    parser=argparse.ArgumentParser(prog='officegenerator', description='Create example files using officegenerator module', epilog="Developed by Mariano Muñoz 2018-{}".format(__versiondate__.year), formatter_class=argparse.RawTextHelpFormatter)
+    parser=argparse.ArgumentParser(prog='officegenerator', description=_('Create example files using officegenerator module'), epilog=argparse_epilog(), formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=__version__)
     group= parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--create', help="Create demo files", action="store_true",default=False)
@@ -36,16 +37,16 @@ def main():
 
     if args.create==True:
         demo_ods()
-        print("ODS Generated")
+        print(_("ODS Generated"))
 
         demo_ods_readed()
-        print("ODS Readed and regenerated")
+        print(_("ODS Readed and regenerated"))
 
         demo_odt()
-        print("ODT Generated")
+        print(_("ODT Generated"))
 
         demo_xlsx()
-        print("XLSX Generated")
+        print(_("XLSX Generated"))
 
 
 def demo_ods_readed():
@@ -75,7 +76,7 @@ def demo_ods_readed():
 
 def demo_ods():
     doc=ODS_Write("officegenerator.ods")
-    doc.setMetadata("officegenerator example",  "This class documentation", "Mariano Muñoz")
+    doc.setMetadata("OfficeGenerator example",  "This class documentation", "Mariano Muñoz")
     s1=doc.createSheet("Example")
     s1.add("A", "1", [["Title", "Value"]], "HeaderOrange")
     s1.add("A", "2", "Percentage", "TextLeft")

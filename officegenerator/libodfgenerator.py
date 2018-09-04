@@ -29,6 +29,132 @@ try:
 except:
     _=str
 
+class ODS_Read:
+    def __init__(self, filename):
+        self.doc=load(filename)#doc is only used in this function. All is generated in self.doc
+        self.filename=filename
+
+        
+    def getSheetElementByName(self, name):
+        """
+            Devuelve el elemento de sheet buscando por su nombre
+        """
+        for numrow, sheet in  enumerate(self.doc.spreadsheet.getElementsByType(Table)):
+            if sheet.getAttribute("name")==name:
+                return sheet
+        return None        
+
+    def getSheetElementByIndex(self, index):
+        """
+            Devuelve el elemento de sheet buscando por su posición en el documento
+        """
+        try:
+            return self.doc.spreadsheet.getElementsByType(Table)[index]
+        except:
+            return None
+        
+        
+    def rowNumber(self, sheet_element):
+        """
+            Devuelve el numero de filas de un determinado sheet_element
+        """
+        return len(sheet_element.getElementsByType(TableRow))-1
+        
+    def columnNumber(self, sheet_element):
+        """
+            Devuelve el numero de filas de un determinado sheet_element
+        """
+        return len(sheet_element.getElementsByType(TableColumn))
+        
+        
+    def getCellValue(self, sheet_element, letter, number):
+        """
+            Returns the celll value
+        """
+        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
+        cell=row.getElementsByType(TableCell)[column2index(letter)]
+        r=None
+        
+        if cell.getAttribute('valuetype')=='string':
+            r=cell.getAttribute('value')
+        if cell.getAttribute('valuetype')=='float':
+            r=Decimal(cell.getAttribute('value'))
+        if cell.getAttribute('valuetype')=='percentage':
+            r=OdfPercentage(Decimal(cell.getAttribute('value')), Decimal(1))
+        if cell.getAttribute('formula')!=None:
+            r=str(cell.getAttribute('formula'))[3:]
+        if cell.getAttribute('valuetype')=='currency':
+            r=OdfMoney(Decimal(cell.getAttribute('value')), cell.getAttribute('currency'))
+        if cell.getAttribute('valuetype')=='date':
+            datevalue=cell.getAttribute('datevalue')
+            if len(datevalue)<=10:
+                r=datetime.datetime.strptime(datevalue, "%Y-%m-%d").date()
+            else:
+                r=datetime.datetime.strptime(datevalue, "%Y-%m-%dT%H:%M:%S")
+#        print(cell.allowed_attributes(), cell.getAttribute('datevalue'), cell.getAttribute('datatype'))
+#        print(cell.getAttribute('value'), cell.getAttribute('valuetype'),   r)
+        return r
+
+    def getCell(self, sheet_element,  letter, number):
+        """
+            Returns an odfcell object
+        """
+        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
+        cell=row.getElementsByType(TableCell)[column2index(letter)]
+        object=self.getCellValue(sheet_element, letter, number)
+        #Get spanning
+        spanning_columns=cell.getAttribute('numbercolumnsspanned')
+        if spanning_columns==None:
+            spanning_columns=1
+        else:
+            spanning_columns=int(spanning_columns)
+        spanning_rows=cell.getAttribute('numberrowsspanned')
+        if spanning_rows==None:
+            spanning_rows=1
+        else:
+            spanning_rows=int(spanning_rows)
+        
+        #Get Stylename
+        stylename=cell.getAttribute('stylename')
+
+
+        #Odfcell
+        r=OdfCell(letter, number, object, stylename)
+        r.setSpanning(spanning_columns, spanning_rows)
+        
+        #Get comment
+#        comment=cell.getElementsByType(Annotation)
+#        if len(comment)>0:
+##            print((comment[0].allowed_attributes()))
+#            comment_text=comment[0].getAttribute('name')
+#            r.setComment(comment_text)
+#            print(comment)
+
+        return r
+        
+    def setCell(self, sheet_element,  letter, number, cell):
+        """
+            Updates a cell
+            insertBefore(newchild, refchild) – Inserts the node newchild before the existing child node refchild.
+appendChild(newchild) – Adds the node newchild to the end of the list of children.
+removeChild(oldchild) – Re
+
+        ESTA FUNCION SE USA PARA SUSTITUIR EN UNA PLANTILLA
+        NO SE PUEDEN AÑADIR MAS CELDAS O FILAS
+        PARA ESO USAR ODS_Write DE MOMENTO
+        """
+#        if cell.__class__ not in [ODFCell, ODFFORMULA]: FALTA PROGRAMAR
+        
+        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
+        oldcell=row.getElementsByType(TableCell)[column2index(letter)]
+        row.insertBefore(cell.generate(), oldcell)
+        row.removeChild(oldcell)
+        
+    def save(self, filename):
+        if  filename==self.filename:
+            print("You can't overwrite a readed ods")
+            return        
+        self.doc.save( filename)
 class ODF:
     def __init__(self, filename):
         self.filename=filename
@@ -949,137 +1075,6 @@ class ODS(ODF):
         self.activeSheet=value.title
 
 
-class ODS_Read:
-    """
-       Los elementos P tienen los estilos:
-       
-        if result.__class__ in (str, int, float, datetime.datetime, OdfMoney, OdfPercentage, OdfFormula, Decimal):#Un solo valor
-    """
-    def __init__(self, filename):
-        self.doc=load(filename)#doc is only used in this function. All is generated in self.doc
-        self.filename=filename
-
-        
-    def getSheetElementByName(self, name):
-        """
-            Devuelve el elemento de sheet buscando por su nombre
-        """
-        for numrow, sheet in  enumerate(self.doc.spreadsheet.getElementsByType(Table)):
-            if sheet.getAttribute("name")==name:
-                return sheet
-        return None        
-
-    def getSheetElementByIndex(self, index):
-        """
-            Devuelve el elemento de sheet buscando por su posición en el documento
-        """
-        try:
-            return self.doc.spreadsheet.getElementsByType(Table)[index]
-        except:
-            return None
-        
-        
-    def rowNumber(self, sheet_element):
-        """
-            Devuelve el numero de filas de un determinado sheet_element
-        """
-        return len(sheet_element.getElementsByType(TableRow))-1
-        
-    def columnNumber(self, sheet_element):
-        """
-            Devuelve el numero de filas de un determinado sheet_element
-        """
-        return len(sheet_element.getElementsByType(TableColumn))
-        
-        
-    def getCellValue(self, sheet_element, letter, number):
-        """
-            Returns the celll value
-        """
-        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
-        cell=row.getElementsByType(TableCell)[column2index(letter)]
-        r=None
-        
-        if cell.getAttribute('valuetype')=='string':
-            r=cell.getAttribute('value')
-        if cell.getAttribute('valuetype')=='float':
-            r=Decimal(cell.getAttribute('value'))
-        if cell.getAttribute('valuetype')=='percentage':
-            r=OdfPercentage(Decimal(cell.getAttribute('value')), Decimal(1))
-        if cell.getAttribute('formula')!=None:
-            r=str(cell.getAttribute('formula'))[3:]
-        if cell.getAttribute('valuetype')=='currency':
-            r=OdfMoney(Decimal(cell.getAttribute('value')), cell.getAttribute('currency'))
-        if cell.getAttribute('valuetype')=='date':
-            datevalue=cell.getAttribute('datevalue')
-            if len(datevalue)<=10:
-                r=datetime.datetime.strptime(datevalue, "%Y-%m-%d").date()
-            else:
-                r=datetime.datetime.strptime(datevalue, "%Y-%m-%dT%H:%M:%S")
-#        print(cell.allowed_attributes(), cell.getAttribute('datevalue'), cell.getAttribute('datatype'))
-#        print(cell.getAttribute('value'), cell.getAttribute('valuetype'),   r)
-        return r
-
-    def getCell(self, sheet_element,  letter, number):
-        """
-            Returns an odfcell object
-        """
-        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
-        cell=row.getElementsByType(TableCell)[column2index(letter)]
-        object=self.getCellValue(sheet_element, letter, number)
-        #Get spanning
-        spanning_columns=cell.getAttribute('numbercolumnsspanned')
-        if spanning_columns==None:
-            spanning_columns=1
-        else:
-            spanning_columns=int(spanning_columns)
-        spanning_rows=cell.getAttribute('numberrowsspanned')
-        if spanning_rows==None:
-            spanning_rows=1
-        else:
-            spanning_rows=int(spanning_rows)
-        
-        #Get Stylename
-        stylename=cell.getAttribute('stylename')
-
-
-        #Odfcell
-        r=OdfCell(letter, number, object, stylename)
-        r.setSpanning(spanning_columns, spanning_rows)
-        
-        #Get comment
-#        comment=cell.getElementsByType(Annotation)
-#        if len(comment)>0:
-##            print((comment[0].allowed_attributes()))
-#            comment_text=comment[0].getAttribute('name')
-#            r.setComment(comment_text)
-#            print(comment)
-
-        return r
-        
-    def setCell(self, sheet_element,  letter, number, cell):
-        """
-            Updates a cell
-            insertBefore(newchild, refchild) – Inserts the node newchild before the existing child node refchild.
-appendChild(newchild) – Adds the node newchild to the end of the list of children.
-removeChild(oldchild) – Re
-
-        ESTA FUNCION SE USA PARA SUSTITUIR EN UNA PLANTILLA
-        NO SE PUEDEN AÑADIR MAS CELDAS O FILAS
-        PARA ESO USAR ODS_Write DE MOMENTO
-        """
-#        if cell.__class__ not in [ODFCell, ODFFORMULA]: FALTA PROGRAMAR
-        
-        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
-        oldcell=row.getElementsByType(TableCell)[column2index(letter)]
-        row.insertBefore(cell.generate(), oldcell)
-        row.removeChild(oldcell)
-        
-    def save(self, filename):
-        if  filename==self.filename:
-            print("You can't overwrite a readed ods")
-            return        
-        self.doc.save( filename)
                 
 class ODS_Write(ODS):
     def __init__(self, filename):

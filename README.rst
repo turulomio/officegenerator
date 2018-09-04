@@ -26,6 +26,9 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+X.X.X
+  * __version__ is now in commons
+  * Improved spanish translation
 0.7.0
   * Replaced predefined styles by predefined colors
   * Added officegenerator.xlsx to demo
