@@ -36,6 +36,7 @@ class Doxygen(Command):
 
     def run(self):
         print("Creating Doxygen Documentation")
+        os.system("rm -Rf build")
         os.chdir("doc")
         os.system("rm -Rf doc/html")
         os.system("doxygen Doxyfile")

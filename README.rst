@@ -26,6 +26,9 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+0.7.0
+  * Replaced predefined styles by predefined colors
+  * Added officegenerator.xlsx to demo
 0.6.0
   * Addapted code to openpyxl-2.4.1
 0.5.0
