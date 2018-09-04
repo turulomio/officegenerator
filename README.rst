@@ -7,7 +7,7 @@ Web page main developer
 
 Description
 ===========
-Python module to quickly generate office documents with specific styles
+Python module to quickly generate office documents with predefined styles
 
 License
 =======
