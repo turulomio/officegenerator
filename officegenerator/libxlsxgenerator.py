@@ -1,9 +1,5 @@
-#!/usr/bin/python3
 ## @namespace officegenerator.libxlsxgenerator
 ## @brief Este módulo permite la lectura y escritura de ficheros xlsx de Microsoft Excel
-
-## I Create styles with color and a suffix: Decimal2, Integer, Percentage, Euros. For example: GreyInteger
-## I Create styles with color and alignment for text. OrangeLeft, OrangeCenter, OrangeRight
 
 import datetime
 import gettext
@@ -103,12 +99,9 @@ class OpenPyXL:
             filename=self.filename
         makedirs(os.path.dirname(filename))
         self.wb.save(filename)
-        
+
         if os.path.exists(filename)==False:
-            print( "*** ERROR: El fichero no se ha generado ***")
-            
-    def overwrite_cell(self):
-        print("Hacer para pasar custom cells")
+            print(_("*** ERROR: File wasn't generated ***"))
 
     ## Writes a cell
     ## @param alignment String None by default. Can be "right","left","center"
