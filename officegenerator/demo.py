@@ -8,8 +8,9 @@ import gettext
 import os
 import pkg_resources
 
-from .__init__ import __version__, __versiondate__
-from .libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd, columnAdd
+from officegenerator.__init__ import __version__, __versiondate__
+from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd, columnAdd
+from officegenerator.libxlsxgenerator import OpenPyXL
 from odf.text import P
 
 try:
@@ -20,10 +21,6 @@ except:
 
 
 def main():
-
-    #imagepath=(os.path.dirname(__file__)+"/../images/")
-    #print(imagepath)
-
     parser=argparse.ArgumentParser(prog='officegenerator', description='Create example files using officegenerator module', epilog="Developed by Mariano Muñoz 2018-{}".format(__versiondate__.year), formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=__version__)
     group= parser.add_mutually_exclusive_group(required=True)
@@ -32,14 +29,14 @@ def main():
     args=parser.parse_args()
 
     if args.remove==True:
-        os.system("rm libodfgenerator.ods")
-        os.system("rm libodfgenerator.odt")
-        os.system("rm libodfgenerator_readed.ods")
+        os.system("rm officegenerator.ods")
+        os.system("rm officegenerator.odt")
+        os.system("rm officegenerator_readed.ods")
 
     if args.create==True:
         #ODS
-        doc=ODS_Write("libodfgenerator.ods")
-        doc.setMetadata("LibODFGenerator example",  "This class documentation", "Mariano Muñoz")
+        doc=ODS_Write("officegenerator.ods")
+        doc.setMetadata("officegenerator example",  "This class documentation", "Mariano Muñoz")
         s1=doc.createSheet("Example")
         s1.add("A", "1", [["Title", "Value"]], "HeaderOrange")
         s1.add("A", "2", "Percentage", "TextLeft")
@@ -72,10 +69,10 @@ def main():
         
         s3=doc.createSheet("Styles")
         s3.setColumnsWidth([400, 150, 150])
-        s3.add("A","1","LibODFGenerator has the folowing default Styles:")
+        s3.add("A","1","officegenerator has the folowing default Styles:")
         for number,  style in enumerate(["HeaderOrange", "HeaderYellow", "HeaderGreen", "HeaderRed", "HeaderGray", "HeaderOrangeLeft", "HeaderYellowLeft","HeaderGreenLeft",  "HeaderGrayLeft", "TextLeft", "TextRight", "TextCenter"]):
             s3.add("B", rowAdd("1", number) , style, style=style)
-        s3.add("A",rowAdd("2", number+1) ,"LibODFGenerator has the folowing default cell classes:")
+        s3.add("A",rowAdd("2", number+1) ,"officegenerator has the folowing default cell classes:")
         s3.add("B",rowAdd("2", number+1) ,OdfMoney(1234.23, "EUR"))
         s3.add("C",rowAdd("2", number+1) ,OdfMoney(-1234.23, "EUR"))
         s3.add("B",rowAdd("2", number+2) ,OdfPercentage(1234.23, 10000))
@@ -93,7 +90,7 @@ def main():
         doc.save()
         print("ODS Generated")
     
-        doc=ODS_Read("libodfgenerator.ods")
+        doc=ODS_Read("officegenerator.ods")
         s1=doc.getSheetElementByIndex(0)
         print("Getting values from ODS:")
         print("  + String", doc.getCellValue(s1, "A", "1"))
@@ -110,7 +107,7 @@ def main():
         odfcell=doc.getCell(s1, "B", "6")
         odfcell.object=1789.12
         doc.setCell(s1, "B", "6", odfcell)
-        doc.save("libodfgenerator_readed.ods")
+        doc.save("officegenerator_readed.ods")
     
         odfcell=doc.getCell(s1, "B", "10")
         odfcell.object="TURULETE"
@@ -118,15 +115,15 @@ def main():
         doc.setCell(s1, "B", "10", odfcell )
     
         #ODT#
-        doc=ODT("libodfgenerator.odt", language="fr", country="FR")
-        doc.setMetadata("LibODFGenerator manual",  "LibODFGenerator documentation", "Mariano Muñoz")
-        doc.title("Manual of LibODFGenerator")
+        doc=ODT("officegenerator.odt", language="fr", country="FR")
+        doc.setMetadata("officegenerator manual",  "officegenerator documentation", "Mariano Muñoz")
+        doc.title("Manual of officegenerator")
         doc.header("ODT Writing", 1)
         doc.simpleParagraph("Hola a todos")
         doc.list(["Pryueba hola no", "Adios", "Bienvenido"], style="BulletList")
         doc.simpleParagraph("Hola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todos")
         doc.numberedList(["Pryueba hola no", "Adios", "Bienvenido"])
-        doc.simpleParagraph("Con libodfgenerator podemos")
+        doc.simpleParagraph("Con officegenerator podemos")
         doc.simpleParagraph("This library create several default styles for writing ODT files:")
         doc.list(["Title: Generates a title with 18pt and bold font", "Header1: Generates a Level 1 header"], style="BulletList")
         #crown_png=pkg_resources.resource_filename(
@@ -147,11 +144,21 @@ def main():
         doc.pageBreak()
 
         doc.header("ODS Writing", 1)
-        doc.simpleParagraph("This library create several default styles for writing ODS files. You can see examples in libodfgenerator.ods.")
+        doc.simpleParagraph("This library create several default styles for writing ODS files. You can see examples in officegenerator.ods.")
         doc.pageBreak(horizontal=True)
 
         doc.header("ODS Reading", 1)
         doc.save()
         print("ODT Generated")
+        
+        demo_xlsx()
+        print("XLSX Generated")
+
+def demo_xlsx():
+    xlsx=OpenPyXL("officegenerator.xlsx")
+    xlsx.setCurrentSheet(0)
+    xlsx.overwrite("A","1", "Title", style=xlsx.stOrange)
+    xlsx.save()
+
 if __name__ == "__main__":
     main()

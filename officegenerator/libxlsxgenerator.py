@@ -26,35 +26,28 @@ except:
 
 class OpenPyXL:
     def __init__(self,filename,template=None):
+        self.filename=filename
+        self.template=template
         if template==None:
-            if platform.system()=="Windows":
-                self.filename=filename.replace("/home/informatica/", "z:/")
-            else:
-                self.filename=filename
             self.wb=openpyxl.Workbook()
         else:
-            if platform.system()=="Windows":
-                self.filename=filename.replace("/home/informatica/", "z:/")
-                self.template=template.replace("/usr/share/pysgae/", "Templates/")
-            else:
-                self.filename=filename
-                self.template=template
             self.wb=openpyxl.load_workbook(self.template)
-        
+
         self.ws_current_id=id
-        
-        self.stNormal=openpyxl.styles.Style( 
-            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            ), 
-            number_format="#,##0"
-        )        
-        self.stNormalDecimal=openpyxl.styles.Style( 
+
+#        self.stNormal=openpyxl.styles.NamedStyle( 
+#            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
+#            font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
+#            border=openpyxl.styles.Border(
+#                left=openpyxl.styles.Side(border_style='thin'),
+#                top=openpyxl.styles.Side(border_style='thin'),
+#                right=openpyxl.styles.Side(border_style='thin'),
+#                bottom=openpyxl.styles.Side(border_style='thin') 
+#            ), 
+#            number_format="#,##0"
+#        )        
+        self.stNormalDecimal=openpyxl.styles.NamedStyle( 
+            name="NormalDecimal",
             alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
             border=openpyxl.styles.Border(
@@ -66,7 +59,8 @@ class OpenPyXL:
             number_format="#,##0.00"
         )
         
-        self.stNormalEuros=openpyxl.styles.Style( 
+        self.stNormalEuros=openpyxl.styles.NamedStyle(
+            name="NormalEuros",
             alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
             border=openpyxl.styles.Border(
@@ -78,7 +72,8 @@ class OpenPyXL:
             number_format="#,##0.00 €"
         )        
         
-        self.stNormalLeft=openpyxl.styles.Style( 
+        self.stNormalLeft=openpyxl.styles.NamedStyle( 
+            name="NormalLeft",
             alignment=openpyxl.styles.Alignment(horizontal='left', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
             border=openpyxl.styles.Border(
@@ -90,7 +85,8 @@ class OpenPyXL:
             number_format="#,##0"
         )
         
-        self.stNormalCenter=openpyxl.styles.Style( 
+        self.stNormalCenter=openpyxl.styles.NamedStyle( 
+            name="NormalCenter",
             alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
             border=openpyxl.styles.Border(
@@ -100,7 +96,8 @@ class OpenPyXL:
                 bottom=openpyxl.styles.Side(border_style='thin') 
             ),
         )
-        self.stOrange=openpyxl.styles.Style(
+        self.stOrange=openpyxl.styles.NamedStyle(
+            name="Orange",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFFFDCA8')), 
             alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -111,7 +108,8 @@ class OpenPyXL:
                 bottom=openpyxl.styles.Side(border_style='thin') 
             )
         )
-        self.stYellow=openpyxl.styles.Style(
+        self.stYellow=openpyxl.styles.NamedStyle(
+            name="Yellow",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFFFFFC0')), 
             alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -122,7 +120,8 @@ class OpenPyXL:
                 bottom=openpyxl.styles.Side(border_style='thin') 
             )
         )
-        self.stGreen=openpyxl.styles.Style(
+        self.stGreen=openpyxl.styles.NamedStyle(
+            name="Green",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFC0FFC0')), 
             alignment=openpyxl.styles.Alignment(horizontal='left', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -133,7 +132,8 @@ class OpenPyXL:
                 bottom=openpyxl.styles.Side(border_style='thin') 
             )
         )
-        self.stGrey1=openpyxl.styles.Style(
+        self.stGrey1=openpyxl.styles.NamedStyle(
+            name="Grey1",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFDCDCDC')), 
             alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -144,7 +144,8 @@ class OpenPyXL:
                 bottom=openpyxl.styles.Side(border_style='thin') 
             )
         )
-        self.stGrey2=openpyxl.styles.Style(
+        self.stGrey2=openpyxl.styles.NamedStyle(
+            name="Grey2",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFC3C3C3')), 
             alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -156,7 +157,8 @@ class OpenPyXL:
             )
         )
         
-        self.stGrey1Number=openpyxl.styles.Style(
+        self.stGrey1Number=openpyxl.styles.NamedStyle(
+            name="Grey1Number",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFDCDCDC')), 
             alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -168,7 +170,8 @@ class OpenPyXL:
             ), 
             number_format="#,##0"
         )
-        self.stGrey1Euros=openpyxl.styles.Style(
+        self.stGrey1Euros=openpyxl.styles.NamedStyle(
+            name="Grey1Euros",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFDCDCDC')), 
             alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -179,9 +182,10 @@ class OpenPyXL:
                 bottom=openpyxl.styles.Side(border_style='thin')
             ), 
             number_format="#,##0.00 €"
-        )        
-    
-        self.stGrey2Number=openpyxl.styles.Style(
+        )
+
+        self.stGrey2Number=openpyxl.styles.NamedStyle(
+            name="Grey2Number",
             fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFC3C3C3')), 
             alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
             font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
@@ -230,17 +234,17 @@ class OpenPyXL:
     def sheet_name(self, id=None):
         if id==None:
             id=self.ws_current_id
-        return self.wb.get_sheet_names()[id]
+        return self.wb.sheetnames()[id]
 
     def get_sheet_by_id(self, id):
-        return self.wb.get_sheet_by_name(self.wb.get_sheet_names()[id])
-        
+        return self.wb[self.wb.sheetnames[id]]
+
     def get_sheet_id(self, name):
-        for id, s_name in enumerate(self.wb.get_sheet_names()):
+        for id, s_name in enumerate(self.wb.sheetnames):
             if s_name==name:
                 return id
         return None
-        
+
     def remove_sheet_by_id(self, id):
         ws=self.get_sheet_by_id(id)
         self.wb.remove_sheet(ws)
@@ -254,20 +258,16 @@ class OpenPyXL:
         
         if os.path.exists(filename)==False:
             print( "*** ERROR: El fichero no se ha generado ***")
-        
-        
 
-    def overwrite(self, letter,number, result, ws=None, style=None):
+    def overwrite(self, letter, number, result, ws=None, style=None):
         """Writes in aself.ws_current worksheet from cell, (letter, number) the array result"""
         def setStyle(cell, value, style):
             if style==None:#Auto
                 if value.__class__ in(datetime.datetime, str):
                     cell.style=self.stNormalLeft
-                else:
-                    cell.style=self.stNormal
             else:
                 cell.style=style
-        def setValue(cell, value, style):        
+        def setValue(cell, value, style):
             if value.__class__ in (str, int, float):#Un solo valor
                 cell.value=value
                 setStyle(cell, value, style)
@@ -286,8 +286,8 @@ class OpenPyXL:
         ################################################
         if ws==None:
             ws=self.get_sheet_by_id(self.ws_current_id)
-            
         if result.__class__ in (str, int, float, datetime.datetime):#Un solo valor
+            print(ws)
             c=ws[letter+number]
             setValue(c, result, style)
         elif result.__class__ in (list,):#Una lista
