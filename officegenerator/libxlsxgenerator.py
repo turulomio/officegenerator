@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 ## @namespace officegenerator.libxlsxgenerator
 ## @brief Este módulo permite la lectura y escritura de ficheros xlsx de Microsoft Excel
-## En el caso de que sea necesaria la modificación de este módulo deberá realizarse en el proyecto Xulpymoney y ser luego copiado al proyecto en el que se necesite
+
+## I Create styles with color and a suffix: Decimal2, Integer, Percentage, Euros. For example: GreyInteger
+## I Create styles with color and alignment for text. OrangeLeft, OrangeCenter, OrangeRight
 
 import datetime
 import gettext
@@ -13,9 +15,8 @@ import openpyxl.worksheet
 import openpyxl.formatting.rule
 import os
 import pkg_resources
-import platform
 
-from .libodfgenerator import columnAdd, makedirs, rowAdd
+from officegenerator.commons import columnAdd, makedirs, rowAdd
 
 
 try:
@@ -301,19 +302,22 @@ class OpenPyXL:
                 else:
                     print(row.__class__, "ROW CLASS NOT FOUND",  row)
 
+    ## Sets cell name to use in formulas
     def setCellName(self, range, name):
-        """Cell name to use in formulas"""
         ws=self.get_sheet_by_id(self.ws_current_id)
         self.wb.create_named_range(name, ws, range)
 
+    ## Sets the corrent sheet 
+    ## @param id Integer with the index of the sheet
     def setCurrentSheet(self, id):
         self.ws_current_id=id
         
+    ## Set columns width in current sheet
+    ## @param arrWidths List with integers representing column width
     def setColumnsWidth(self, arrWidths):
-        """arrWidths es un array de anchuras"""
         ws=self.get_sheet_by_id(self.ws_current_id)
         for i in range(len(arrWidths)):
-            ws.column_dimensions[openpyxl.cell.get_column_letter(i+1)].width=arrWidths[i]
+            ws.column_dimensions[columnAdd("A", i)].width=arrWidths[i]
    
     def mergeCells(self, range, style=None):
         """range='A1:B1

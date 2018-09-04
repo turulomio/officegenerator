@@ -1,6 +1,5 @@
+## @namespace officegenerator.demo
 ## @brief Generate ODF example files
-##
-## Prueba
 
 import argparse
 import datetime
@@ -9,7 +8,7 @@ import os
 import pkg_resources
 
 from officegenerator.__init__ import __version__, __versiondate__
-from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd, columnAdd
+from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd
 from officegenerator.libxlsxgenerator import OpenPyXL
 from odf.text import P
 
@@ -158,11 +157,22 @@ def demo_xlsx():
     xlsx=OpenPyXL("officegenerator.xlsx")
     xlsx.setCurrentSheet(0)
 
+    xlsx.setSheetName(_("Styles"))
+    xlsx.setColumnsWidth([80, 80])
     xlsx.overwrite("A","1", "Style name", style=xlsx.stOrange)
     xlsx.overwrite("B","1", "Result", style=xlsx.stOrange)
 
-    xlsx.overwrite("A","2", "Orange", style=xlsx.stOrange)
+    xlsx.overwrite("A","2", "Orange")
     xlsx.overwrite("B","2", "Texto", style=xlsx.stOrange)
+
+    xlsx.overwrite("A","3", "Green")
+    xlsx.overwrite("B","3", "Texto", style=xlsx.stGreen)
+
+    xlsx.overwrite("A","4", "Grey1")
+    xlsx.overwrite("B","4", "Texto", style=xlsx.stGrey1)
+
+    xlsx.overwrite("A","5", "Grey1Number")
+    xlsx.overwrite("B","5", 2980, style=xlsx.stGrey1Number)
 
     xlsx.save()
 

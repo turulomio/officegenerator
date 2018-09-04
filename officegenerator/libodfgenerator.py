@@ -1,3 +1,4 @@
+## @namespace officegenerator.libodfgenerator
 ## @brief Package that allows to read and write Libreoffice ods and odt files
 ## This file is from the Xulpymoney project. If you want to change it. Ask for project administrator
 
@@ -7,7 +8,7 @@ import logging
 import os
 import pkg_resources
 import sys
-from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load,  __version__
+from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, GraphicProperties, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
 from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds
 from odf.text import P,  H,  Span, ListStyle,  ListLevelStyleBullet,  List,  ListItem, ListLevelStyleNumber,  OutlineLevelStyle,  OutlineStyle,  PageNumber,  PageCount
@@ -17,6 +18,7 @@ from odf.dc import Creator, Description, Title, Date
 from odf.meta import InitialCreator
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
+from officegenerator.commons import makedirs,  column2index, column2number,  row2index,  row2number,  number2column,  number2row, rowAdd, columnAdd
 
 from decimal import Decimal
 
@@ -1291,71 +1293,3 @@ class ODS_Write(ODS):
         ODS.save(self, filename)
         
 
-
-##########################################################################################
-## Allows to operate with columns letter names
-## @param letter String with the column name. For example A or AA...
-## @param number Columns to move
-## @return String With the name of the column after movement
-def columnAdd(letter, number):
-    letter_value=column2number(letter)+number
-    return number2column(letter_value)
-
-
-def rowAdd(letter,number):
-    return str(int(letter)+number)
-
-## Convierte un número  con el numero de columna al nombre de la columna de hoja de datos
-##
-## Number to Excel-style column name, e.g., 1 = A, 26 = Z, 27 = AA, 703 = AAA.
-def number2column(n):
-    name = ''
-    while n > 0:
-        n, r = divmod (n - 1, 26)
-        name = chr(r + ord('A')) + name
-    return name
-
-## Convierte una columna de hoja de datos a un número
-##
-## Excel-style column name to number, e.g., A = 1, Z = 26, AA = 27, AAA = 703.
-def column2number(name):
-    n = 0
-    for c in name:
-        n = n * 26 + 1 + ord(c) - ord('A')
-    return n
-
-## Converts a column name to a index position (number of column -1)
-def column2index(name):
-    return column2number(name)-1
-
-## Convierte el nombre de la fila de la hoja de datos a un índice, es decir el número de la fila -1
-def row2index(number):
-    return int(number)-1
-
-## Covierte el nombre de la fila de la hoja de datos a un  numero entero que corresponde con el numero de la fila
-def row2number(strnumber):
-    return int(strnumber)
-
-## Convierte el numero de la fila al nombre de la fila en la hoja de datos , que corresponde con un string del numero de la fila
-def number2row(number):
-    return str(number)
-    
-## Convierte el indice de la fila al numero cadena de la hoja de datos
-def index2row(index):
-    return str(index+1)
-    
-## Convierte el indice de la columna a la cadena de letras de la columna de la hoja de datos
-def index2column(index):
-    return number2column(index+1)
-    
-## Crea un directorio con todos sus subdirectorios
-##
-## No produce error si ya está creado.
-def makedirs(dir):
-    try:
-        os.makedirs(dir)
-    except:
-        pass
-
-def ODFPYversion():
-    return __version__.split("/")[1]
