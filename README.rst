@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+X.X.X
+  * Addapted code to openpyxl-2.4.1
 0.5.0
   * [#1] Added dependencies in setup.py
   * [#5] officegenerartor_odf2xml require --file parameter
