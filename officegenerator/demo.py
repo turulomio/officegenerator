@@ -11,6 +11,7 @@ from officegenerator.__init__ import __version__, __versiondate__
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd
 from officegenerator.libxlsxgenerator import OpenPyXL
 from odf.text import P
+import openpyxl.styles
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -125,8 +126,6 @@ def main():
         doc.simpleParagraph("Con officegenerator podemos")
         doc.simpleParagraph("This library create several default styles for writing ODT files:")
         doc.list(["Title: Generates a title with 18pt and bold font", "Header1: Generates a Level 1 header"], style="BulletList")
-        #crown_png=pkg_resources.resource_filename(
-        #pngfile = pkg_resources.resource_string(__name__, 'images/crown.png')
         pngfile = pkg_resources.resource_filename(__name__, 'images/crown.png')
         doc.addImage(pngfile,"images/crown.png")
         p = P(stylename="Standard")
@@ -158,22 +157,32 @@ def demo_xlsx():
     xlsx.setCurrentSheet(0)
 
     xlsx.setSheetName(_("Styles"))
-    xlsx.setColumnsWidth([80, 80])
-    xlsx.overwrite("A","1", "Style name", style=xlsx.stOrange)
-    xlsx.overwrite("B","1", "Result", style=xlsx.stOrange)
-
-    xlsx.overwrite("A","2", "Orange")
-    xlsx.overwrite("B","2", "Texto", style=xlsx.stOrange)
-
-    xlsx.overwrite("A","3", "Green")
-    xlsx.overwrite("B","3", "Texto", style=xlsx.stGreen)
-
-    xlsx.overwrite("A","4", "Grey1")
-    xlsx.overwrite("B","4", "Texto", style=xlsx.stGrey1)
-
-    xlsx.overwrite("A","5", "Grey1Number")
-    xlsx.overwrite("B","5", 2980, style=xlsx.stGrey1Number)
-
+    xlsx.setColumnsWidth([20, 20, 20, 20, 20, 20, 20, 20])
+    
+    xlsx.overwrite("A","1", _("Style name"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("B","1", _("Date and time"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("C","1", _("Date"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("D","1", _("Integer"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("E","1", _("Euros"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("F","1", _("Percentage"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("G","1", _("Number with 2 decimals"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("H","1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
+    for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGreyLight, xlsx.stYellow, xlsx.stGreyDark, None]):
+        name= [ k for k,v in locals().items() if v is style][0]
+        xlsx.overwrite("A", rowAdd("2", row), name, style=style)
+        xlsx.overwrite("B", rowAdd("2", row), datetime.datetime.now(), style=style)
+        xlsx.overwrite("C", rowAdd("2", row), datetime.date.today(), style=style)
+        xlsx.overwrite("D", rowAdd("2", row), pow(-1, row)*-10000000, style=style)
+        xlsx.overwrite("E", rowAdd("2", row), OdfMoney(12.56, "€"), style=style, decimals=row+1)
+        xlsx.overwrite("F", rowAdd("2", row), OdfPercentage(1, 3), style=style,  decimals=row+1)
+        xlsx.overwrite("G", rowAdd("2", row), pow(-1, row)*12.121212, style=style, decimals=2)
+        xlsx.overwrite("H", rowAdd("2", row), pow(-1, row)*-12.121212, style=style, decimals=6)
+    xlsx.setComment("B2", _("This is a comment"))
+    
+    ##To write a custom cell
+    cell=xlsx.wb.active['B12']
+    cell.font=openpyxl.styles.Font(name='Arial', size=16, bold=True, color=openpyxl.styles.colors.RED)
+    cell.value=_("This is a custom cell")
     xlsx.save()
 
 if __name__ == "__main__":

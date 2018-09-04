@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-24 03:51+0200\n"
+"POT-Creation-Date: 2018-09-04 20:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,39 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "Styles"
+msgstr ""
+
+msgid "Style name"
+msgstr ""
+
+msgid "Date and time"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Integer"
+msgstr ""
+
+msgid "Euros"
+msgstr ""
+
+msgid "Percentage"
+msgstr ""
+
+msgid "Number with 2 decimals"
+msgstr ""
+
+msgid "Number with 6 decimals"
+msgstr ""
+
+msgid "This is a comment"
+msgstr ""
+
+msgid "This is a custom cell"
+msgstr ""
 
 msgid "Convert a ODF file into an indented xml"
 msgstr ""

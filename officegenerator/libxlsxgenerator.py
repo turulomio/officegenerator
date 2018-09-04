@@ -17,6 +17,8 @@ import os
 import pkg_resources
 
 from officegenerator.commons import columnAdd, makedirs, rowAdd
+from officegenerator.libodfgenerator import OdfMoney, OdfPercentage
+from decimal import Decimal
 
 
 try:
@@ -35,168 +37,13 @@ class OpenPyXL:
             self.wb=openpyxl.load_workbook(self.template)
 
         self.ws_current_id=id
+        
+        self.stOrange=openpyxl.styles.Color('FFFFDCA8')
+        self.stYellow=openpyxl.styles.Color('FFFFFFC0')
+        self.stGreen=openpyxl.styles.Color('FFC0FFC0')
+        self.stGreyLight=openpyxl.styles.Color('FFDCDCDC')
+        self.stGreyDark=openpyxl.styles.Color('FFC3C3C3')
 
-#        self.stNormal=openpyxl.styles.NamedStyle( 
-#            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
-#            font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
-#            border=openpyxl.styles.Border(
-#                left=openpyxl.styles.Side(border_style='thin'),
-#                top=openpyxl.styles.Side(border_style='thin'),
-#                right=openpyxl.styles.Side(border_style='thin'),
-#                bottom=openpyxl.styles.Side(border_style='thin') 
-#            ), 
-#            number_format="#,##0"
-#        )        
-        self.stNormalDecimal=openpyxl.styles.NamedStyle( 
-            name="NormalDecimal",
-            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            ), 
-            number_format="#,##0.00"
-        )
-        
-        self.stNormalEuros=openpyxl.styles.NamedStyle(
-            name="NormalEuros",
-            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            ), 
-            number_format="#,##0.00 €"
-        )        
-        
-        self.stNormalLeft=openpyxl.styles.NamedStyle( 
-            name="NormalLeft",
-            alignment=openpyxl.styles.Alignment(horizontal='left', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            ), 
-            number_format="#,##0"
-        )
-        
-        self.stNormalCenter=openpyxl.styles.NamedStyle( 
-            name="NormalCenter",
-            alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=False), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            ),
-        )
-        self.stOrange=openpyxl.styles.NamedStyle(
-            name="Orange",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFFFDCA8')), 
-            alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            )
-        )
-        self.stYellow=openpyxl.styles.NamedStyle(
-            name="Yellow",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFFFFFC0')), 
-            alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            )
-        )
-        self.stGreen=openpyxl.styles.NamedStyle(
-            name="Green",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFC0FFC0')), 
-            alignment=openpyxl.styles.Alignment(horizontal='left', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            )
-        )
-        self.stGrey1=openpyxl.styles.NamedStyle(
-            name="Grey1",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFDCDCDC')), 
-            alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            )
-        )
-        self.stGrey2=openpyxl.styles.NamedStyle(
-            name="Grey2",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFC3C3C3')), 
-            alignment=openpyxl.styles.Alignment(horizontal='center', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            )
-        )
-        
-        self.stGrey1Number=openpyxl.styles.NamedStyle(
-            name="Grey1Number",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFDCDCDC')), 
-            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin')
-            ), 
-            number_format="#,##0"
-        )
-        self.stGrey1Euros=openpyxl.styles.NamedStyle(
-            name="Grey1Euros",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFDCDCDC')), 
-            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin')
-            ), 
-            number_format="#,##0.00 €"
-        )
-
-        self.stGrey2Number=openpyxl.styles.NamedStyle(
-            name="Grey2Number",
-            fill=openpyxl.styles.PatternFill(patternType='solid', fgColor=openpyxl.styles.Color('FFC3C3C3')), 
-            alignment=openpyxl.styles.Alignment(horizontal='right', vertical='center'), 
-            font=openpyxl.styles.Font(name='Arial', size=10, bold=True), 
-            border=openpyxl.styles.Border(
-                left=openpyxl.styles.Side(border_style='thin'),
-                top=openpyxl.styles.Side(border_style='thin'),
-                right=openpyxl.styles.Side(border_style='thin'),
-                bottom=openpyxl.styles.Side(border_style='thin') 
-            )
-        )
     def freezePanels(self, cell):
         """Cell is string coordinates"""
         ws=self.get_sheet_by_id(self.ws_current_id)
@@ -259,48 +106,75 @@ class OpenPyXL:
         
         if os.path.exists(filename)==False:
             print( "*** ERROR: El fichero no se ha generado ***")
+            
+    def overwrite_cell(self):
+        print("Hacer para pasar custom cells")
 
-    def overwrite(self, letter, number, result, ws=None, style=None):
-        """Writes in aself.ws_current worksheet from cell, (letter, number) the array result"""
-        def setStyle(cell, value, style):
-            if style==None:#Auto
-                if value.__class__ in(datetime.datetime, str):
-                    cell.style=self.stNormalLeft
-            else:
-                cell.style=style
-        def setValue(cell, value, style):
-            if value.__class__ in (str, int, float):#Un solo valor
+    ## Writes a cell
+    ## @param alignment String None by default. Can be "right","left","center"
+    ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGreyDark, stGreyLight, stOrange, stYellow
+    ## @param decimals Integer with the number of decimals. 2 by default
+    def overwrite(self, letter, number, result, ws=None, style=None,  decimals=2, alignment=None):
+        def setValue(cell, value, style, decimals, alignment):
+            if value.__class__ in (int, ):#Un solo valor
                 cell.value=value
-                setStyle(cell, value, style)
+                cell.number_format="#.###;[RED]-#.###"
+                alignment='right' if alignment==None else alignment
+            elif value.__class__ in (float, Decimal):#Un solo valor
+                cell.value=value
+                alignment='right' if alignment==None else alignment
+                cell.number_format="#.##0,00;[RED]-#.##0,00"
+            elif value.__class__ in (str, ):#Un solo valor
+                cell.value=value
+                alignment='left' if alignment==None else alignment
             elif value.__class__ in (datetime.datetime, ):
                 cell.value=value
-                setStyle(cell, value, style)
+                alignment='left' if alignment==None else alignment
                 cell.number_format="YYYY-MM-DD HH:mm"
             elif value.__class__ in (datetime.date, ):
                 cell.value=value
-                setStyle(cell, value, style)
+                alignment='left' if alignment==None else alignment
                 cell.number_format="YYYY-MM-DD"
+            elif value.__class__ in (OdfMoney, ):
+                cell.value=value.amount
+                alignment='right' if alignment==None else alignment
+                #zeros=decimals*"0"
+                cell.number_format="#.##0,00 {0};[RED]-#.##0,00 {0}".format(value.currency)
+                print(cell.number_format)
+            elif value.__class__ in (OdfPercentage, ):
+                cell.value=value.value
+                alignment='right' if alignment==None else alignment
+                cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
             elif value==None:
-                pass
+                return
             else:
                 print(value.__class__, "VALUE CLASS NOT FOUND")
+            if style!=None:
+                cell.fill=openpyxl.styles.PatternFill("solid", fgColor=style)
+            bold=False if style==None else True
+            cell.font=openpyxl.styles.Font(name='Arial', size=10, bold=bold)
+            cell.border=openpyxl.styles.Border(
+                left=openpyxl.styles.Side(border_style='thin'),
+                top=openpyxl.styles.Side(border_style='thin'),
+                right=openpyxl.styles.Side(border_style='thin'),
+                bottom=openpyxl.styles.Side(border_style='thin') 
+            )
+            cell.alignment=openpyxl.styles.Alignment(horizontal=alignment, vertical='center')
         ################################################
         if ws==None:
             ws=self.get_sheet_by_id(self.ws_current_id)
-        if result.__class__ in (str, int, float, datetime.datetime):#Un solo valor
-            c=ws[letter+number]
-            setValue(c, result, style)
-        elif result.__class__ in (list,):#Una lista
+        if result.__class__== list:#Una lista
             for i,row in enumerate(result):
-                if row.__class__ in (int, str, float, datetime.datetime):#Una lista de una columna
-                    c=ws[letter+rowAdd(number,i)]
-                    setValue(c, result[i], style)
-                elif row.__class__ in (list, ):#Una lista de varias columnas
+                if row.__class__ in (list, ):#Una lista de varias columnas
                     for j,column in enumerate(row):
                         c=ws[columnAdd(letter, j)+rowAdd(number,i)]
-                        setValue(c, result[i][j], style)
-                else:
-                    print(row.__class__, "ROW CLASS NOT FOUND",  row)
+                        setValue(c, result[i][j], style, decimals, alignment)
+                else:#Una lista de una columna
+                    c=ws[letter+rowAdd(number,i)]
+                    setValue(c, result[i], style, decimals, alignment)
+        else:#Un solo valor
+            c=ws[letter+number]
+            setValue(c, result, style, decimals, alignment)
 
     ## Sets cell name to use in formulas
     def setCellName(self, range, name):

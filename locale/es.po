@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-24 03:51+0200\n"
+"POT-Creation-Date: 2018-09-04 20:50+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -17,6 +17,39 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Styles"
+msgstr "Estilos"
+
+msgid "Style name"
+msgstr "Nombre de estilo"
+
+msgid "Date and time"
+msgstr "Fecha y hora"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Integer"
+msgstr "Entero"
+
+msgid "Euros"
+msgstr "Euros"
+
+msgid "Percentage"
+msgstr "Porcentaje"
+
+msgid "Number with 2 decimals"
+msgstr "Número con 2 decimales"
+
+msgid "Number with 6 decimals"
+msgstr "Número con 6 decimales"
+
+msgid "This is a comment"
+msgstr "Esto es un comentario"
+
+msgid "This is a custom cell"
+msgstr "Esto es una celda modificada"
 
 msgid "Convert a ODF file into an indented xml"
 msgstr "Convierte un fichero ODF en un xml indentado"
