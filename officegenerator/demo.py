@@ -157,7 +157,13 @@ def main():
 def demo_xlsx():
     xlsx=OpenPyXL("officegenerator.xlsx")
     xlsx.setCurrentSheet(0)
-    xlsx.overwrite("A","1", "Title", style=xlsx.stOrange)
+
+    xlsx.overwrite("A","1", "Style name", style=xlsx.stOrange)
+    xlsx.overwrite("B","1", "Result", style=xlsx.stOrange)
+
+    xlsx.overwrite("A","2", "Orange", style=xlsx.stOrange)
+    xlsx.overwrite("B","2", "Texto", style=xlsx.stOrange)
+
     xlsx.save()
 
 if __name__ == "__main__":

@@ -287,7 +287,6 @@ class OpenPyXL:
         if ws==None:
             ws=self.get_sheet_by_id(self.ws_current_id)
         if result.__class__ in (str, int, float, datetime.datetime):#Un solo valor
-            print(ws)
             c=ws[letter+number]
             setValue(c, result, style)
         elif result.__class__ in (list,):#Una lista
