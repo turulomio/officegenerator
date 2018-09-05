@@ -1,6 +1,7 @@
 ## @namespace officegenerator.libxlsxgenerator
 ## @brief Este módulo permite la lectura y escritura de ficheros xlsx de Microsoft Excel
-
+##
+## You can change current sheet, with createSheet or using setCurrentSheet. After that all commands will use that sheet until you change it again
 import datetime
 import gettext
 import openpyxl
@@ -32,67 +33,79 @@ class OpenPyXL:
         else:
             self.wb=openpyxl.load_workbook(self.template)
 
-        self.ws_current_id=id
-        
+        self.ws_current=self.wb.active
+        self.setCurrentSheet(self.ws_current.title)
+
         self.stOrange=openpyxl.styles.Color('FFFFDCA8')
         self.stYellow=openpyxl.styles.Color('FFFFFFC0')
         self.stGreen=openpyxl.styles.Color('FFC0FFC0')
         self.stGreyLight=openpyxl.styles.Color('FFDCDCDC')
         self.stGreyDark=openpyxl.styles.Color('FFC3C3C3')
 
-    def freezePanels(self, cell):
-        """Cell is string coordinates"""
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        ws.freeze_panes=ws.cell(cell)
+    ## Freezes panels
+    ## @param strcell String For example "A2"
+    def freezePanels(self, strcell):
+        self.ws_current.freeze_panes=self.ws_current.cell(strcell)
         
-    def setSelectedCell(self, cell):
-        """Cell is string coordinates
+    ## Selects a cell
+    ## @param strcell String For example "A2"
+    def setSelectedCell(self, strcell):
+        self.ws_current.sheet_view.pane.topLeftCell=strcell
+        self.ws_current.sheet_view.selection=[]
+        self.ws_current.sheet_view.selection.append(openpyxl.worksheet.Selection("topLeft", strcell, None, strcell))
         
-        Estaq función fue echa a modo prueba error"""
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        ws.sheet_view.pane.topLeftCell=cell
-        ws.sheet_view.selection=[]
-        ws.sheet_view.selection.append(openpyxl.worksheet.Selection("topLeft", cell, None, cell))
-        
-
+    ## Changes name of the current sheet
     def setSheetName(self, name):
-        """Changes current id"""
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        ws.title=name
+        self.ws_current.title=name
 
+    ## Create a sheet at the end, renames it and selects it as current
     def createSheet(self, name):
-        """Create a sheet at the end, renames it and selects it as current"""
         self.wb.create_sheet(title=name)
-        self.ws_current_id=self.get_sheet_id(name)
-        
+        self.setCurrentSheet(name)
+
+    ## Function that establishes current worksheet. Updates self.ws_current and self.ws_current_id
+    ##
+    ## id Is a integer beginning with 0
+    ## name is the title of the sheet
+    ## @param id_or_name Index or Nmae
+    def setCurrentSheet(self, id_or_name):
+        if id_or_name.__class__==int:
+            self.ws_current_id=id_or_name
+        else:#name
+            self.ws_current_id=self.get_sheet_id(id_or_name)
+        self.ws_current=self.get_sheet_by_id(self.ws_current_id)
+
     def setColorScale(self, range):
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        ws.conditional_formatting.add(range, 
+        self.ws_current.conditional_formatting.add(range, 
                             openpyxl.formatting.rule.ColorScaleRule(
                                                 start_type='percentile', start_value=0, start_color='00FF00',
                                                 mid_type='percentile', mid_value=50, mid_color='FFFFFF',
                                                 end_type='percentile', end_value=100, end_color='FF0000'
                                                 )   
                                             )
-
+    ## Returns sheet_name
     def sheet_name(self, id=None):
         if id==None:
             id=self.ws_current_id
         return self.wb.sheetnames()[id]
 
+
+    ## It returns a sheet object with the index id
     def get_sheet_by_id(self, id):
         return self.wb[self.wb.sheetnames[id]]
 
+    ## It returns a index integer of the sheet with a given name
     def get_sheet_id(self, name):
         for id, s_name in enumerate(self.wb.sheetnames):
             if s_name==name:
                 return id
         return None
 
+    ## After removing it sets current sheet to 0 index
     def remove_sheet_by_id(self, id):
         ws=self.get_sheet_by_id(id)
         self.wb.remove_sheet(ws)
-        self.get_sheet_by_id(0)
+        self.setCurrentSheet(0)
 
     def save(self, filename=None):
         if filename==None:
@@ -103,14 +116,16 @@ class OpenPyXL:
         if os.path.exists(filename)==False:
             print(_("*** ERROR: File wasn't generated ***"))
 
-
-
+    ## Returns a cell object in the current sheet
+    ## @param letter
+    ## @param number
+    ## @return sheet
+    def cell(self,letter,number):
+        return self.ws_current[letter+number]
 
     ## Internal function that uses overwrite to set style to a cell
     def __setValue(self, letter, number, value, style, decimals, alignment):
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        cell=ws[letter+number]
-        self.__setValue_by_cell(cell,value,style,decimals,alignment)
+        self.__setValue_by_cell(self.cell(letter,number),value,style,decimals,alignment)
 
     ## Internat function to set a cell style passing a cell
     def __setValue_by_cell(self, cell, value, style, decimals, alignment):
@@ -176,33 +191,23 @@ class OpenPyXL:
 
     ## Sets cell name to use in formulas
     def setCellName(self, range, name):
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        self.wb.create_named_range(name, ws, range)
-
-    ## Sets the corrent sheet 
-    ## @param id Integer with the index of the sheet
-    def setCurrentSheet(self, id):
-        self.ws_current_id=id
+        self.wb.create_named_range(name, self.ws_current, range)
 
     ## Set columns width in current sheet
     ## @param arrWidths List with integers representing column width
     def setColumnsWidth(self, arrWidths):
-        ws=self.get_sheet_by_id(self.ws_current_id)
         for i in range(len(arrWidths)):
-            ws.column_dimensions[columnAdd("A", i)].width=arrWidths[i]
-
+            self.ws_current.column_dimensions[columnAdd("A", i)].width=arrWidths[i]
 
     ## Function to merge cells 
     ## @param range String for example: A1:B1
     ## @param style was added to avoid formating errors after merging
     def mergeCells(self, range, style=None, decimals=None, alignment=None):
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        for row in ws[range]: #Returns a list of cells
+        for row in self.ws_current[range]: #Returns a list of cells
             for cell in row:
                 self.__setValue_by_cell(cell, cell.value, style, decimals, alignment)
-        ws.merge_cells(range)
+        self.ws_current.merge_cells(range)
 
     def setComment(self, cell, comment):
         """Cell is string coordinates"""
-        ws=self.get_sheet_by_id(self.ws_current_id)
-        ws[cell].comment=openpyxl.comments.Comment(comment, "PySGAE")
+        self.ws_current[cell].comment=openpyxl.comments.Comment(comment, "PySGAE")
