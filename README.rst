@@ -26,9 +26,11 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
-X.X.X
+0.8.0
   * __version__ is now in commons
   * Improved spanish translation
+  * Solved problem with merged cells
+  * Added overwrite_and_merge to XLSX generator
 0.7.0
   * Replaced predefined styles by predefined colors
   * Added officegenerator.xlsx to demo

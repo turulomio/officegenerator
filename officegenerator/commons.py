@@ -8,8 +8,8 @@ import pkg_resources
 import warnings
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '0.7.0'
-__versiondate__=datetime.date(2018,9,4)
+__version__ = '0.8.0'
+__versiondate__=datetime.date(2018,9,5)
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
