@@ -192,7 +192,13 @@ def demo_xlsx():
     cell=xlsx.wb.active['B12']
     cell.font=openpyxl.styles.Font(name='Arial', size=16, bold=True, color=openpyxl.styles.colors.RED)
     cell.value=_("This is a custom cell")
+    #Merge cells
+    xlsx.overwrite("A", "13", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
+    xlsx.mergeCells("A13:C14",style=xlsx.stOrange)
+
+
     xlsx.save()
+
 
 if __name__ == "__main__":
     main()
