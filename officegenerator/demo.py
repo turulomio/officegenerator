@@ -193,8 +193,8 @@ def demo_xlsx():
     cell.font=openpyxl.styles.Font(name='Arial', size=16, bold=True, color=openpyxl.styles.colors.RED)
     cell.value=_("This is a custom cell")
     #Merge cells
-    xlsx.overwrite("A", "13", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
-    xlsx.mergeCells("A13:C14",style=xlsx.stOrange)
+    xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
+    xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGreyDark, alignment="right")
 
 
     xlsx.save()

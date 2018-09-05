@@ -13,7 +13,7 @@ import openpyxl.formatting.rule
 import os
 import pkg_resources
 
-from officegenerator.commons import columnAdd, makedirs, rowAdd
+from officegenerator.commons import columnAdd, makedirs, rowAdd, deprecated
 from officegenerator.libodfgenerator import OdfMoney, OdfPercentage
 from decimal import Decimal
 
@@ -123,12 +123,9 @@ class OpenPyXL:
     def cell(self,letter,number):
         return self.ws_current[letter+number]
 
-    ## Internal function that uses overwrite to set style to a cell
-    def __setValue(self, letter, number, value, style, decimals, alignment):
-        self.__setValue_by_cell(self.cell(letter,number),value,style,decimals,alignment)
-
-    ## Internat function to set a cell style passing a cell
-    def __setValue_by_cell(self, cell, value, style, decimals, alignment):
+    ## Internat function to set a cell. All properties except border that it's setted in overwrite functions (merged and no merged)
+    ## @param cell is a cell object
+    def __setValue(self, cell, value, style, decimals, alignment):
         if value.__class__ in (int, ):#Un solo valor
             cell.value=value
             cell.number_format="#.###;[RED]-#.###"
@@ -166,12 +163,6 @@ class OpenPyXL:
             cell.fill=openpyxl.styles.PatternFill("solid", fgColor=style)
         bold=False if style==None else True
         cell.font=openpyxl.styles.Font(name='Arial', size=10, bold=bold)
-        cell.border=openpyxl.styles.Border(
-            left=openpyxl.styles.Side(border_style='thin'),
-            top=openpyxl.styles.Side(border_style='thin'),
-            right=openpyxl.styles.Side(border_style='thin'),
-            bottom=openpyxl.styles.Side(border_style='thin') 
-        )
         cell.alignment=openpyxl.styles.Alignment(horizontal=alignment, vertical='center')
 
     ## Writes a cell
@@ -183,11 +174,27 @@ class OpenPyXL:
             for i,row in enumerate(result):
                 if row.__class__ in (list, ):#Una lista de varias columnas
                     for j,column in enumerate(row):
-                        self.__setValue(columnAdd(letter, j), rowAdd(number, i), result[i][j], style, decimals, alignment)
+                        cell=self.cell(columnAdd(letter, j), rowAdd(number, i))
+                        self.__setValue(cell, result[i][j], style, decimals, alignment)
+                        self.__setBorder(cell)
                 else:#Una lista de una columna
-                    self.__setValue(letter, rowAdd(number,i), result[i], style, decimals, alignment)
+                    cell=self.cell(letter, rowAdd(number, i))
+                    self.__setValue(cell, result[i], style, decimals, alignment)
+                    self.__setBorder(cell)
         else:#Un solo valor
-            self.__setValue(letter, number, result, style, decimals, alignment)
+            cell=self.cell(letter, number)
+            self.__setValue(cell, result, style, decimals, alignment)
+            self.__setBorder(cell)
+
+
+    #Sets border to a cell not merged
+    def __setBorder(self, cell):
+        cell.border=openpyxl.styles.Border(
+            left=openpyxl.styles.Side(border_style='thin'),
+            top=openpyxl.styles.Side(border_style='thin'),
+            right=openpyxl.styles.Side(border_style='thin'),
+            bottom=openpyxl.styles.Side(border_style='thin') 
+        )
 
     ## Sets cell name to use in formulas
     def setCellName(self, range, name):
@@ -202,12 +209,39 @@ class OpenPyXL:
     ## Function to merge cells 
     ## @param range String for example: A1:B1
     ## @param style was added to avoid formating errors after merging
+    @deprecated
     def mergeCells(self, range, style=None, decimals=None, alignment=None):
         for row in self.ws_current[range]: #Returns a list of cells
             for cell in row:
                 self.__setValue_by_cell(cell, cell.value, style, decimals, alignment)
         self.ws_current.merge_cells(range)
 
-    def setComment(self, cell, comment):
-        """Cell is string coordinates"""
-        self.ws_current[cell].comment=openpyxl.comments.Comment(comment, "PySGAE")
+
+    ## Result must be the value only for the first cell
+    def overwrite_and_merge(self, cell_range,  result, style=None,  decimals=2, alignment=None):
+        self.ws_current.merge_cells(cell_range)
+        top = openpyxl.styles.Border(top=openpyxl.styles.Side(border_style='thin'))
+        left = openpyxl.styles.Border(left=openpyxl.styles.Side(border_style='thin'))
+        right = openpyxl.styles.Border(right=openpyxl.styles.Side(border_style='thin'))
+        bottom = openpyxl.styles.Border(bottom=openpyxl.styles.Side(border_style='thin'))
+
+        first_cell = self.ws_current[cell_range.split(":")[0]]
+        self.__setValue(first_cell, result, style, decimals, alignment)
+
+        rows = self.ws_current[cell_range]
+
+        for cell in rows[0]:
+            cell.border = cell.border + top
+        for cell in rows[-1]:
+            cell.border = cell.border + bottom
+
+        for row in rows:
+            l = row[0]
+            r = row[-1]
+            l.border = l.border + left
+            r.border = r.border + right
+
+    ## Sets a comment
+    ## @param strcell String "A1" for example
+    def setComment(self, strcell, comment):
+        self.ws_current[strcell].comment=openpyxl.comments.Comment(comment, "PySGAE")

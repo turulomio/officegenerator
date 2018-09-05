@@ -1,9 +1,11 @@
 ## @namespace officegenerator.commons
 ## @brief Common code to odfpy and openpyxl wrappers
 import datetime
+import functools
 import gettext
 import os
 import pkg_resources
+import warnings
 from odf.opendocument import  __version__ as __odfpy_version__
 
 __version__ = '0.7.0'
@@ -14,6 +16,22 @@ try:
     _=t.gettext
 except:
     _=str
+
+
+def deprecated(func):
+     """This is a decorator which can be used to mark functions
+     as deprecated. It will result in a warning being emitted
+     when the function is used."""
+     @functools.wraps(func)
+     def new_func(*args, **kwargs):
+         warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+         warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                       category=DeprecationWarning,
+                       stacklevel=2)
+         warnings.simplefilter('default', DeprecationWarning)  # reset filter
+         return func(*args, **kwargs)
+     return new_func
+
 
 ## Function used in argparse_epilog
 ## @return String
