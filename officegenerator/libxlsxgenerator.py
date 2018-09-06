@@ -213,7 +213,7 @@ class OpenPyXL:
     def mergeCells(self, range, style=None, decimals=None, alignment=None):
         for row in self.ws_current[range]: #Returns a list of cells
             for cell in row:
-                self.__setValue_by_cell(cell, cell.value, style, decimals, alignment)
+                self.__setValue(cell, cell.value, style, decimals, alignment)
         self.ws_current.merge_cells(range)
 
 
