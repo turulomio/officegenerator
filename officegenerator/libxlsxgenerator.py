@@ -45,15 +45,15 @@ class OpenPyXL:
     ## Freezes panels
     ## @param strcell String For example "A2"
     def freezePanels(self, strcell):
-        self.ws_current.freeze_panes=self.ws_current.cell(strcell)
-        
+        self.ws_current.freeze_panes=self.ws_current[strcell]
+
     ## Selects a cell
     ## @param strcell String For example "A2"
     def setSelectedCell(self, strcell):
-        self.ws_current.sheet_view.pane.topLeftCell=strcell
-        self.ws_current.sheet_view.selection=[]
-        self.ws_current.sheet_view.selection.append(openpyxl.worksheet.Selection("topLeft", strcell, None, strcell))
-        
+#        self.ws_current.sheet_view.pane.topLeftCell=strcell
+#        self.ws_current.sheet_view.selection=[]
+#        self.ws_current.sheet_view.selection.append(openpyxl.worksheet.Selection("topLeft", strcell, None, strcell))
+        self.ws_current.views.sheetView[0].selection[0].activeCell=strcell
     ## Changes name of the current sheet
     def setSheetName(self, name):
         self.ws_current.title=name

@@ -195,6 +195,8 @@ def demo_xlsx():
     #Merge cells
     xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
     xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGreyDark, alignment="right")
+    xlsx.setSelectedCell("B10")
+    xlsx.freezePanels("A8")
 
 
     xlsx.save()
