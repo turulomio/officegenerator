@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+0.9.0
+  * Solved problem with freeze and setselectedcell
 0.8.0
   * __version__ is now in commons
   * Improved spanish translation

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-04 22:18+0200\n"
+"POT-Creation-Date: 2018-09-06 09:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,6 +66,12 @@ msgid "This is a comment"
 msgstr ""
 
 msgid "This is a custom cell"
+msgstr ""
+
+msgid "This cell is going to be merged with B13 and C13"
+msgstr ""
+
+msgid "This cell is going to be merged and aligned"
 msgstr ""
 
 msgid "*** ERROR: File wasn't generated ***"
