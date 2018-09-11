@@ -105,3 +105,30 @@ def makedirs(dir):
 
 def ODFPYversion():
     return __odfpy_version__.split("/")[1]
+
+
+class SheetCoord:
+    def __init__(self, strcoord):
+        self.letter, self.number=self.__extract(strcoord)
+    def __extract(self, strcoord):
+        if strcoord.contains(":"):
+            print("I can't manage range coord")
+            return
+        letter=""
+        number=""
+        for l in strcoord:
+            if l.isdigit()==False:
+                letter=letter+l
+            else:
+                number=number+l
+        return (letter,number)
+
+class SheetRange:
+    def __init__(self,strrange):
+        self.start, self.end=self.__extract(strrange)
+    def __extract(self,range):
+        if not range.contains(":"):
+            print("I can't manage this range")
+            return
+        a=range.split(":")
+        return (SheetCoord(a[0]), SheetCoord(a[1]))

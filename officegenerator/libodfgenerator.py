@@ -155,6 +155,7 @@ removeChild(oldchild) – Re
             print("You can't overwrite a readed ods")
             return        
         self.doc.save( filename)
+
 class ODF:
     def __init__(self, filename):
         self.filename=filename
@@ -1150,7 +1151,6 @@ class ODS_Write(ODS):
             self.doc.styles.addElement(hs)
 
         def styleCurrrencies():
-            
             # Create the styles for $AUD format currency values
             ns1 = CurrencyStyle(name="EuroBlack", volatile="true")
             ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
@@ -1191,7 +1191,7 @@ class ODS_Write(ODS):
     #        pourcent.addElement(ParagraphProperties(textalign='end'))
     #        pourcent.addElement(TextProperties(attributes={'fontsize':"10pt",'fontweight':"bold", 'color':"#000000" }))
             self.doc.automaticstyles.addElement(pourcent)
-            
+
         def styleDatetimes():
             #create custom format in styles.xml
             date_style = DateStyle(name="DatetimeBlack") #, language="lv", country="LV")
