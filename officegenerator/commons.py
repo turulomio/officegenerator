@@ -107,11 +107,11 @@ def ODFPYversion():
     return __odfpy_version__.split("/")[1]
 
 
-class SheetCoord:
+class Coord:
     def __init__(self, strcoord):
         self.letter, self.number=self.__extract(strcoord)
     def __extract(self, strcoord):
-        if strcoord.contains(":"):
+        if strcoord.find(":")!=-1:
             print("I can't manage range coord")
             return
         letter=""
@@ -123,12 +123,37 @@ class SheetCoord:
                 number=number+l
         return (letter,number)
 
-class SheetRange:
+    def addRow(self, num=1):
+        self.number=str(int(self.number)+num)
+        return self
+
+    @staticmethod
+    def assertCoord(o):
+        if o.__class__==Coord:
+            return o
+        elif o.__class__==str:
+            return Coord(o)
+
+class Range:
     def __init__(self,strrange):
         self.start, self.end=self.__extract(strrange)
+
     def __extract(self,range):
-        if not range.contains(":"):
+        if range.find(":")==-1:
             print("I can't manage this range")
             return
         a=range.split(":")
-        return (SheetCoord(a[0]), SheetCoord(a[1]))
+        return (Coord(a[0]), Coord(a[1]))
+
+    def numRows(self):
+        return row2number(self.start.number)-row2number(self.end.number)
+
+    def numColumns(self):
+        return column2number(self.start.letter)-column2number(self.end.letter)
+
+    @staticmethod
+    def assertRange(o):
+        if o.__class__==Range:
+            return o
+        elif o.__class__==str:
+            return Range(o)

@@ -18,7 +18,7 @@ from odf.dc import Creator, Description, Title, Date
 from odf.meta import InitialCreator
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import makedirs,  column2index, column2number,  row2index,  row2number,  number2column,  number2row, rowAdd, columnAdd
+from officegenerator.commons import makedirs,  column2index, column2number,  row2index,  row2number,  number2column,  number2row, rowAdd, columnAdd, Coord, Range
 
 from decimal import Decimal
 
@@ -662,6 +662,10 @@ B1:
         """
         c=self.getCell(letter, number)
         c.setComment(comment)
+        
+    def setCommentWithCoord(self, coord, comment):
+        coord=Coord.assertCoord(coord)
+        self.setComment(coord.letter, coord.number, comment)
 
     def setColumnsWidth(self, widths, unit="pt"):
         """
@@ -712,6 +716,18 @@ B1:
                         self.addCell(OdfCell(columnAdd(letter, j), rowAdd(number, i), result[i][j], style))
                 else:
                     logging.warning(row.__class__, "ROW CLASS NOT FOUND",  row)
+
+
+    ## @param coord can be a string or a Coord object
+    def addWithCoord(self, coord, result, style=None, alignment=None, decimals=None):
+        coord=Coord.assertCoord(coord)
+        self.add(coord.letter, coord.number, result, style)
+
+    ## @param range Range
+    def addMerged(self, range, result, style=None):
+        range=Range.assertRange(range)
+        self.addWithCoord(range.start, result, style)
+        self.mergeCells(range.start.letter, range.start.number, range.numColumns(),range.numRows())
 
     def generate(self, ods):
         # Start the table

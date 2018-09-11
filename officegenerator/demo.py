@@ -10,7 +10,7 @@ import pkg_resources
 from officegenerator.commons import __version__
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, OdfPercentage, OdfMoney, rowAdd
 from officegenerator.libxlsxgenerator import OpenPyXL
-from officegenerator.commons import argparse_epilog
+from officegenerator.commons import argparse_epilog, Coord
 from odf.text import P
 import openpyxl.styles
 
@@ -126,6 +126,36 @@ def demo_ods():
     s4.setSplitPosition("C", "3")
 
     doc.setActiveSheet(s3)
+
+    s5=doc.createSheet("Format number")
+    s5.setColumnsWidth([200, 200, 200, 200, 200, 200, 200, 200])
+
+    s5.addWithCoord("A1", _("Style name"))
+    s5.addWithCoord("B1", _("Date and time"))
+    s5.addWithCoord("C1", _("Date"))
+    s5.addWithCoord("D1", _("Integer"))
+    s5.addWithCoord("E1", _("Euros"))
+    s5.addWithCoord("F1", _("Percentage"))
+    s5.addWithCoord("G1", _("Number with 2 decimals"))
+    s5.addWithCoord("H1", _("Number with 6 decimals"))
+    for row, style in enumerate(["HeaderOrange"]):
+        name= [ k for k,v in locals().items() if v is style][0]
+        s5.addWithCoord(Coord("A2").addRow(row), name, style=style)
+        s5.addWithCoord(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
+        s5.addWithCoord(Coord("C2").addRow(row), datetime.date.today(), style=style)
+        s5.addWithCoord(Coord("D2").addRow(row), pow(-1, row)*-10000000, style=style)
+        s5.addWithCoord(Coord("E2").addRow(row), OdfMoney(12.56, "€"), style=style, decimals=row+1)
+        s5.addWithCoord(Coord("F2").addRow(row), OdfPercentage(1, 3), style=style,  decimals=row+1)
+        s5.addWithCoord(Coord("G2").addRow(row), pow(-1, row)*12.121212, style=style, decimals=2)
+        s5.addWithCoord(Coord("H2").addRow(row), pow(-1, row)*-12.121212, style=style, decimals=6)
+    s5.setCommentWithCoord("B2", _("This is a comment"))
+    
+    #Merge cells
+    s5.addMerged("A13:C14", _("This cell is going to be merged with B13 and C13"))
+    s5.addMerged("A18:G18", _("This cell is going to be merged and aligned"))
+    s5.setCursorPosition("B","10")
+    s5.setSplitPosition("A","8")
+
     doc.save()
 
 def demo_odt():
