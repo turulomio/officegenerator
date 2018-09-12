@@ -325,6 +325,9 @@ def ODFPYversion():
 class Coord:
     def __init__(self, strcoord):
         self.letter, self.number=self.__extract(strcoord)
+    def __repr__(self):
+        return "Coord <{}>".format(self.string())
+
     def __extract(self, strcoord):
         if strcoord.find(":")!=-1:
             print("I can't manage range coord")
@@ -337,10 +340,29 @@ class Coord:
             else:
                 number=number+l
         return (letter,number)
+        
+    def string(self):
+        return self.letter+self.number
 
     def addRow(self, num=1):
-        self.number=str(int(self.number)+num)
-        return self
+        number=rowAdd(self.number, num)
+        return Coord(self.letter+ number)
+
+    def addColumn(self, num=1):
+        letter=columnAdd(self.letter, num)
+        return Coord(letter+self.number)
+        
+    def letterIndex(self):
+        return column2index(self.letter)
+        
+    def letterPosition(self):
+        return column2number(self.letter)
+
+    def numberIndex(self):
+        return row2index(self.number)
+        
+    def numberPosition(self):
+        return row2number(self.number)
 
     @staticmethod
     def assertCoord(o):
@@ -359,6 +381,9 @@ class Range:
             return
         a=range.split(":")
         return (Coord(a[0]), Coord(a[1]))
+
+    def string(self):
+        return "{}:{}".format(self.start.string(), self.end.string())
 
     def numRows(self):
         return row2number(self.end.number)-row2number(self.start.number) +1

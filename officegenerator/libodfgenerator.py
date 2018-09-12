@@ -19,7 +19,7 @@ from decimal import Decimal
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
 
-from officegenerator.commons import makedirs,  column2index, column2number,  row2index,  row2number,  number2column,  number2row, rowAdd, columnAdd, Coord, Range,  Percentage, Currency,  deprecated
+from officegenerator.commons import makedirs,  column2index,  row2index,   number2column,  number2row,  Coord, Range,  Percentage, Currency
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -38,16 +38,7 @@ class ColumnWidthODS:
     XXL=200
     XXXL=250
     XXXXL=300
-    
-class OdfPercentage(Percentage):
-    @deprecated
-    def __init__(self, numerator=None, denominator=None):
-        Percentage.__init__(self, numerator, denominator)
 
-class OdfMoney(Currency):
-    @deprecated
-    def __init__(self, amount=None, currency='EUR'):
-        Currency.__init__(self, amount, currency)
 
 class ODS_Read:
     def __init__(self, filename):
@@ -99,11 +90,11 @@ class ODS_Read:
         if cell.getAttribute('valuetype')=='float':
             r=Decimal(cell.getAttribute('value'))
         if cell.getAttribute('valuetype')=='percentage':
-            r=OdfPercentage(Decimal(cell.getAttribute('value')), Decimal(1))
+            r=Percentage(Decimal(cell.getAttribute('value')), Decimal(1))
         if cell.getAttribute('formula')!=None:
             r=str(cell.getAttribute('formula'))[3:]
         if cell.getAttribute('valuetype')=='currency':
-            r=OdfMoney(Decimal(cell.getAttribute('value')), cell.getAttribute('currency'))
+            r=Currency(Decimal(cell.getAttribute('value')), cell.getAttribute('currency'))
         if cell.getAttribute('valuetype')=='date':
             datevalue=cell.getAttribute('datevalue')
             if len(datevalue)<=10:
@@ -175,6 +166,8 @@ removeChild(oldchild) – Re
             return        
         self.doc.save( filename)
 
+
+## Abstract class the defines opendocument metadata, images, languages
 class ODF:
     def __init__(self, filename):
         self.filename=filename
@@ -200,7 +193,8 @@ class ODF:
         """Set the main language of the document"""
         self.language="es"
         self.country="ES"
-        
+
+## Class used to generate a ODT file with predefined formats
 class ODT(ODF):
     def __init__(self, filename, template=None, language="es", country="ES"):
         def styleGraphics():
@@ -555,32 +549,45 @@ class ODT(ODF):
 
 
 
+## Creates a cell
+##  Constructor can be
+## 4 args letter, number, object, style
 class OdfCell:
-    def __init__(self, letter, number, object, style=None):
-        """
-            Object can be OdfMoney,OdfPercentage, String, datetime.date, datetime.datetime, Decimal
-        """
-        self.letter=letter
-        self.number=number
-        self.object=object
-        self.style=style
+    def __init__(self, *args):
+        def init_letter_number(letter, number, object, style):
+            self.letter=letter
+            self.number=number
+            self.object=object
+            self.style=style
+            self.coord=Coord(self.letter+self.number)
+        def init_coord(coord, object, style):
+            self.coord=Coord.assertCoord(coord)
+            self.object=object
+            self.style=style
+        #######
+        if len(args)==4:
+            init_letter_number(*args)
+        elif len(args)==3:
+            init_coord(*args)
+
         self.spannedColumns=1
         self.spannedRows=1
         self.comment=None
-
+        
+    def __repr__(self):
+        return "OdfCell <{}{}>".format(self.coord.letter, self.coord.number)
+        
     def generate(self):
-        if self.object.__class__==OdfMoney:
-            odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename="Euro")
-        elif self.object.__class__==OdfPercentage:
-            odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename="Percentage")
+        if self.object.__class__==Currency:
+            odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
+        elif self.object.__class__==Percentage:
+            odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
         elif self.object.__class__==datetime.datetime:
-            odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename="Datetime")
+            odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
         elif self.object.__class__==datetime.date:
-            odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename="Date")
-        elif self.object.__class__ in (Decimal, float):
-            odfcell= TableCell(valuetype="float", value=self.object,  stylename="Decimal")
-        elif self.object.__class__==int:
-            odfcell= TableCell(valuetype="float", value=self.object, stylename="Entero")
+            odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
+        elif self.object.__class__ in (Decimal, float,  int):
+            odfcell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
         else:#strings
             if self.object[:1]=="=":#Formula
                 odfcell = TableCell(formula="of:"+self.object,  stylename=self.style)
@@ -591,11 +598,11 @@ class OdfCell:
             odfcell.setAttribute("numberrowsspanned", str(self.spannedRows))
             odfcell.setAttribute("numbercolumnsspanned", str(self.spannedColumns))
         if self.comment!=None:
-            a=Annotation(textstylename="TextRight")
+            a=Annotation(textstylename="Right")
             d=Date()
             d.addText(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
             a.addElement(d)
-            a.addElement(P(stylename="TextRight", text=self.comment))
+            a.addElement(P(stylename="Right", text=self.comment))
             odfcell.addElement(a)
         return odfcell
         
@@ -617,11 +624,11 @@ class OdfSheet:
         self.title=title
         self.widths=None
         self.arr=[]
-        self.setCursorPosition("A", "1")#Default values
-        self.setSplitPosition("A", "1")
+        self.setCursorPosition("A1")#Default values
+        self.setSplitPosition("A1")
 
 
-    def setSplitPosition(self, letter, number):
+    def setSplitPosition(self, coord):
         """
                 split/freeze vertical (0|1|2) - 1 = split ; 2 = freeze
     split/freeze horizontal (0|1|2) - 1 = split ; 2 = freeze
@@ -656,9 +663,9 @@ B1:
                 return "3"
             return "2"
 
-
-        self.horizontalSplitPosition=str(column2index(letter))
-        self.verticalSplitPosition=str(row2index(number))
+        coord=Coord.assertCoord(coord)
+        self.horizontalSplitPosition=str(coord.letterIndex())
+        self.verticalSplitPosition=str(coord.numberIndex())
         self.horizontalSplitMode="0" if self.horizontalSplitPosition=="0" else "2"
         self.verticalSplitMode="0" if self.verticalSplitPosition=="0" else "2"
         self.activeSplitRange=setActiveSplitRange()
@@ -668,23 +675,22 @@ B1:
         self.positionRight="0" if self.horizontalSplitPosition=="0" else str(self.horizontalSplitPosition)
         ##print (letter,  number, ":", self.horizontalSplitPosition,  self.verticalSplitPosition,  self.activeSplitRange, self.positionTop, self.positionBottom,  self.positionLeft, self.positionRight)
 
-    def setCursorPosition(self, letter, number):
+    def setCursorPosition(self, coord):
         """
             Sets the cursor in a Sheet
         """
-        self.cursorPositionX=column2index(letter)
-        self.cursorPositionY=row2index(number)
-
-    def setComment(self, letter, number, comment):
-        """
-            Sets a comment in the givven cell
-        """
-        c=self.getCell(letter, number)
-        c.setComment(comment)
-        
-    def setCommentWithCoord(self, coord, comment):
         coord=Coord.assertCoord(coord)
-        self.setComment(coord.letter, coord.number, comment)
+        self.cursorPositionX=coord.letterIndex()
+        self.cursorPositionY=coord.numberIndex()
+        
+    ## Sets a comment in the givven cell
+    ## @param coord can be Coord o Coord.string()
+    ## @param comment String to insert as a comment in the cell
+    def setComment(self, coord, comment):
+        coord=Coord.assertCoord(coord)
+        c=self.getCell(coord)
+        c.setComment(comment)
+
 
     def setColumnsWidth(self, widths, unit="pt"):
         """
@@ -706,47 +712,50 @@ B1:
     def lastRow(self):
         return  number2row(self.rows())
 
-    def mergeCells(self, letter, number,  columns, rows):
-        """
-            Given a cell position (letter,number), merges columns a rows given
-        """
-        c=self.getCell(letter, number)
-        c.setSpanning(columns, rows)
-
     def addCell(self, cell): 
         self.arr.append(cell)
         
-    def getCell(self, letter, number):
-        """Returns a cell in arr"""
+    ## Returns the cell in the Coord
+    ## @return OdfCell
+    def getCell(self, coord):
+        coord=Coord.assertCoord(coord)
         for c in self.arr:
-            if c.letter==letter  and c.number==number:
+            if c.coord.string()==coord.string():
                 return c
         return None
+
+    ## Puede ser
+    ## - letter,number, result,style
+    ## - coord, result, style
+    def add(self, *args):
+        if len(args)==4:
+            coord=Coord.assertCoord(args[0]+args[1])
+            result=args[2]
+            style=args[3]
+        elif len(args)==3:
+            coord=Coord.assertCoord(args[0])
+            result=args[1]
+            style=args[2]
         
-    def add(self, letter,number, result, style):
-        if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  OdfMoney, OdfPercentage, Decimal):#Un solo valor
-            self.addCell(OdfCell(letter, number, result, style))
+        if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal):#Un solo valor
+            self.addCell(OdfCell(coord, result, style))
         elif result.__class__ in (list,):#Una lista
             for i,row in enumerate(result):
                 if row.__class__ in (int, str, float, datetime.datetime,  datetime.date):#Una lista de una columna
-                    self.addCell(OdfCell(letter, rowAdd(number, i), result[i], style))
+                    self.addCell(OdfCell(coord.addRow(i), result[i], style))
                 elif row.__class__ in (list, ):#Una lista de varias columnas
-                    for j,column in enumerate(row):
-                        self.addCell(OdfCell(columnAdd(letter, j), rowAdd(number, i), result[i][j], style))
+                    for j, column in enumerate(row):
+                        self.addCell(OdfCell(coord.addColumn(j).addRow(i), result[i][j], style))
                 else:
                     logging.warning(row.__class__, "ROW CLASS NOT FOUND",  row)
 
 
-    ## @param coord can be a string or a Coord object
-    def addWithCoord(self, coord, result, style):
-        coord=Coord.assertCoord(coord)
-        self.add(coord.letter, coord.number, result, style)
-
     ## @param range Range
     def addMerged(self, range, result, style):
         range=Range.assertRange(range)
-        self.addWithCoord(range.start, result, style)
-        self.mergeCells(range.start.letter, range.start.number, range.numColumns(),range.numRows())
+        self.add(range.start, result, style)      
+        c=self.getCell(range.start)
+        c.setSpanning(range.numColumns(), range.numRows())
 
     def generate(self, ods):
         # Start the table
@@ -754,7 +763,7 @@ B1:
         rows=self.rows()
         grid=[[None for x in range(columns)] for y in range(rows)]
         for cell in self.arr:
-            grid[row2index(cell.number)][column2index(cell.letter)]=cell
+            grid[cell.coord.numberIndex()][cell.coord.letterIndex()]=cell
         
         table = Table(name=self.title)
         for c in range(columns):#Create columns
@@ -780,7 +789,7 @@ B1:
         """
         r=0
         for cell in self.arr:
-            column=column2number(cell.letter)
+            column=cell.coord.letterPosition()
             if column>r:
                 r=column
         return r
@@ -789,7 +798,7 @@ B1:
     def rows(self):
         r=0
         for cell in self.arr:
-            column=row2number(cell.number)
+            column=cell.coord.numberPosition()
             if column>r:
                 r=column
         return r
@@ -890,266 +899,6 @@ class ODS(ODF):
         """value is OdfSheet"""
         self.activeSheet=value.title
 
-
-                
-class ODS_Write(ODS):
-    def __init__(self, filename):
-        def styleHeaders():
-            hs=Style(name="HeaderOrange", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#ffcc99", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties( fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="center"))
-            self.doc.styles.addElement(hs)
-
-            hs=Style(name="HeaderRed", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#ff0000", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties( fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="center"))
-            self.doc.styles.addElement(hs)
-
-            hs=Style(name="HeaderYellow", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#ffff7f", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties(fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="center"))
-            self.doc.styles.addElement(hs) 
-            
-            hs=Style(name="HeaderGreen", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#9bff9e", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties(fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="center"))
-            self.doc.styles.addElement(hs) 
-            
-            hs=Style(name="HeaderGray", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#999999", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties(fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="center"))
-            self.doc.styles.addElement(hs) 
-            
-            hs=Style(name="HeaderOrangeLeft", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#ffcc99", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties( fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="left"))
-            self.doc.styles.addElement(hs)
-            
-            hs=Style(name="HeaderYellowLeft", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#ffff7f", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties(fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="left"))
-            self.doc.styles.addElement(hs)     
-            
-            hs=Style(name="HeaderGreenLeft", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#9bff9e", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties(fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="left"))
-            self.doc.styles.addElement(hs)        
-        
-            hs=Style(name="HeaderGrayLeft", family="table-cell")
-            hs.addElement(TableCellProperties(backgroundcolor="#999999", border="0.06pt solid #000000"))
-            hs.addElement(TextProperties(fontweight="bold"))
-            hs.addElement(ParagraphProperties(textalign="left"))
-            self.doc.styles.addElement(hs) 
-
-        def styleParagraphs():
-            tr=Style(name="TextRight", family="table-cell")
-            tr.addElement(TableCellProperties(border="0.06pt solid #000000"))
-            tr.addElement(ParagraphProperties(textalign="end"))
-            self.doc.styles.addElement(tr)
-
-            hs=Style(name="TextLeft", family="table-cell")
-            hs.addElement(TableCellProperties(border="0.06pt solid #000000"))
-            hs.addElement(ParagraphProperties(textalign="left"))
-            self.doc.styles.addElement(hs)
-
-            hs=Style(name="TextCenter", family="table-cell")
-            hs.addElement(TableCellProperties(border="0.06pt solid #000000"))
-            hs.addElement(ParagraphProperties(textalign="center"))
-            self.doc.styles.addElement(hs)
-
-        def styleCurrrencies():
-            # Create the styles for $AUD format currency values
-            ns1 = CurrencyStyle(name="EuroBlack", volatile="true")
-            ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
-            ns1.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
-            self.doc.styles.addElement(ns1)
-
-            # Create the main style.
-            ns2 = CurrencyStyle(name="EuroColor")
-            ns2.addElement(TextProperties(color="#ff0000"))
-            ns2.addElement(Text(text="-"))
-            ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
-            ns2.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
-            ns2.addElement(Map(condition="value()>=0", applystylename="EuroBlack"))
-            self.doc.styles.addElement(ns2)
-            
-            # Create automatic style for the price cells.
-            moneycontents = Style(name="Euro", family="table-cell",  datastylename="EuroColor",parentstylename="TextRight")
-            self.doc.automaticstyles.addElement(moneycontents)
-            
-        def stylePercentages():
-            #Percentage
-            nonze = PercentageStyle(name='PercentageBlack')
-            nonze.addElement(TextProperties(color="#000000"))
-            nonze.addElement(Number(decimalplaces='2', minintegerdigits='1'))
-            nonze.addElement(Text(text=' %'))
-            self.doc.styles.addElement(nonze)
-            
-            nonze2 = PercentageStyle(name='PercentageColor')
-            nonze2.addElement(TextProperties(color="#ff0000"))
-            nonze2.addElement(Text(text="-"))
-            nonze2.addElement(Number(decimalplaces='2', minintegerdigits='1'))
-            nonze2.addElement(Text(text=' %'))
-            nonze2.addElement(Map(condition="value()>=0", applystylename="PercentageBlack"))
-            self.doc.styles.addElement(nonze2)
-            
-            pourcent = Style(name='Percentage', family='table-cell', datastylename='PercentageColor',parentstylename="TextRight")
-    #        pourcent.addElement(TableCellProperties(border="0.06pt solid #000000"))
-    #        pourcent.addElement(ParagraphProperties(textalign='end'))
-    #        pourcent.addElement(TextProperties(attributes={'fontsize':"10pt",'fontweight':"bold", 'color':"#000000" }))
-            self.doc.automaticstyles.addElement(pourcent)
-
-        def styleDatetimes():
-            #create custom format in styles.xml
-            date_style = DateStyle(name="DatetimeBlack") #, language="lv", country="LV")
-            date_style.addElement(Year(style="long"))
-            date_style.addElement(Text(text="-"))
-            date_style.addElement(Month(style="long"))
-            date_style.addElement(Text(text="-"))
-            date_style.addElement(Day(style="long"))
-            date_style.addElement(Text(text=" "))
-            date_style.addElement(Hours(style="long"))
-            date_style.addElement(Text(text=":"))
-            date_style.addElement(Minutes(style="long"))
-            date_style.addElement(Text(text=":"))
-            date_style.addElement(Seconds(style="long"))
-            self.doc.styles.addElement(date_style)
-            #link to generated style from content.xml
-            ds = Style(name="Datetime", datastylename="DatetimeBlack",parentstylename="TextLeft", family="table-cell")
-            self.doc.automaticstyles.addElement(ds)
-            
-            
-            #create custom format in styles.xml
-            date_style = DateStyle(name="DateBlack") #, language="lv", country="LV")
-            date_style.addElement(Year(style="long"))
-            date_style.addElement(Text(text="-"))
-            date_style.addElement(Month(style="long"))
-            date_style.addElement(Text(text="-"))
-            date_style.addElement(Day(style="long"))
-            self.doc.styles.addElement(date_style)
-            #link to generated style from content.xml
-            ds = Style(name="Date", datastylename="DateBlack",parentstylename="TextLeft", family="table-cell")
-            self.doc.automaticstyles.addElement(ds)
-
-    #    <number:number-style style:volatile="true" style:name="N108P0">
-    #      <number:number number:min-integer-digits="1" number:decimal-places="2" ns41:min-decimal-places="2"/>
-    #    </number:number-style>
-    #    <number:number-style style:name="N108">
-    #      <style:text-properties fo:color="#ff0000"/>
-    #      <number:text>-</number:text>
-    #      <number:number number:min-integer-digits="1" number:decimal-places="2" ns41:min-decimal-places="2"/>
-    #      <style:map style:condition="value()&gt;=0" style:apply-style-name="N108P0"/>
-    #    </number:number-style>
-            # Create the styles for $AUD format currency values
-        def styleNumbers():
-            ns1 = NumberStyle(name="EnteroBlack", volatile="true")
-            ns1.addElement(Number(decimalplaces="0", minintegerdigits="1", grouping="true"))
-            self.doc.styles.addElement(ns1)
-
-            # Create the main style.
-            ns2 = NumberStyle(name="EnteroColor")
-            ns2.addElement(TextProperties(color="#ff0000"))
-            ns2.addElement(Text(text="-"))
-            ns2.addElement(Number(decimalplaces="0", minintegerdigits="1", grouping="true"))
-            ns2.addElement(Map(condition="value()>=0", applystylename="EnteroBlack"))
-            self.doc.styles.addElement(ns2)
-            
-            # Create automatic style for the price cells.
-            moneycontents = Style(name="Entero", family="table-cell",  datastylename="EnteroColor",parentstylename="TextRight")
-            self.doc.styles.addElement(moneycontents)
-
-
-            ns1 = NumberStyle(name="DecimalBlack", volatile="true")
-            ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
-            self.doc.styles.addElement(ns1)
-
-            # Create the main style.
-            ns2 = NumberStyle(name="DecimalColor")
-            ns2.addElement(TextProperties(color="#ff0000"))
-            ns2.addElement(Text(text="-"))
-            ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
-            ns2.addElement(Map(condition="value()>=0", applystylename="DecimalBlack"))
-            self.doc.styles.addElement(ns2)
-            
-            # Create automatic style for the price cells.
-            moneycontents = Style(name="Decimal", family="table-cell",  datastylename="DecimalColor",parentstylename="TextRight")
-            self.doc.styles.addElement(moneycontents)
-
-        ##################################################
-        ODS.__init__(self, filename)
-        styleHeaders()
-        styleParagraphs()
-        styleCurrrencies()
-        styleDatetimes()
-        stylePercentages()
-        styleNumbers()
-
-
-
-class OdfSheet_With_Colors(OdfSheet):
-    def __init__(self, doc, title):
-        OdfSheet.__init__(self, doc, title)
-        
-    ## @param coord can be a string or a Coord object
-    def addWithCoord(self, coord, result,  style):
-        coord=Coord.assertCoord(coord)
-        self.add(coord.letter, coord.number, result, style)
-        
-    def add(self, letter,number, result, style):
-        if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  OdfMoney, OdfPercentage, Decimal):#Un solo valor
-            self.addCell(OdfCell_With_Colors(letter+ number, result, style))
-        elif result.__class__ in (list,):#Una lista
-            for i,row in enumerate(result):
-                if row.__class__ in (int, str, float, datetime.datetime,  datetime.date):#Una lista de una columna
-                    self.addCell(OdfCell_With_Colors(letter+ rowAdd(number, i), result[i], style))
-                elif row.__class__ in (list, ):#Una lista de varias columnas
-                    for j,column in enumerate(row):
-                        self.addCell(OdfCell_With_Colors(columnAdd(letter, j)+ rowAdd(number, i), result[i][j], style))
-                else:
-                    logging.warning(row.__class__, "ROW CLASS NOT FOUND",  row)
-    
-class OdfCell_With_Colors(OdfCell):
-    def __init__(self, coord, object, style):
-        coord=Coord.assertCoord(coord)
-        OdfCell.__init__(self, coord.letter, coord.number, object, style)
-
-    def generate(self):
-        if self.object.__class__==OdfMoney:
-            odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
-        elif self.object.__class__==OdfPercentage:
-            odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
-        elif self.object.__class__==datetime.datetime:
-            odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
-        elif self.object.__class__==datetime.date:
-            odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
-        elif self.object.__class__ in (Decimal, float,  int):
-            odfcell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
-        else:#strings
-            if self.object[:1]=="=":#Formula
-                odfcell = TableCell(formula="of:"+self.object,  stylename=self.style)
-            else:#Cadena
-                odfcell = TableCell(valuetype="string", value=self.object,  stylename=self.style)
-                odfcell.addElement(P(text = self.object))
-        if self.spannedRows!=1 or self.spannedColumns!=1:
-            odfcell.setAttribute("numberrowsspanned", str(self.spannedRows))
-            odfcell.setAttribute("numbercolumnsspanned", str(self.spannedColumns))
-        if self.comment!=None:
-            a=Annotation(textstylename="Right")
-            d=Date()
-            d.addText(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
-            a.addElement(d)
-            a.addElement(P(stylename="Right", text=self.comment))
-            odfcell.addElement(a)
-        return odfcell
-
 class Color:
     def __init__(self, name, rgb):
         self.name=name
@@ -1206,7 +955,7 @@ class ColorManager:
         for o in self.arr:
             o.generate_ods_styles(doc)
 
-class ODS_Write_With_Colors(ODS):
+class ODS_Write(ODS):
     def __init__(self, filename):
         ODS.__init__(self, filename)
                 
@@ -1301,17 +1050,19 @@ class ODS_Write_With_Colors(ODS):
         self.doc.styles.addElement(ns2)
             
         self.colors=ColorManager()
-        self.colors.append(Color("Green", "#9bff9e"))
-        self.colors.append(Color("GreyLight", "#888888"))
-        self.colors.append(Color("GreyDark", "#bbbbbb"))
+        self.colors.append(Color("Green", "#9bff9b"))
+        self.colors.append(Color("GrayDark", "#888888"))
+        self.colors.append(Color("GrayLight", "#bbbbbb"))
         self.colors.append(Color("Orange", "#ffcc99"))
         self.colors.append(Color("Yellow", "#ffff7f"))
         self.colors.append(Color("White", "#ffffff"))
+        self.colors.append(Color("Blue", "#9b9bff"))
+        self.colors.append(Color("Red", "#ff9b9b"))
         self.colors.generate_ods_styles(self.doc)
 
 
     def createSheet(self, title):
-        s=OdfSheet_With_Colors(self.doc, title)
+        s=OdfSheet(self.doc, title)
         self.sheets.append(s)
         return s
         

@@ -13,8 +13,7 @@ import openpyxl.formatting.rule
 import os
 import pkg_resources
 
-from officegenerator.commons import columnAdd, makedirs, rowAdd, deprecated
-from officegenerator.libodfgenerator import OdfMoney, OdfPercentage
+from officegenerator.commons import columnAdd, makedirs,  Currency,  Percentage,  Coord, Range
 from decimal import Decimal
 
 
@@ -44,21 +43,18 @@ class OpenPyXL:
         self.stOrange=openpyxl.styles.Color('FFFFDCA8')
         self.stYellow=openpyxl.styles.Color('FFFFFFC0')
         self.stGreen=openpyxl.styles.Color('FFC0FFC0')
-        self.stGreyLight=openpyxl.styles.Color('FFDCDCDC')
-        self.stGreyDark=openpyxl.styles.Color('FFC3C3C3')
+        self.stGrayLight=openpyxl.styles.Color('FFDCDCDC')
+        self.stGrayDark=openpyxl.styles.Color('FFC3C3C3')
 
     ## Freezes panels
     ## @param strcell String For example "A2"
-    def freezePanels(self, strcell):
-        self.ws_current.freeze_panes=self.ws_current[strcell]
+    def freezePanels(self, coord_string):
+        self.ws_current.freeze_panes=self.ws_current[coord_string]
 
     ## Selects a cell
-    ## @param strcell String For example "A2"
-    def setSelectedCell(self, strcell):
-#        self.ws_current.sheet_view.pane.topLeftCell=strcell
-#        self.ws_current.sheet_view.selection=[]
-#        self.ws_current.sheet_view.selection.append(openpyxl.worksheet.Selection("topLeft", strcell, None, strcell))
-        self.ws_current.views.sheetView[0].selection[0].activeCell=strcell
+    ## @param coord_string String For example "A2"
+    def setSelectedCell(self, coord_string):
+        self.ws_current.views.sheetView[0].selection[0].activeCell=coord_string
     ## Changes name of the current sheet
     def setSheetName(self, name):
         self.ws_current.title=name
@@ -125,8 +121,9 @@ class OpenPyXL:
     ## @param letter
     ## @param number
     ## @return sheet
-    def cell(self,letter,number):
-        return self.ws_current[letter+number]
+    def cell(self, coord):
+        coord=Coord.assertCoord(coord)
+        return self.ws_current[coord.string()]
 
     ## Internat function to set a cell. All properties except border that it's setted in overwrite functions (merged and no merged)
     ## @param cell is a cell object
@@ -150,13 +147,13 @@ class OpenPyXL:
             cell.value=value
             alignment='left' if alignment==None else alignment
             cell.number_format="YYYY-MM-DD"
-        elif value.__class__ in (OdfMoney, ):
+        elif value.__class__ in (Currency, ):
             cell.value=value.amount
             alignment='right' if alignment==None else alignment
             #zeros=decimals*"0"
             cell.number_format="#.##0,00 {0};[RED]-#.##0,00 {0}".format(value.currency)
             print(cell.number_format)
-        elif value.__class__ in (OdfPercentage, ):
+        elif value.__class__ in (Percentage, ):
             cell.value=value.value
             alignment='right' if alignment==None else alignment
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
@@ -172,22 +169,23 @@ class OpenPyXL:
 
     ## Writes a cell
     ## @param alignment String None by default. Can be "right","left","center"
-    ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGreyDark, stGreyLight, stOrange, stYellow
+    ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGrayDark, stGrayLight, stOrange, stYellow
     ## @param decimals Integer with the number of decimals. 2 by default
-    def overwrite(self, letter, number, result, style=None,  decimals=2, alignment=None):
+    def overwrite(self, coord, result, style=None,  decimals=2, alignment=None):
+        coord=Coord.assertCoord(coord)
         if result.__class__== list:#Una lista
             for i,row in enumerate(result):
                 if row.__class__ in (list, ):#Una lista de varias columnas
                     for j,column in enumerate(row):
-                        cell=self.cell(columnAdd(letter, j), rowAdd(number, i))
+                        cell=self.cell(coord.addColumn(j).addRow(i))
                         self.__setValue(cell, result[i][j], style, decimals, alignment)
                         self.__setBorder(cell)
                 else:#Una lista de una columna
-                    cell=self.cell(letter, rowAdd(number, i))
+                    cell=self.cell(coord.addRow(i))
                     self.__setValue(cell, result[i], style, decimals, alignment)
                     self.__setBorder(cell)
         else:#Un solo valor
-            cell=self.cell(letter, number)
+            cell=self.cell(coord)
             self.__setValue(cell, result, style, decimals, alignment)
             self.__setBorder(cell)
 
@@ -202,8 +200,8 @@ class OpenPyXL:
         )
 
     ## Sets cell name to use in formulas
-    def setCellName(self, range, name):
-        self.wb.create_named_range(name, self.ws_current, range)
+    def setCellName(self, range_string, name):
+        self.wb.create_named_range(name, self.ws_current, range_string)
 
     ## Set columns width in current sheet
     ## @param arrWidths List with integers representing column width
@@ -211,29 +209,19 @@ class OpenPyXL:
         for i in range(len(arrWidths)):
             self.ws_current.column_dimensions[columnAdd("A", i)].width=arrWidths[i]
 
-    ## Function to merge cells 
-    ## @param range String for example: A1:B1
-    ## @param style was added to avoid formating errors after merging
-    @deprecated
-    def mergeCells(self, range, style=None, decimals=None, alignment=None):
-        for row in self.ws_current[range]: #Returns a list of cells
-            for cell in row:
-                self.__setValue(cell, cell.value, style, decimals, alignment)
-        self.ws_current.merge_cells(range)
-
-
     ## Result must be the value only for the first cell
-    def overwrite_and_merge(self, cell_range,  result, style=None,  decimals=2, alignment=None):
-        self.ws_current.merge_cells(cell_range)
+    def overwrite_and_merge(self, range_string,  result, style=None,  decimals=2, alignment=None):
+        range=Range.assertRange(range_string)
+        self.ws_current.merge_cells(range.string())
         top = openpyxl.styles.Border(top=openpyxl.styles.Side(border_style='thin'))
         left = openpyxl.styles.Border(left=openpyxl.styles.Side(border_style='thin'))
         right = openpyxl.styles.Border(right=openpyxl.styles.Side(border_style='thin'))
         bottom = openpyxl.styles.Border(bottom=openpyxl.styles.Side(border_style='thin'))
 
-        first_cell = self.ws_current[cell_range.split(":")[0]]
+        first_cell = self.ws_current[range.start.string()]
         self.__setValue(first_cell, result, style, decimals, alignment)
 
-        rows = self.ws_current[cell_range]
+        rows = self.ws_current[range.string()]
 
         for cell in rows[0]:
             cell.border = cell.border + top
@@ -248,10 +236,6 @@ class OpenPyXL:
 
     ## Sets a comment
     ## @param strcell String "A1" for example
-    def setComment(self, strcell, comment):
-        self.ws_current[strcell].comment=openpyxl.comments.Comment(comment, "PySGAE")
+    def setComment(self, coord_string, comment):
+        self.ws_current[coord_string].comment=openpyxl.comments.Comment(comment, "PySGAE")
 
-
-class OpenPyXL2010(OpenPyXL):
-    def __init__(self, filename, template=None):
-        OpenPyXL.__init__(filename, template)
