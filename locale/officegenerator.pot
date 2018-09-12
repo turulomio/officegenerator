@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-06 09:51+0200\n"
+"POT-Creation-Date: 2018-09-12 20:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,7 +35,7 @@ msgstr ""
 msgid "XLSX Generated"
 msgstr ""
 
-msgid "Styles"
+msgid "This is a comment"
 msgstr ""
 
 msgid "Style name"
@@ -62,7 +62,13 @@ msgstr ""
 msgid "Number with 6 decimals"
 msgstr ""
 
-msgid "This is a comment"
+msgid "This cell is going to be merged with B13 a F14"
+msgstr ""
+
+msgid "This cell is going to be merged and aligned desde B18 a G18"
+msgstr ""
+
+msgid "Styles"
 msgstr ""
 
 msgid "This is a custom cell"
