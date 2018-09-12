@@ -24,6 +24,11 @@ try:
 except:
     _=str
 
+    
+class ColumnWidthXLSX:
+    Date=40
+    Detetime=60
+    
 class OpenPyXL:
     def __init__(self,filename,template=None):
         self.filename=filename
@@ -245,3 +250,8 @@ class OpenPyXL:
     ## @param strcell String "A1" for example
     def setComment(self, strcell, comment):
         self.ws_current[strcell].comment=openpyxl.comments.Comment(comment, "PySGAE")
+
+
+class OpenPyXL2010(OpenPyXL):
+    def __init__(self, filename, template=None):
+        OpenPyXL.__init__(filename, template)

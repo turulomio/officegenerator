@@ -3,9 +3,12 @@
 import datetime
 import functools
 import gettext
+import logging
 import os
 import pkg_resources
+import sys
 import warnings
+from decimal import Decimal
 from odf.opendocument import  __version__ as __odfpy_version__
 
 __version__ = '0.9.0'
@@ -25,12 +28,224 @@ def deprecated(func):
      @functools.wraps(func)
      def new_func(*args, **kwargs):
          warnings.simplefilter('always', DeprecationWarning)  # turn off filter
-         warnings.warn("Call to deprecated function {}.".format(func.__name__),
-                       category=DeprecationWarning,
-                       stacklevel=2)
+         warnings.warn("Call to deprecated function {}.".format(func.__name__), category=DeprecationWarning, stacklevel=2)
          warnings.simplefilter('default', DeprecationWarning)  # reset filter
          return func(*args, **kwargs)
      return new_func
+
+
+class Currency:
+    """
+        currency es un ID
+        EUR=Euros
+        USD=Dolares americanosw
+        self.append(Currency().init__create(QApplication.translate("Core","Chinese Yoan"), "¥", 'CNY'))
+        self.append(Currency().init__create(QApplication.translate("Core","Euro"), "€", "EUR"))
+        self.append(Currency().init__create(QApplication.translate("Core","Pound"),"£", 'GBP'))
+        self.append(Currency().init__create(QApplication.translate("Core","Japones Yen"), '¥', "JPY"))
+        self.append(Currency().init__create(QApplication.translate("Core","American Dolar"), '$', 'USD'))
+        self.append(Currency().init__create(QApplication.translate("Core","Units"), 'u', 'u'))
+    """
+    def __init__(self, amount=None,  currency='EUR') :
+        if amount==None:
+            self.amount=Decimal(0)
+        else:
+            self.amount=Decimal(str(amount))
+        if currency==None:
+            self.currency='EUR'
+        else:
+            self.currency=currency
+
+
+    def __add__(self, money):
+        """Si las divisas son distintas, queda el resultado con la divisa del primero"""
+        if self.currency==money.currency:
+            return Currency(self.amount+money.amount, self.currency)
+        else:
+            logging.error("Before adding, please convert to the same currency")
+            raise "OdfMoneyOperationException"
+            
+        
+    def __sub__(self, money):
+        """Si las divisas son distintas, queda el resultado con la divisa del primero"""
+        if self.currency==money.currency:
+            return Currency(self.amount-money.amount, self.currency)
+        else:
+            logging.error("Before substracting, please convert to the same currency")
+            raise "OdfMoneyOperationException"
+        
+    def __lt__(self, money):
+        if self.currency==money.currency:
+            if self.amount < money.amount:
+                return True
+            return False
+        else:
+            logging.error("Before lt ordering, please convert to the same currency")
+            sys.exit(1)
+        
+    def __mul__(self, money):
+        """Si las divisas son distintas, queda el resultado con la divisa del primero
+        En caso de querer multiplicar por un numero debe ser despues
+        money*4
+        """
+        if money.__class__ in (int,  float, Decimal):
+            return Currency(self.amount*money, self.currency)
+        if self.currency==money.currency:
+            return Currency(self.amount*money.amount, self.currency)
+        else:
+            logging.error("Before multiplying, please convert to the same currency")
+            sys.exit(1)
+    
+    def __truediv__(self, money):
+        """Si las divisas son distintas, queda el resultado con la divisa del primero"""
+        if self.currency==money.currency:
+            return Currency(self.amount/money.amount, self.currency)
+        else:
+            logging.error("Before true dividing, please convert to the same currency")
+            sys.exit(1)
+        
+    def __repr__(self):
+        return self.string(2)
+        
+    def string(self,   digits=2):
+        return "{} {}".format(round(self.amount, digits), self.symbol())
+        
+    def symbol(self):
+        if self.currency=="EUR":
+            return "€"
+        elif self.currency=="USD":
+            return "$"
+        
+    def isZero(self):
+        if self.amount==Decimal(0):
+            return True
+        else:
+            return False
+            
+    def isGETZero(self):
+        if self.amount>=Decimal(0):
+            return True
+        else:
+            return False           
+
+    def isGTZero(self):
+        if self.amount>Decimal(0):
+            return True
+        else:
+            return False
+
+    def isLTZero(self):
+        if self.amount<Decimal(0):
+            return True
+        else:
+            return False
+
+    def isLETZero(self):
+        if self.amount<=Decimal(0):
+            return True
+        else:
+            return False
+            
+    def __neg__(self):
+        """Devuelve otro money con el amount con signo cambiado"""
+        return Currency(-self.amount, self.currency)
+
+    def round(self, digits=2):
+        return round(self.amount, digits)
+
+class Percentage:
+    def __init__(self, numerator=None, denominator=None):
+        self.value=None
+        self.setValue(self.toDecimal(numerator),self.toDecimal(denominator))
+        
+    def toDecimal(self, o):
+        if o==None:
+            return o
+        if o.__class__==Currency:
+            return o.amount
+        elif o.__class__==Decimal:
+            return o
+        elif o.__class__ in ( int, float):
+            return Decimal(o)
+        elif o.__class__==Percentage:
+            return o.value
+        else:
+            logging.warning (o.__class__)
+            return None
+        
+    def __repr__(self):
+        return self.string()
+            
+    def __neg__(self):
+        """Devuelve otro money con el amount con signo cambiado"""
+        if self.value==None:
+            return self
+        return Percentage(-self.value, 1)
+        
+    def __lt__(self, other):
+        if self.value==None:
+            value1=Decimal('-Infinity')
+        else:
+            value1=self.value
+        if other.value==None:
+            value2=Decimal('-Infinity')
+        else:
+            value2=other.value
+        if value1<value2:
+            return True
+        return False
+        
+    def __mul__(self, value):
+        if self.value==None or value==None:
+            r=None
+        else:
+            r=self.value*self.toDecimal(value)
+        return Percentage(r, 1)
+
+    def __truediv__(self, value):
+        try:
+            r=self.value/self.toDecimal(value)
+        except:
+            r=None
+        return Percentage(r, 1)
+        
+    def setValue(self, numerator,  denominator):
+        try:
+            self.value=Decimal(numerator/denominator)
+        except:
+            self.value=None
+        
+        
+    def value_100(self):
+        if self.value==None:
+            return None
+        else:
+            return self.value*Decimal(100)
+        
+    def string(self, rnd=2):
+        if self.value==None:
+            return "None %"
+        return "{} %".format(round(self.value_100(), rnd))
+        
+
+    def isValid(self):
+        if self.value!=None:
+            return True
+        return False
+        
+    def isGETZero(self):
+        if self.value>=0:
+            return True
+        return False
+    def isGTZero(self):
+        if self.value>0:
+            return True
+        return False
+    def isLTZero(self):
+        if self.value<0:
+            return True
+        return False
+
 
 
 ## Function used in argparse_epilog
@@ -146,10 +361,10 @@ class Range:
         return (Coord(a[0]), Coord(a[1]))
 
     def numRows(self):
-        return row2number(self.start.number)-row2number(self.end.number)
+        return row2number(self.end.number)-row2number(self.start.number) +1
 
     def numColumns(self):
-        return column2number(self.start.letter)-column2number(self.end.letter)
+        return column2number(self.end.letter)-column2number(self.start.letter) +1
 
     @staticmethod
     def assertRange(o):

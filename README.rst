@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+X.X.X
+  * Added compatibilty classes OpenPyXL2010 and ODS_Write_Without_Styles
 0.9.0
   * Solved problem with freeze and setselectedcell
 0.8.0

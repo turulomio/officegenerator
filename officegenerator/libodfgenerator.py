@@ -7,7 +7,6 @@ import gettext
 import logging
 import os
 import pkg_resources
-import sys
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, GraphicProperties, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
 from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds
@@ -16,25 +15,37 @@ from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
 from odf.draw import Frame, Image
 from odf.dc import Creator, Description, Title, Date
 from odf.meta import InitialCreator
+from decimal import Decimal
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import makedirs,  column2index, column2number,  row2index,  row2number,  number2column,  number2row, rowAdd, columnAdd, Coord, Range
 
-from decimal import Decimal
-
+from officegenerator.commons import makedirs,  column2index, column2number,  row2index,  row2number,  number2column,  number2row, rowAdd, columnAdd, Coord, Range,  Percentage, Currency,  deprecated
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
     _=t.gettext
 except:
     _=str
+            
+class ColumnWidthODS:
+    Date=60
+    Datetime=100
+    
+class OdfPercentage(Percentage):
+    @deprecated
+    def __init__(self, numerator=None, denominator=None):
+        Percentage.__init__(self, numerator, denominator)
+
+class OdfMoney(Currency):
+    @deprecated
+    def __init__(self, amount=None, currency='EUR'):
+        Currency.__init__(self, amount, currency)
 
 class ODS_Read:
     def __init__(self, filename):
         self.doc=load(filename)#doc is only used in this function. All is generated in self.doc
         self.filename=filename
 
-        
     def getSheetElementByName(self, name):
         """
             Devuelve el elemento de sheet buscando por su nombre
@@ -704,8 +715,9 @@ B1:
                 return c
         return None
         
-    def add(self, letter,number, result, style=None):
-        if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  OdfMoney, OdfPercentage, OdfFormula, Decimal):#Un solo valor
+    def add(self, letter,number, result, style):
+        print("Add")
+        if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  OdfMoney, OdfPercentage, Decimal):#Un solo valor
             self.addCell(OdfCell(letter, number, result, style))
         elif result.__class__ in (list,):#Una lista
             for i,row in enumerate(result):
@@ -719,14 +731,15 @@ B1:
 
 
     ## @param coord can be a string or a Coord object
-    def addWithCoord(self, coord, result, style=None, alignment=None, decimals=None):
+    def addWithCoord(self, coord, result, style):
         coord=Coord.assertCoord(coord)
         self.add(coord.letter, coord.number, result, style)
 
     ## @param range Range
-    def addMerged(self, range, result, style=None):
+    def addMerged(self, range, result, style):
         range=Range.assertRange(range)
         self.addWithCoord(range.start, result, style)
+        print(range.start.letter, range.start.number, range.numColumns(),range.numRows())
         self.mergeCells(range.start.letter, range.start.number, range.numColumns(),range.numRows())
 
     def generate(self, ods):
@@ -775,227 +788,7 @@ B1:
                 r=column
         return r
 
-class OdfFormula:
-
-    #tc = TableCell(formula='=AVERAGE(C4:CB62)/2',stylename='pourcent', valuetype='percentage')    
-    pass
-
-class OdfMoney:
-    """
-        currency es un ID
-        EUR=Euros
-        USD=Dolares americanosw
-        self.append(Currency().init__create(QApplication.translate("Core","Chinese Yoan"), "¥", 'CNY'))
-        self.append(Currency().init__create(QApplication.translate("Core","Euro"), "€", "EUR"))
-        self.append(Currency().init__create(QApplication.translate("Core","Pound"),"£", 'GBP'))
-        self.append(Currency().init__create(QApplication.translate("Core","Japones Yen"), '¥', "JPY"))
-        self.append(Currency().init__create(QApplication.translate("Core","American Dolar"), '$', 'USD'))
-        self.append(Currency().init__create(QApplication.translate("Core","Units"), 'u', 'u'))
-    """
-    def __init__(self, amount=None,  currency='EUR') :
-        if amount==None:
-            self.amount=Decimal(0)
-        else:
-            self.amount=Decimal(str(amount))
-        if currency==None:
-            self.currency='EUR'
-        else:
-            self.currency=currency
-
-
-    def __add__(self, money):
-        """Si las divisas son distintas, queda el resultado con la divisa del primero"""
-        if self.currency==money.currency:
-            return OdfMoney(self.amount+money.amount, self.currency)
-        else:
-            logging.error("Before adding, please convert to the same currency")
-            raise "OdfMoneyOperationException"
-            
         
-    def __sub__(self, money):
-        """Si las divisas son distintas, queda el resultado con la divisa del primero"""
-        if self.currency==money.currency:
-            return OdfMoney(self.amount-money.amount, self.currency)
-        else:
-            logging.error("Before substracting, please convert to the same currency")
-            raise "OdfMoneyOperationException"
-        
-    def __lt__(self, money):
-        if self.currency==money.currency:
-            if self.amount < money.amount:
-                return True
-            return False
-        else:
-            logging.error("Before lt ordering, please convert to the same currency")
-            sys.exit(1)
-        
-    def __mul__(self, money):
-        """Si las divisas son distintas, queda el resultado con la divisa del primero
-        En caso de querer multiplicar por un numero debe ser despues
-        money*4
-        """
-        if money.__class__ in (int,  float, Decimal):
-            return OdfMoney(self.amount*money, self.currency)
-        if self.currency==money.currency:
-            return OdfMoney(self.amount*money.amount, self.currency)
-        else:
-            logging.error("Before multiplying, please convert to the same currency")
-            sys.exit(1)
-    
-    def __truediv__(self, money):
-        """Si las divisas son distintas, queda el resultado con la divisa del primero"""
-        if self.currency==money.currency:
-            return OdfMoney(self.amount/money.amount, self.currency)
-        else:
-            logging.error("Before true dividing, please convert to the same currency")
-            sys.exit(1)
-        
-    def __repr__(self):
-        return self.string(2)
-        
-    def string(self,   digits=2):
-        return "{} {}".format(round(self.amount, digits), self.symbol())
-        
-    def symbol(self):
-        if self.currency=="EUR":
-            return "€"
-        elif self.currency=="USD":
-            return "$"
-        
-    def isZero(self):
-        if self.amount==Decimal(0):
-            return True
-        else:
-            return False
-            
-    def isGETZero(self):
-        if self.amount>=Decimal(0):
-            return True
-        else:
-            return False           
-
-    def isGTZero(self):
-        if self.amount>Decimal(0):
-            return True
-        else:
-            return False
-
-    def isLTZero(self):
-        if self.amount<Decimal(0):
-            return True
-        else:
-            return False
-
-    def isLETZero(self):
-        if self.amount<=Decimal(0):
-            return True
-        else:
-            return False
-            
-    def __neg__(self):
-        """Devuelve otro money con el amount con signo cambiado"""
-        return OdfMoney(-self.amount, self.currency)
-
-    def round(self, digits=2):
-        return round(self.amount, digits)
-
-class OdfPercentage:
-    def __init__(self, numerator=None, denominator=None):
-        self.value=None
-        self.setValue(self.toDecimal(numerator),self.toDecimal(denominator))
-        
-    def toDecimal(self, o):
-        if o==None:
-            return o
-        if o.__class__==OdfMoney:
-            return o.amount
-        elif o.__class__==Decimal:
-            return o
-        elif o.__class__ in ( int, float):
-            return Decimal(o)
-        elif o.__class__==OdfPercentage:
-            return o.value
-        else:
-            logging.warning (o.__class__)
-            return None
-        
-    def __repr__(self):
-        return self.string()
-            
-    def __neg__(self):
-        """Devuelve otro money con el amount con signo cambiado"""
-        if self.value==None:
-            return self
-        return OdfPercentage(-self.value, 1)
-        
-    def __lt__(self, other):
-        if self.value==None:
-            value1=Decimal('-Infinity')
-        else:
-            value1=self.value
-        if other.value==None:
-            value2=Decimal('-Infinity')
-        else:
-            value2=other.value
-        if value1<value2:
-            return True
-        return False
-        
-    def __mul__(self, value):
-        if self.value==None or value==None:
-            r=None
-        else:
-            r=self.value*self.toDecimal(value)
-        return OdfPercentage(r, 1)
-
-    def __truediv__(self, value):
-        try:
-            r=self.value/self.toDecimal(value)
-        except:
-            r=None
-        return OdfPercentage(r, 1)
-        
-    def setValue(self, numerator,  denominator):
-        try:
-            self.value=Decimal(numerator/denominator)
-        except:
-            self.value=None
-        
-        
-    def value_100(self):
-        if self.value==None:
-            return None
-        else:
-            return self.value*Decimal(100)
-        
-    def string(self, rnd=2):
-        if self.value==None:
-            return "None %"
-        return "{} %".format(round(self.value_100(), rnd))
-        
-
-    def isValid(self):
-        if self.value!=None:
-            return True
-        return False
-        
-    def isGETZero(self):
-        if self.value>=0:
-            return True
-        return False
-    def isGTZero(self):
-        if self.value>0:
-            return True
-        return False
-    def isLTZero(self):
-        if self.value<0:
-            return True
-        return False
-        
-class ODSColumnWidth:
-    Date=40
-    Detetime=60
-    
 
 class ODS(ODF):
     def __init__(self, filename):
@@ -1005,6 +798,7 @@ class ODS(ODF):
         self.activeSheet=None
 
     def createSheet(self, title):
+        print("ODS CREATE SHEET")
         s=OdfSheet(self.doc, title)
         self.sheets.append(s)
         return s
@@ -1285,10 +1079,7 @@ class ODS_Write(ODS):
             self.doc.styles.addElement(moneycontents)
 
         ##################################################
-        ODF.__init__(self, filename)
-        self.doc=OpenDocumentSpreadsheet()
-        self.sheets=[]
-        self.activeSheet=None
+        ODS.__init__(self, filename)
         styleHeaders()
         styleParagraphs()
         styleCurrrencies()
@@ -1296,11 +1087,229 @@ class ODS_Write(ODS):
         stylePercentages()
         styleNumbers()
 
-        
-    
-    def save(self, filename=None):
-        if  filename==None:
-            filename=self.filename
-        ODS.save(self, filename)
-        
 
+
+class OdfSheet_With_Colors(OdfSheet):
+    def __init__(self, doc, title):
+        OdfSheet.__init__(self, doc, title)
+        
+    ## @param coord can be a string or a Coord object
+    def addWithCoord(self, coord, result,  style):
+        print("AddCoordColor")
+        coord=Coord.assertCoord(coord)
+        self.add(coord.letter, coord.number, result, style)
+        
+    def add(self, letter,number, result, style):
+        if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  OdfMoney, OdfPercentage, Decimal):#Un solo valor
+            self.addCell(OdfCell_With_Colors(letter+ number, result, style))
+        elif result.__class__ in (list,):#Una lista
+            for i,row in enumerate(result):
+                if row.__class__ in (int, str, float, datetime.datetime,  datetime.date):#Una lista de una columna
+                    self.addCell(OdfCell_With_Colors(letter+ rowAdd(number, i), result[i], style))
+                elif row.__class__ in (list, ):#Una lista de varias columnas
+                    for j,column in enumerate(row):
+                        self.addCell(OdfCell_With_Colors(columnAdd(letter, j)+ rowAdd(number, i), result[i][j], style))
+                else:
+                    logging.warning(row.__class__, "ROW CLASS NOT FOUND",  row)
+    
+class OdfCell_With_Colors(OdfCell):
+    def __init__(self, coord, object, style):
+        coord=Coord.assertCoord(coord)
+        print (coord)
+        OdfCell.__init__(self, coord.letter, coord.number, object, style)
+
+    def generate(self):
+        if self.object.__class__==OdfMoney:
+            odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
+        elif self.object.__class__==OdfPercentage:
+            odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
+        elif self.object.__class__==datetime.datetime:
+            odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
+        elif self.object.__class__==datetime.date:
+            odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
+        elif self.object.__class__ in (Decimal, float,  int):
+            odfcell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
+        else:#strings
+            if self.object[:1]=="=":#Formula
+                odfcell = TableCell(formula="of:"+self.object,  stylename=self.style)
+            else:#Cadena
+                odfcell = TableCell(valuetype="string", value=self.object,  stylename=self.style)
+                odfcell.addElement(P(text = self.object))
+        if self.spannedRows!=1 or self.spannedColumns!=1:
+            odfcell.setAttribute("numberrowsspanned", str(self.spannedRows))
+            odfcell.setAttribute("numbercolumnsspanned", str(self.spannedColumns))
+        if self.comment!=None:
+            a=Annotation(textstylename="Right")
+            d=Date()
+            d.addText(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+            a.addElement(d)
+            a.addElement(P(stylename="Right", text=self.comment))
+            odfcell.addElement(a)
+        return odfcell
+
+class Color:
+    def __init__(self, name, rgb):
+        self.name=name
+        self.rgb=rgb
+
+    def generate_ods_styles(self, doc):
+        hs=Style(name=self.name + "Center", family="table-cell")
+        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
+        hs.addElement(TextProperties( fontweight="bold"))
+        hs.addElement(ParagraphProperties(textalign="center"))
+        doc.styles.addElement(hs)
+        
+        hs=Style(name=self.name + "Left", family="table-cell")
+        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
+        hs.addElement(TextProperties( fontweight="bold"))
+        hs.addElement(ParagraphProperties(textalign="left"))
+        doc.styles.addElement(hs)
+        
+        hs=Style(name=self.name + "Right", family="table-cell")
+        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
+        hs.addElement(TextProperties( fontweight="bold"))
+        hs.addElement(ParagraphProperties(textalign="end"))
+        doc.styles.addElement(hs)
+
+        moneycontents = Style(name=self.name+"Euro", family="table-cell",  datastylename="Euro",parentstylename=self.name+"Right")
+        doc.styles.addElement(moneycontents)
+        
+        pourcent = Style(name=self.name+'Percentage', family='table-cell', datastylename='Percentage',parentstylename=self.name+"Right")
+        doc.styles.addElement(pourcent)
+
+        dt = Style(name=self.name+"Datetime", datastylename="Datetime",parentstylename=self.name+"Left", family="table-cell")
+        doc.styles.addElement(dt)
+
+        date = Style(name=self.name+"Date", datastylename="Date",parentstylename=self.name+"Left", family="table-cell")
+        doc.styles.addElement(date)
+        
+        integer = Style(name=self.name+"Integer", family="table-cell",  datastylename="Entero",parentstylename=self.name+"Right")
+        doc.styles.addElement(integer)
+        
+        decimal2= Style(name=self.name+"Decimal2", family="table-cell",  datastylename="Decimal2",parentstylename=self.name+"Right")
+        doc.styles.addElement(decimal2)
+        
+        decimal6= Style(name=self.name+"Decimal6", family="table-cell",  datastylename="Decimal6",parentstylename=self.name+"Right")
+        doc.styles.addElement(decimal6)
+        
+class ColorManager:
+    def __init__(self):
+        self.arr=[]
+    
+    def append(self, o):
+        self.arr.append(o)
+        
+    def generate_ods_styles(self, doc):
+        for o in self.arr:
+            o.generate_ods_styles(doc)
+
+class ODS_Write_With_Colors(ODS):
+    def __init__(self, filename):
+        ODS.__init__(self, filename)
+                
+        # Create the styles for $AUD format currency values
+        ns1 = CurrencyStyle(name="EuroBlack", volatile="true")
+        ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
+        ns1.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
+        self.doc.styles.addElement(ns1)
+
+        # Create the main style.
+        ns2 = CurrencyStyle(name="Euro")
+        ns2.addElement(TextProperties(color="#ff0000"))
+        ns2.addElement(Text(text="-"))
+        ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
+        ns2.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
+        ns2.addElement(Map(condition="value()>=0", applystylename="EuroBlack"))
+        self.doc.styles.addElement(ns2)
+        
+        #Percentage
+        nonze = PercentageStyle(name='PercentageBlack')
+        nonze.addElement(TextProperties(color="#000000"))
+        nonze.addElement(Number(decimalplaces='2', minintegerdigits='1'))
+        nonze.addElement(Text(text=' %'))
+        self.doc.styles.addElement(nonze)
+        
+        nonze2 = PercentageStyle(name='Percentage')
+        nonze2.addElement(TextProperties(color="#ff0000"))
+        nonze2.addElement(Text(text="-"))
+        nonze2.addElement(Number(decimalplaces='2', minintegerdigits='1'))
+        nonze2.addElement(Text(text=' %'))
+        nonze2.addElement(Map(condition="value()>=0", applystylename="PercentageBlack"))
+        self.doc.styles.addElement(nonze2)
+        
+        # Datetimes
+        date_style = DateStyle(name="Datetime") #, language="lv", country="LV")
+        date_style.addElement(Year(style="long"))
+        date_style.addElement(Text(text="-"))
+        date_style.addElement(Month(style="long"))
+        date_style.addElement(Text(text="-"))
+        date_style.addElement(Day(style="long"))
+        date_style.addElement(Text(text=" "))
+        date_style.addElement(Hours(style="long"))
+        date_style.addElement(Text(text=":"))
+        date_style.addElement(Minutes(style="long"))
+        date_style.addElement(Text(text=":"))
+        date_style.addElement(Seconds(style="long"))
+        self.doc.styles.addElement(date_style)#NO SERIA ESTE UN AUTOMATICO????
+
+        #Date
+        date_style = DateStyle(name="Date") #, language="lv", country="LV")
+        date_style.addElement(Year(style="long"))
+        date_style.addElement(Text(text="-"))
+        date_style.addElement(Month(style="long"))
+        date_style.addElement(Text(text="-"))
+        date_style.addElement(Day(style="long"))
+        self.doc.styles.addElement(date_style)
+
+        #Integer
+        ns1 = NumberStyle(name="IntegerBlack", volatile="true")
+        ns1.addElement(Number(decimalplaces="0", minintegerdigits="1", grouping="true"))
+        self.doc.styles.addElement(ns1)
+
+        ns2 = NumberStyle(name="Integer")
+        ns2.addElement(TextProperties(color="#ff0000"))
+        ns2.addElement(Text(text="-"))
+        ns2.addElement(Number(decimalplaces="0", minintegerdigits="1", grouping="true"))
+        ns2.addElement(Map(condition="value()>=0", applystylename="IntegerBlack"))
+        self.doc.styles.addElement(ns2)
+            
+        #Decimal 2
+        ns1 = NumberStyle(name="Decimal2Black", volatile="true")
+        ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
+        self.doc.styles.addElement(ns1)
+
+        ns2 = NumberStyle(name="Decimal2")
+        ns2.addElement(TextProperties(color="#ff0000"))
+        ns2.addElement(Text(text="-"))
+        ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
+        ns2.addElement(Map(condition="value()>=0", applystylename="Decimal2Black"))
+        self.doc.styles.addElement(ns2)
+            
+        #Decimal 2
+        ns1 = NumberStyle(name="Decimal6Black", volatile="true")
+        ns1.addElement(Number(decimalplaces="6", minintegerdigits="1", grouping="true"))
+        self.doc.styles.addElement(ns1)
+
+        ns2 = NumberStyle(name="Decimal6")
+        ns2.addElement(TextProperties(color="#ff0000"))
+        ns2.addElement(Text(text="-"))
+        ns2.addElement(Number(decimalplaces="6", minintegerdigits="1", grouping="true"))
+        ns2.addElement(Map(condition="value()>=0", applystylename="Decimal6Black"))
+        self.doc.styles.addElement(ns2)
+            
+        self.colors=ColorManager()
+        self.colors.append(Color("Green", "#9bff9e"))
+        self.colors.append(Color("GreyLight", "#888888"))
+        self.colors.append(Color("GreyDark", "#bbbbbb"))
+        self.colors.append(Color("Orange", "#ffcc99"))
+        self.colors.append(Color("Yellow", "#ffff7f"))
+        self.colors.append(Color("White", "#ffffff"))
+        self.colors.generate_ods_styles(self.doc)
+
+
+    def createSheet(self, title):
+        print("ODS CREATE SHEET WITH COLOR")
+        s=OdfSheet_With_Colors(self.doc, title)
+        self.sheets.append(s)
+        return s
+        
