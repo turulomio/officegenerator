@@ -30,6 +30,14 @@ except:
 class ColumnWidthODS:
     Date=60
     Datetime=100
+    XS=12
+    S=25
+    M=50
+    L=100
+    XL=150
+    XXL=200
+    XXXL=250
+    XXXXL=300
     
 class OdfPercentage(Percentage):
     @deprecated
@@ -716,7 +724,6 @@ B1:
         return None
         
     def add(self, letter,number, result, style):
-        print("Add")
         if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  OdfMoney, OdfPercentage, Decimal):#Un solo valor
             self.addCell(OdfCell(letter, number, result, style))
         elif result.__class__ in (list,):#Una lista
@@ -739,7 +746,6 @@ B1:
     def addMerged(self, range, result, style):
         range=Range.assertRange(range)
         self.addWithCoord(range.start, result, style)
-        print(range.start.letter, range.start.number, range.numColumns(),range.numRows())
         self.mergeCells(range.start.letter, range.start.number, range.numColumns(),range.numRows())
 
     def generate(self, ods):
@@ -798,7 +804,6 @@ class ODS(ODF):
         self.activeSheet=None
 
     def createSheet(self, title):
-        print("ODS CREATE SHEET")
         s=OdfSheet(self.doc, title)
         self.sheets.append(s)
         return s
@@ -1095,7 +1100,6 @@ class OdfSheet_With_Colors(OdfSheet):
         
     ## @param coord can be a string or a Coord object
     def addWithCoord(self, coord, result,  style):
-        print("AddCoordColor")
         coord=Coord.assertCoord(coord)
         self.add(coord.letter, coord.number, result, style)
         
@@ -1115,7 +1119,6 @@ class OdfSheet_With_Colors(OdfSheet):
 class OdfCell_With_Colors(OdfCell):
     def __init__(self, coord, object, style):
         coord=Coord.assertCoord(coord)
-        print (coord)
         OdfCell.__init__(self, coord.letter, coord.number, object, style)
 
     def generate(self):
@@ -1183,7 +1186,7 @@ class Color:
         date = Style(name=self.name+"Date", datastylename="Date",parentstylename=self.name+"Left", family="table-cell")
         doc.styles.addElement(date)
         
-        integer = Style(name=self.name+"Integer", family="table-cell",  datastylename="Entero",parentstylename=self.name+"Right")
+        integer = Style(name=self.name+"Integer", family="table-cell",  datastylename="Integer",parentstylename=self.name+"Right")
         doc.styles.addElement(integer)
         
         decimal2= Style(name=self.name+"Decimal2", family="table-cell",  datastylename="Decimal2",parentstylename=self.name+"Right")
@@ -1308,7 +1311,6 @@ class ODS_Write_With_Colors(ODS):
 
 
     def createSheet(self, title):
-        print("ODS CREATE SHEET WITH COLOR")
         s=OdfSheet_With_Colors(self.doc, title)
         self.sheets.append(s)
         return s

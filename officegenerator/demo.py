@@ -166,7 +166,7 @@ def demo_ods_With_Colors():
     doc=ODS_Write_With_Colors("officegenerator_With_Colors.ods")
     doc.setMetadata("OfficeGenerator example",  "This class documentation", "Mariano Muñoz")
     s5=doc.createSheet("Format number")
-    s5.setColumnsWidth([100, ColumnWidthODS.Datetime, ColumnWidthODS.Date, 100, 100, 100, 100, 100])
+    s5.setColumnsWidth([ColumnWidthODS.L, ColumnWidthODS.Datetime, ColumnWidthODS.Date, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.XL, ColumnWidthODS.XXL])
 
     s5.addWithCoord("A1", _("Style name"), style="OrangeCenter")
     s5.addWithCoord("B1", _("Date and time"), style="OrangeCenter")
@@ -183,14 +183,14 @@ def demo_ods_With_Colors():
         s5.addWithCoord(Coord("D2").addRow(row), pow(-1, row)*-10000000, style=color.name+ "Integer")
         s5.addWithCoord(Coord("E2").addRow(row), OdfMoney(pow(-1, row)*12.56, "€"), style=color.name + "Euro")
         s5.addWithCoord(Coord("F2").addRow(row), OdfPercentage(pow(-1, row)*1, 3), style=color.name+"Percentage")
-        s5.addWithCoord(Coord("G2").addRow(row), pow(-1, row)*12.121212, style=color.name+"Decimal2")
+        s5.addWithCoord(Coord("G2").addRow(row), pow(-1, row)*123456789.121212, style=color.name+"Decimal2")
         s5.addWithCoord(Coord("H2").addRow(row), pow(-1, row)*-12.121212, style=color.name+"Decimal6")
 
     s5.setCommentWithCoord("B2", _("This is a comment"))
     
     #Merge cells
-    s5.addMerged("B13:F14", _("This cell is going to be merged with B13 and C13"), style="GreenCenter")
-    s5.addMerged("B18:G18", _("This cell is going to be merged and aligned"), style="YellowRight")
+    s5.addMerged("B13:F14", _("This cell is going to be merged with B13 a F14"), style="GreenCenter")
+    s5.addMerged("B18:G18", _("This cell is going to be merged and aligned desde B18 a G18"), style="YellowRight")
     s5.setCursorPosition("B","10")
     s5.setSplitPosition("A","8")
     doc.save()
