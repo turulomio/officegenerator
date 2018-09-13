@@ -1,12 +1,13 @@
 Nueva release
 =============
-1) Cambiar la versión y la fecha en commons.py
-2) Modificar el Changelog en el fichero README
- ) python3 setup.py doc and edit es.po 
- ) python3 setup.py doc again
-3) python3 setup.py doxygen
-4) python setup.py sdist upload -r pypi        Para subirlo a python
-5) Subir versión a Sourceforge
-6) Subir versión al subversion
-7) Crear un nuevo ebuild con la nueva versión
-8) Subirlo ebuild al subversion del portage
+01) Cambiar la versión y la fecha en commons.py
+02) Modificar el Changelog en el fichero README
+03) Python3 setup.py test
+04) python3 setup.py doc and edit es.po 
+  ) python3 setup.py doc again
+05) python3 setup.py doxygen
+06) python setup.py sdist upload -r pypi        Para subirlo a python
+07) Subir versión a Sourceforge
+08) Subir versión al subversion
+09) Crear un nuevo ebuild con la nueva versión
+10) Subirlo ebuild al subversion del portage
