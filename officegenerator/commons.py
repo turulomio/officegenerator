@@ -397,3 +397,14 @@ class Range:
             return o
         elif o.__class__==str:
             return Range(o)
+
+
+    ## Adds a row to the range
+    def appendRow(self, num=1):
+        self.end=self.end.addRow()
+        return Range(self.string())
+
+    ## Adds a column to the range
+    def appendRow(self, num=1):
+        self.end=self.end.addColumn()
+        return Range(self.string())

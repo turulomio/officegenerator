@@ -7,6 +7,7 @@ import gettext
 import logging
 import os
 import pkg_resources
+from decimal import Decimal
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, GraphicProperties, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
 from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds
@@ -15,7 +16,7 @@ from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
 from odf.draw import Frame, Image
 from odf.dc import Creator, Description, Title, Date
 from odf.meta import InitialCreator
-from decimal import Decimal
+
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
 
@@ -1066,3 +1067,21 @@ class ODS_Write(ODS):
         self.sheets.append(s)
         return s
         
+
+## Guess style from color and object class
+def guess_ods_style(color, object):
+    if object.__class__==str:
+        return color + "Left"
+    if object.__class__==int:
+        return color + "Integer"
+    if object.__class__==Currency:
+        return color + "Euro"
+    if object.__class__==Percentage:
+        return color + "Percentage"
+    if object.__class__in (Decimal, float):
+        return color +  "Decimal2"
+    if object.__class__==datetime.datetime:
+        return color + "Datetime"
+    if object.__class__==datetime.date:
+        return color + "Date"
+    print("guess_ods_style not guessed",  object.__class__)
