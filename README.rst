@@ -15,17 +15,19 @@ GPL-3
 
 Dependencies
 ============
-  * https://www.python.org/, as the main programming language.
-  * https://pypi.org/project/odfpy/, to generate LibreOffice documents.
-  * https://pypi.org/project/openpyxl/, to generate MS Office XLSX/XLSM  documents.
-  * http://xmlsoft.org/, to execute xmllint in officegenerator_odf2xml
+* https://www.python.org/, as the main programming language.
+* https://pypi.org/project/odfpy/, to generate LibreOffice documents.
+* https://pypi.org/project/openpyxl/, to generate MS Office XLSX/XLSM  documents.
+* http://xmlsoft.org/, to execute xmllint in officegenerator_odf2xml
 
 Usage
 =====
-You can view officegenerator/demo.py to see an example of code
+You can view officegenerator/demo.py to see an example of code: https://sourceforge.net/p/officegenerator/code/HEAD/tree/officegenerator/demo.py
 
 Changelog
 =========
+0.13.0
+  * Coord and Range addRow/Column functions now updates the object and doesn't create a new one
 0.12.0
   * Improving Range and Coord limit situations
 0.11.0

@@ -11,7 +11,7 @@ import warnings
 from decimal import Decimal
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '0.12.0'
+__version__ = '0.13.0'
 __versiondate__=datetime.date(2018,9,13)
 
 try:
@@ -321,7 +321,7 @@ def makedirs(dir):
 def ODFPYversion():
     return __odfpy_version__.split("/")[1]
 
-
+## Class that manage spreadsheet coordinates (letter + number)
 class Coord:
     def __init__(self, strcoord):
         self.letter, self.number=self.__extract(strcoord)
@@ -341,34 +341,44 @@ class Coord:
                 number=number+l
         return (letter,number)
 
+    ## Returns Coord string
+    ## @return string For example "Z1"
     def string(self):
         return self.letter+self.number
 
-    ## Add a number of rows to the Coord and return a new Coord object
-    ## @param num Integer Can be positive and negative. When num is negative, if Coord.letter is less than A, returns A. If Coord.number is less than 1, returns 1
+    ## Add a number of rows to the Coord and return itself
+    ## @param num Integer Can be positive and negative. When num is negative, if Coord.number is less than 1, returns 1
     def addRow(self, num=1):
         if self.numberIndex()+num<0:
-            number="1"
+            self.number="1"
         else:
-            number=rowAdd(self.number, num)
-        return Coord(self.letter + number)
+            self.number=rowAdd(self.number, num)
+        return self
 
+    ## Add a number of columns/letters to the Coord and return itself
+    ## @param num Integer. Can be positive and negative. When num is negative, if Coord.letter is less than A, returns A.
     def addColumn(self, num=1):
         if self.letterIndex()+num<0:
-            letter="A"
+            self.letter="A"
         else:
-            letter=columnAdd(self.letter, num)
-        return Coord(letter+self.number)
+            self.letter=columnAdd(self.letter, num)
+        return self
 
+    ## Reterns the letter/column index (letterPosition()-1)
+    ## @return int
     def letterIndex(self):
         return column2index(self.letter)
 
+    ## Returns the letter/column position
+    ## @return int 
     def letterPosition(self):
         return column2number(self.letter)
 
+    ## Returns the number/row index (numberPosition()-1)
     def numberIndex(self):
         return row2index(self.number)
 
+    ## Returns the number/row position
     def numberPosition(self):
         return row2number(self.number)
 
@@ -417,19 +427,19 @@ class Range:
     ## Adds a row to the end Coord, so it adds a row to the range
     def addRowAfter(self, num=1):
         self.end=self.end.addRow(num)
-        return Range(self.string())
+        return self
 
     ## Adds a column to the end Coord, so it adds a column to the range
     def addColumnAfter(self, num=1):
         self.end=self.end.addColumn(num)
-        return Range(self.string())
+        return self
 
     ## Adds a row to the top of the start Coord, so it adds a row to the range. If start Coord number is 1 returns the same Coord
     def addRowBefore(self, num=1):
         self.start=self.start.addRow(-num)
-        return Range(self.string())
+        return self
 
     ## Adds a column to the end Coord, so it adds a column to the range. If start Coord letter is A, returns the same Coord
     def addColumnBefore(self, num=1):
         self.start=self.start.addColumn(-num)
-        return Range(self.string())
+        return self
