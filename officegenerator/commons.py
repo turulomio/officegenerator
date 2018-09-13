@@ -340,27 +340,35 @@ class Coord:
             else:
                 number=number+l
         return (letter,number)
-        
+
     def string(self):
         return self.letter+self.number
 
+    ## Add a number of rows to the Coord and return a new Coord object
+    ## @param num Integer Can be positive and negative. When num is negative, if Coord.letter is less than A, returns A. If Coord.number is less than 1, returns 1
     def addRow(self, num=1):
-        number=rowAdd(self.number, num)
-        return Coord(self.letter+ number)
+        if self.numberIndex()+num<0:
+            number="1"
+        else:
+            number=rowAdd(self.number, num)
+        return Coord(self.letter + number)
 
     def addColumn(self, num=1):
-        letter=columnAdd(self.letter, num)
+        if self.letterIndex()+num<0:
+            letter="A"
+        else:
+            letter=columnAdd(self.letter, num)
         return Coord(letter+self.number)
-        
+
     def letterIndex(self):
         return column2index(self.letter)
-        
+
     def letterPosition(self):
         return column2number(self.letter)
 
     def numberIndex(self):
         return row2index(self.number)
-        
+
     def numberPosition(self):
         return row2number(self.number)
 
@@ -407,23 +415,21 @@ class Range:
 
 
     ## Adds a row to the end Coord, so it adds a row to the range
-    def appendRow(self, num=1):
+    def addRowAfter(self, num=1):
         self.end=self.end.addRow(num)
         return Range(self.string())
 
     ## Adds a column to the end Coord, so it adds a column to the range
-    def appendColumn(self, num=1):
+    def addColumnAfter(self, num=1):
         self.end=self.end.addColumn(num)
         return Range(self.string())
 
     ## Adds a row to the top of the start Coord, so it adds a row to the range. If start Coord number is 1 returns the same Coord
-    def prependRow(self, num=1):
-        if self.start.number!="1":
-            self.start.addRow(-num)
+    def addRowBefore(self, num=1):
+        self.start=self.start.addRow(-num)
         return Range(self.string())
 
     ## Adds a column to the end Coord, so it adds a column to the range. If start Coord letter is A, returns the same Coord
-    def prependColumn(self, num=1):
-        if self.start.letter!="A":
-            self.start.addColumn(-num)
+    def addColumnBefore(self, num=1):
+        self.start=self.start.addColumn(-num)
         return Range(self.string())
