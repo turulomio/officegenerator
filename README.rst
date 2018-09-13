@@ -26,6 +26,10 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+0.11.0
+  * Added package tests
+  * Added append/prepend rows/columns to Range
+  * Added guess_ods_style function
 0.10.0
   * Replaced letter, number parameters by Coord and Range
   * Added compatibilty classes OpenPyXL2010 and ODS_Write_Without_Styles
