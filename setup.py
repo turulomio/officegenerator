@@ -90,5 +90,6 @@ setup(name='officegenerator',
                'doc': Doc,
               },
      zip_safe=False,
+     test_suite = 'officegenerator.tests',
      include_package_data=True
 )

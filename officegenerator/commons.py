@@ -371,10 +371,13 @@ class Coord:
         elif o.__class__==str:
             return Coord(o)
 
+
+## Class that manages spreadsheet Ranges for ods and xlsx
 class Range:
     def __init__(self,strrange):
         self.start, self.end=self.__extract(strrange)
 
+    ## Converts a string to a Range. Returns None if conversion can't be done
     def __extract(self,range):
         if range.find(":")==-1:
             print("I can't manage this range")
@@ -382,15 +385,19 @@ class Range:
         a=range.split(":")
         return (Coord(a[0]), Coord(a[1]))
 
+    ## String of a range in spreadsheets
     def string(self):
         return "{}:{}".format(self.start.string(), self.end.string())
 
+    ## Number of range of the range
     def numRows(self):
         return row2number(self.end.number)-row2number(self.start.number) +1
 
+    ## Number of columns of the range
     def numColumns(self):
         return column2number(self.end.letter)-column2number(self.start.letter) +1
 
+    ## Returns a Range object even o is a str or a Range
     @staticmethod
     def assertRange(o):
         if o.__class__==Range:
@@ -399,12 +406,24 @@ class Range:
             return Range(o)
 
 
-    ## Adds a row to the range
+    ## Adds a row to the end Coord, so it adds a row to the range
     def appendRow(self, num=1):
-        self.end=self.end.addRow()
+        self.end=self.end.addRow(num)
         return Range(self.string())
 
-    ## Adds a column to the range
-    def appendRow(self, num=1):
-        self.end=self.end.addColumn()
+    ## Adds a column to the end Coord, so it adds a column to the range
+    def appendColumn(self, num=1):
+        self.end=self.end.addColumn(num)
+        return Range(self.string())
+
+    ## Adds a row to the top of the start Coord, so it adds a row to the range. If start Coord number is 1 returns the same Coord
+    def prependRow(self, num=1):
+        if self.start.number!="1":
+            self.start.addRow(-num)
+        return Range(self.string())
+
+    ## Adds a column to the end Coord, so it adds a column to the range. If start Coord letter is A, returns the same Coord
+    def prependColumn(self, num=1):
+        if self.start.letter!="A":
+            self.start.addColumn(-num)
         return Range(self.string())
