@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code
 
 Changelog
 =========
+0.12.0
+  * Improving Range and Coord limit situations
 0.11.0
   * Added package tests
   * Added append/prepend rows/columns to Range
