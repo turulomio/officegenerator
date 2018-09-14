@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-12 20:02+0200\n"
+"POT-Creation-Date: 2018-09-14 06:29+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -69,6 +69,21 @@ msgstr "Esta celda va a unir el rango B13 y F14"
 msgid "This cell is going to be merged and aligned desde B18 a G18"
 msgstr "Esta celda va a unir y alinear el rango B18 a G18"
 
+msgid "Manual of officegenerator"
+msgstr "Manual de OfficeGenerator"
+
+msgid "ODT"
+msgstr "ODT"
+
+msgid "ODT files can be quickly generated with OfficeGenerator."
+msgstr "Los ficheros ODT son creados rápidamente con OfficeGenerator."
+
+msgid "It create predefined styles that allows to create nice documents without worry about styles."
+msgstr "Crea estilos predefinidos que te permiten crear documentos vistosos sin preocuparte de los estilos."
+
+msgid "ODT Predefined styles"
+msgstr "Estilos predefinidos para ODT"
+
 msgid "Styles"
 msgstr "Estilos"
 
@@ -80,6 +95,9 @@ msgstr "Esta celda va a ser unida desde con B13 y C13"
 
 msgid "This cell is going to be merged and aligned"
 msgstr "Esta celda va a ser unida y alineada"
+
+msgid "{} Class not found in '{}'"
+msgstr "No se encontró la clase {} en '{}'"
 
 msgid "*** ERROR: File wasn't generated ***"
 msgstr "*** ERROR: El fichero no ha sido generado ***"

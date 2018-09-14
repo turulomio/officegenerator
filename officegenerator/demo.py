@@ -145,10 +145,11 @@ def demo_ods():
 
 def demo_odt():
     doc=ODT("officegenerator.odt", language="fr", country="FR")
-    doc.setMetadata("officegenerator manual",  "officegenerator documentation", "Mariano Muñoz")
-    doc.title("Manual of officegenerator")
-    doc.header("ODT Writing", 1)
-    doc.simpleParagraph("Hola a todos")
+    doc.setMetadata("Officegenerator manual",  "officegenerator documentation", "Mariano Muñoz")
+    doc.title(_("Manual of officegenerator"))
+    doc.header(_("ODT"), 1)
+    doc.simpleParagraph(_("ODT files can be quickly generated with OfficeGenerator.") + " " + _("It create predefined styles that allows to create nice documents without worry about styles."))
+    doc.header(_("ODT Predefined styles"), 2)
     doc.list(["Pryueba hola no", "Adios", "Bienvenido"], style="BulletList")
     doc.simpleParagraph("Hola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todos")
     doc.numberedList(["Pryueba hola no", "Adios", "Bienvenido"])

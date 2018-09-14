@@ -21,10 +21,8 @@ except:
     _=str
 
 
+## This is a decorator which can be used to mark functions as deprecated. It will result in a warning being emitted when the function is used
 def deprecated(func):
-     """This is a decorator which can be used to mark functions
-     as deprecated. It will result in a warning being emitted
-     when the function is used."""
      @functools.wraps(func)
      def new_func(*args, **kwargs):
          warnings.simplefilter('always', DeprecationWarning)  # turn off filter
@@ -33,19 +31,10 @@ def deprecated(func):
          return func(*args, **kwargs)
      return new_func
 
-
+## Class to manage currencies in officegenerator
+##
+## The symbol is defined by code with self.symbol()
 class Currency:
-    """
-        currency es un ID
-        EUR=Euros
-        USD=Dolares americanosw
-        self.append(Currency().init__create(QApplication.translate("Core","Chinese Yoan"), "¥", 'CNY'))
-        self.append(Currency().init__create(QApplication.translate("Core","Euro"), "€", "EUR"))
-        self.append(Currency().init__create(QApplication.translate("Core","Pound"),"£", 'GBP'))
-        self.append(Currency().init__create(QApplication.translate("Core","Japones Yen"), '¥', "JPY"))
-        self.append(Currency().init__create(QApplication.translate("Core","American Dolar"), '$', 'USD'))
-        self.append(Currency().init__create(QApplication.translate("Core","Units"), 'u', 'u'))
-    """
     def __init__(self, amount=None,  currency='EUR') :
         if amount==None:
             self.amount=Decimal(0)
@@ -64,16 +53,15 @@ class Currency:
         else:
             logging.error("Before adding, please convert to the same currency")
             raise "OdfMoneyOperationException"
-            
-        
+
     def __sub__(self, money):
         """Si las divisas son distintas, queda el resultado con la divisa del primero"""
         if self.currency==money.currency:
             return Currency(self.amount-money.amount, self.currency)
         else:
             logging.error("Before substracting, please convert to the same currency")
-            raise "OdfMoneyOperationException"
-        
+            raise "CurrencyOperationException"
+
     def __lt__(self, money):
         if self.currency==money.currency:
             if self.amount < money.amount:
@@ -82,12 +70,11 @@ class Currency:
         else:
             logging.error("Before lt ordering, please convert to the same currency")
             sys.exit(1)
-        
+
+    ## Si las divisas son distintas, queda el resultado con la divisa del primero
+    ##
+    ## En caso de querer multiplicar por un numero debe ser despues. For example: money*4
     def __mul__(self, money):
-        """Si las divisas son distintas, queda el resultado con la divisa del primero
-        En caso de querer multiplicar por un numero debe ser despues
-        money*4
-        """
         if money.__class__ in (int,  float, Decimal):
             return Currency(self.amount*money, self.currency)
         if self.currency==money.currency:
@@ -95,7 +82,7 @@ class Currency:
         else:
             logging.error("Before multiplying, please convert to the same currency")
             sys.exit(1)
-    
+
     def __truediv__(self, money):
         """Si las divisas son distintas, queda el resultado con la divisa del primero"""
         if self.currency==money.currency:
@@ -103,30 +90,34 @@ class Currency:
         else:
             logging.error("Before true dividing, please convert to the same currency")
             sys.exit(1)
-        
+
     def __repr__(self):
         return self.string(2)
-        
+
+    ## Returs a typical currency string
+    ## @param digits int that defines the number of decimals. 2 by default
+    ## @return string
     def string(self,   digits=2):
         return "{} {}".format(round(self.amount, digits), self.symbol())
-        
+
+    ## Returns the symbol of the currency
     def symbol(self):
         if self.currency=="EUR":
             return "€"
         elif self.currency=="USD":
             return "$"
-        
+
     def isZero(self):
         if self.amount==Decimal(0):
             return True
         else:
             return False
-            
+
     def isGETZero(self):
         if self.amount>=Decimal(0):
             return True
         else:
-            return False           
+            return False
 
     def isGTZero(self):
         if self.amount>Decimal(0):
@@ -145,7 +136,7 @@ class Currency:
             return True
         else:
             return False
-            
+
     def __neg__(self):
         """Devuelve otro money con el amount con signo cambiado"""
         return Currency(-self.amount, self.currency)
@@ -153,11 +144,12 @@ class Currency:
     def round(self, digits=2):
         return round(self.amount, digits)
 
+## Class to manage percentages in spreadsheets
 class Percentage:
     def __init__(self, numerator=None, denominator=None):
         self.value=None
         self.setValue(self.toDecimal(numerator),self.toDecimal(denominator))
-        
+
     def toDecimal(self, o):
         if o==None:
             return o
@@ -172,16 +164,15 @@ class Percentage:
         else:
             logging.warning (o.__class__)
             return None
-        
+
     def __repr__(self):
         return self.string()
-            
+
     def __neg__(self):
-        """Devuelve otro money con el amount con signo cambiado"""
         if self.value==None:
             return self
         return Percentage(-self.value, 1)
-        
+
     def __lt__(self, other):
         if self.value==None:
             value1=Decimal('-Infinity')
@@ -194,7 +185,7 @@ class Percentage:
         if value1<value2:
             return True
         return False
-        
+
     def __mul__(self, value):
         if self.value==None or value==None:
             r=None
@@ -208,39 +199,40 @@ class Percentage:
         except:
             r=None
         return Percentage(r, 1)
-        
+
     def setValue(self, numerator,  denominator):
         try:
             self.value=Decimal(numerator/denominator)
         except:
             self.value=None
-        
-        
+
     def value_100(self):
         if self.value==None:
             return None
         else:
             return self.value*Decimal(100)
-        
+
     def string(self, rnd=2):
         if self.value==None:
             return "None %"
         return "{} %".format(round(self.value_100(), rnd))
-        
 
+    ## Returns if the percentage is valid. I mean it's value different of None
     def isValid(self):
         if self.value!=None:
             return True
         return False
-        
+
     def isGETZero(self):
         if self.value>=0:
             return True
         return False
+
     def isGTZero(self):
         if self.value>0:
             return True
         return False
+
     def isLTZero(self):
         if self.value<0:
             return True

@@ -1,3 +1,6 @@
+## @namespace officegenerator.tests.test_commons
+## @brief Test for officegenerator.commons functions and classes
+
 import unittest
 from officegenerator.commons import Range, Coord
 

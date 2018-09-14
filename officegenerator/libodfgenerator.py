@@ -27,7 +27,8 @@ try:
     _=t.gettext
 except:
     _=str
-            
+
+## Type class that defines predefined width columns
 class ColumnWidthODS:
     Date=60
     Datetime=100
@@ -431,31 +432,30 @@ class ODT(ODF):
         Data: data
         sizes: arr with column widths in cm
         size=font size"""  
-    
+
         self.seqTables=self.seqTables+1
         tablesize=sum(sizes)
-        
+
         s=Style(name="Tabla{}".format(self.seqTables))
         s.addElement(TableProperties(width="{}cm".format(tablesize), align="center"))
         self.doc.automaticstyles.addElement(s)
-        
+
         #Column sizes
         for i, size in enumerate(sizes):
             sc= Style(name="Tabla{}.{}".format(self.seqTables, chr(65+i)), family="table-column")
             sc.addElement(TableColumnProperties(columnwidth="{}cm".format(sizes[i])))
             self.doc.automaticstyles.addElement(sc)
-        
+
         #Cell header style
         sch=Style(name="Tabla{}.HeaderCell".format(self.seqTables, chr(65), 1), family="table-cell")
         sch.addElement(TableCellProperties(border="0.05pt solid #000000"))
         self.doc.automaticstyles.addElement(sch)        
-        
+
         #Cell normal
         sch=Style(name="Tabla{}.Cell".format(self.seqTables), family="table-cell")
         sch.addElement(TableCellProperties(border="0.05pt solid #000000"))
         self.doc.automaticstyles.addElement(sch)
-        
-        
+
         #TAble contents style
         s= Style(name="Tabla{}.Heading{}".format(self.seqTables, font), family="paragraph",parentstylename='Table Heading' )
         s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
@@ -491,7 +491,7 @@ class ODT(ODF):
             tablecell.addElement(p)
             tablerow.addElement(tablecell)
         table.addElement(headerrow)
-            
+
         #Data rows
         for row in data:
             tr = TableRow()
@@ -539,16 +539,6 @@ class ODT(ODF):
         else:
             p=P(stylename="PV")
         self.doc.text.addElement(p)
-#
-#    def link(self):
-#        para = P()
-#        anchor = A(href="http://www.com/", text="A link label")
-#        para.addElement(anchor)
-#        self.doc.text.addElement(para)
-#        
-#    #######################################
-
-
 
 ## Creates a cell
 ##  Constructor can be
@@ -574,10 +564,10 @@ class OdfCell:
         self.spannedColumns=1
         self.spannedRows=1
         self.comment=None
-        
+
     def __repr__(self):
         return "OdfCell <{}{}>".format(self.coord.letter, self.coord.number)
-        
+
     def generate(self):
         if self.object.__class__==Currency:
             odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
@@ -606,13 +596,14 @@ class OdfCell:
             a.addElement(P(stylename="Right", text=self.comment))
             odfcell.addElement(a)
         return odfcell
-        
+
+    ## Manage cell spannning 
+    ##
+    ## Siempre es de izquierda a derecha y de arriba a abajo. Si es 1 no hay spanning
     def setSpanning(self, columns, rows):
-        """Siempre es de izquierda a derecha y de arriba a abajo
-        Si es 1 no hay spanning"""
         self.spannedColumns=columns
         self.spannedRows=rows
-        
+
     def setComment(self, comment):
         self.comment=comment
 
@@ -683,7 +674,7 @@ B1:
         coord=Coord.assertCoord(coord)
         self.cursorPositionX=coord.letterIndex()
         self.cursorPositionY=coord.numberIndex()
-        
+
     ## Sets a comment in the givven cell
     ## @param coord can be Coord o Coord.string()
     ## @param comment String to insert as a comment in the cell
@@ -737,7 +728,7 @@ B1:
             coord=Coord.assertCoord(args[0])
             result=args[1]
             style=args[2]
-        
+
         if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal):#Un solo valor
             self.addCell(OdfCell(coord, result, style))
         elif result.__class__ in (list,):#Una lista
@@ -748,9 +739,9 @@ B1:
                     for j, column in enumerate(row):
                         self.addCell(OdfCell(coord.addColumn(j).addRow(i), result[i][j], style))
                 else:
-                    logging.warning(row.__class__, "ROW CLASS NOT FOUND",  row)
+                    logging.warning(_("{} Class not found in '{}'").format(row.__class__, row))
 
-
+    ## Adds a cell to self.arr with merge, content and style information
     ## @param range Range
     def addMerged(self, range, result, style):
         range=Range.assertRange(range)
@@ -758,6 +749,7 @@ B1:
         c=self.getCell(range.start)
         c.setSpanning(range.numColumns(), range.numRows())
 
+    ## Generates the sheet in self.doc Opendocument varianble
     def generate(self, ods):
         # Start the table
         columns=self.columns()
@@ -765,7 +757,7 @@ B1:
         grid=[[None for x in range(columns)] for y in range(rows)]
         for cell in self.arr:
             grid[cell.coord.numberIndex()][cell.coord.letterIndex()]=cell
-        
+
         table = Table(name=self.title)
         for c in range(columns):#Create columns
             try:
@@ -784,10 +776,9 @@ B1:
                     tr.addElement(TableCell())
         ods.doc.spreadsheet.addElement(table)
 
+    ## Gets the number of columns that are used in the sheet
+    ## @return int
     def columns(self):
-        """
-            Gets column number
-        """
         r=0
         for cell in self.arr:
             column=cell.coord.letterPosition()
@@ -804,8 +795,8 @@ B1:
                 r=column
         return r
 
-        
 
+## Abstract class with common functions to generate Libreoffice Calc ODS files
 class ODS(ODF):
     def __init__(self, filename):
         ODF.__init__(self, filename)
@@ -817,16 +808,15 @@ class ODS(ODF):
         s=OdfSheet(self.doc, title)
         self.sheets.append(s)
         return s
-        
+
     def getActiveSheet(self):
         if self.activeSheet==None:
             return self.sheets[0].title
         return self.activeSheet
-            
+
+    ## Save ODS file
+    ## @param filename str or None. If filename is given, file is saved with a different name to the constructor one
     def save(self, filename=None):
-        """
-            If filename is given, file is saved with a different name.
-        """
         #config settings information
         a=ConfigItemSet(name="ooo:view-settings")
         aa=ConfigItem(type="int", name="VisibleAreaTop")
@@ -900,6 +890,7 @@ class ODS(ODF):
         """value is OdfSheet"""
         self.activeSheet=value.title
 
+## Class to manage color in Libreoffice Calc ODS. It generates all needed ODS styles needed for that color
 class Color:
     def __init__(self, name, rgb):
         self.name=name
@@ -911,13 +902,13 @@ class Color:
         hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="center"))
         doc.styles.addElement(hs)
-        
+
         hs=Style(name=self.name + "Left", family="table-cell")
         hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
         hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="left"))
         doc.styles.addElement(hs)
-        
+
         hs=Style(name=self.name + "Right", family="table-cell")
         hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
         hs.addElement(TextProperties( fontweight="bold"))
@@ -926,7 +917,7 @@ class Color:
 
         moneycontents = Style(name=self.name+"Euro", family="table-cell",  datastylename="Euro",parentstylename=self.name+"Right")
         doc.styles.addElement(moneycontents)
-        
+
         pourcent = Style(name=self.name+'Percentage', family='table-cell', datastylename='Percentage',parentstylename=self.name+"Right")
         doc.styles.addElement(pourcent)
 
@@ -935,31 +926,35 @@ class Color:
 
         date = Style(name=self.name+"Date", datastylename="Date",parentstylename=self.name+"Left", family="table-cell")
         doc.styles.addElement(date)
-        
+
         integer = Style(name=self.name+"Integer", family="table-cell",  datastylename="Integer",parentstylename=self.name+"Right")
         doc.styles.addElement(integer)
-        
+
         decimal2= Style(name=self.name+"Decimal2", family="table-cell",  datastylename="Decimal2",parentstylename=self.name+"Right")
         doc.styles.addElement(decimal2)
-        
+
         decimal6= Style(name=self.name+"Decimal6", family="table-cell",  datastylename="Decimal6",parentstylename=self.name+"Right")
         doc.styles.addElement(decimal6)
-        
+
+
+## Class to Mange Colors in libodfgenerator
 class ColorManager:
     def __init__(self):
         self.arr=[]
-    
+
     def append(self, o):
         self.arr.append(o)
-        
+
     def generate_ods_styles(self, doc):
         for o in self.arr:
             o.generate_ods_styles(doc)
 
+
+## Class to write Libreoffice Calc ODS files
 class ODS_Write(ODS):
     def __init__(self, filename):
         ODS.__init__(self, filename)
-                
+
         # Create the styles for $AUD format currency values
         ns1 = CurrencyStyle(name="EuroBlack", volatile="true")
         ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))

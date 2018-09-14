@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-13 19:31+0200\n"
+"POT-Creation-Date: 2018-09-14 06:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,21 @@ msgstr ""
 msgid "This cell is going to be merged and aligned desde B18 a G18"
 msgstr ""
 
+msgid "Manual of officegenerator"
+msgstr ""
+
+msgid "ODT"
+msgstr ""
+
+msgid "ODT files can be quickly generated with OfficeGenerator."
+msgstr ""
+
+msgid "It create predefined styles that allows to create nice documents without worry about styles."
+msgstr ""
+
+msgid "ODT Predefined styles"
+msgstr ""
+
 msgid "Styles"
 msgstr ""
 
@@ -78,6 +93,9 @@ msgid "This cell is going to be merged with B13 and C13"
 msgstr ""
 
 msgid "This cell is going to be merged and aligned"
+msgstr ""
+
+msgid "{} Class not found in '{}'"
 msgstr ""
 
 msgid "*** ERROR: File wasn't generated ***"
