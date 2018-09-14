@@ -4,7 +4,7 @@ from setuptools import setup, Command
 import os
 import platform
 import site
-from officegenerator.commons import __version__
+
 
 class Doc(Command):
     description = "Update translations"
@@ -63,6 +63,15 @@ class Uninstall(Command):
 
 with open('README.rst', encoding='utf-8') as f:
     long_description = f.read()
+
+## Version of officegenerator captured from commons to avoid problems with package dependencies
+__version__= None
+with open('officegenerator/commons.py', encoding='utf-8') as f:
+    for line in f.readlines():
+        if line.find("__version__ =")!=-1:
+            __version__=line.split("'")[1]
+
+
 setup(name='officegenerator',
      version=__version__,
      description='Python module to read and write LibreOffice and MS Office files',
