@@ -1,11 +1,10 @@
-
 from setuptools import setup, Command
 
 import os
 import platform
 import site
 
-
+## Class to define doc command
 class Doc(Command):
     description = "Update translations"
     user_options = []
@@ -22,7 +21,7 @@ class Doc(Command):
         os.system("msgmerge -N --no-wrap -U locale/es.po locale/officegenerator.pot")
         os.system("msgfmt -cv -o officegenerator/locale/es/LC_MESSAGES/officegenerator.mo locale/es.po")
 
-
+## Class to define doxygen command
 class Doxygen(Command):
     description = "Create/update doxygen documentation in doc/html"
     user_options = []
@@ -42,6 +41,7 @@ class Doxygen(Command):
         os.system("rsync -avzP -e 'ssh -l turulomio' html/ frs.sourceforge.net:/home/users/t/tu/turulomio/userweb/htdocs/doxygen/officegenerator/ --delete-after")
         os.chdir("..")
 
+## Class to define uninstall command
 class Uninstall(Command):
     description = "Uninstall installed files with install"
     user_options = []
