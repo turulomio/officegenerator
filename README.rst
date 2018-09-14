@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
+X.X.X
+  * [#7] Solved bug with charmap in Windows
 0.13.0
   * Coord and Range addRow/Column functions now updates the object and doesn't create a new one
 0.12.0
