@@ -898,19 +898,19 @@ class Color:
 
     def generate_ods_styles(self, doc):
         hs=Style(name=self.name + "Center", family="table-cell")
-        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
+        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000", verticalalign="middle", textalignsource="fix"))
         hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="center"))
         doc.styles.addElement(hs)
 
         hs=Style(name=self.name + "Left", family="table-cell")
-        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
+        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000", verticalalign="middle", textalignsource="fix"))
         hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="left"))
         doc.styles.addElement(hs)
 
         hs=Style(name=self.name + "Right", family="table-cell")
-        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000"))
+        hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000", verticalalign="middle", textalignsource="fix"))
         hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="end"))
         doc.styles.addElement(hs)
