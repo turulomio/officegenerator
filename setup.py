@@ -1,8 +1,9 @@
 from setuptools import setup, Command
-
+import shutil
+import site
 import os
 import platform
-import site
+
 
 ## Class to define doc command
 class Doc(Command):
@@ -57,7 +58,7 @@ class Uninstall(Command):
             os.system("rm -Rf {}/officegenerator*".format(site.getsitepackages()[0]))
             os.system("rm /usr/bin/officegenerator*")
         else:
-            print ("Uninstall only works in Linux")
+            os.system("pip uninstall officegenerator")
 
 ########################################################################
 

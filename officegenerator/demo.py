@@ -30,10 +30,10 @@ def main():
     args=parser.parse_args()
 
     if args.remove==True:
-        os.system("rm officegenerator.ods")
-        os.system("rm officegenerator.odt")
-        os.system("rm officegenerator_readed.ods")
-        os.system("rm officegenerator.xlsx")
+        os.remove("officegenerator.ods")
+        os.remove("officegenerator.odt")
+        os.remove("officegenerator_readed.ods")
+        os.remove("officegenerator.xlsx")
 
     if args.create==True:
         demo_ods()
