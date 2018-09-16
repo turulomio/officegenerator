@@ -146,7 +146,19 @@ def demo_odt():
     doc.header(_("ODT"), 1)
     doc.simpleParagraph(_("ODT files can be quickly generated with OfficeGenerator.") + " " + _("It create predefined styles that allows to create nice documents without worry about styles."))
     doc.header(_("ODT Predefined styles"), 2)
-    doc.list(["Pryueba hola no", "Adios", "Bienvenido"], style="BulletList")
+    doc.simpleParagraph(_("OfficeGenerator has the following predefined styles"))
+    doc.header(_("Tables"), 2)
+    doc.simpleParagraph(_("We can create tables too:"))
+    doc.table(  [_("Concept"), _("Value")], 
+                        ["<", "<"], 
+                        [
+                            [_("Text"), _("This is a text")]
+                        ], 
+                        [20, 20], 
+                        12
+                    )  #def table(self, header, orientation,  data, sizes, font):
+    doc.header(_("Lists and numbered lists"), 2)
+    doc.list(["Prueba hola no", "Adios", "Bienvenido"], style="BulletList")
     doc.simpleParagraph("Hola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todos")
     doc.numberedList(["Pryueba hola no", "Adios", "Bienvenido"])
     doc.simpleParagraph("Con officegenerator podemos")

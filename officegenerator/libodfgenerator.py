@@ -364,6 +364,12 @@ class ODT(ODF):
         h=H(outlinelevel=level, stylename="Heading{}".format(level), text=text)
         self.doc.text.addElement(h)
 
+
+    ## @param header
+    ## @param orientation. Can be < or >
+    ## @param data
+    ## @param sizes
+    ## @param font
     def table(self, header, orientation,  data, sizes, font):
         """Headerl text
         Data: data
