@@ -1,5 +1,5 @@
-## @namespace officegenerator.tests.demo
-## @brief Test for officegenerator.commons functions and classes
+## @namespace officegenerator.tests.test_demo
+## @brief Test for officegenerator_demo script
 
 import unittest
 from officegenerator.demo import main
