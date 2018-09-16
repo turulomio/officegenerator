@@ -152,7 +152,6 @@ class OpenPyXL:
             alignment='right' if alignment==None else alignment
             #zeros=decimals*"0"
             cell.number_format="#.##0,00 {0};[RED]-#.##0,00 {0}".format(value.currency)
-            print(cell.number_format)
         elif value.__class__ in (Percentage, ):
             cell.value=value.value
             alignment='right' if alignment==None else alignment

@@ -137,7 +137,7 @@ class ODS_Read:
         #Get comment
 #        comment=cell.getElementsByType(Annotation)
 #        if len(comment)>0:
-##            print((comment[0].allowed_attributes()))
+#            print((comment[0].allowed_attributes()))
 #            comment_text=comment[0].getAttribute('name')
 #            r.setComment(comment_text)
 #            print(comment)
@@ -155,13 +155,12 @@ removeChild(oldchild) – Re
         NO SE PUEDEN AÑADIR MAS CELDAS O FILAS
         PARA ESO USAR ODS_Write DE MOMENTO
         """
-#        if cell.__class__ not in [ODFCell, ODFFORMULA]: FALTA PROGRAMAR
-        
+
         row=sheet_element.getElementsByType(TableRow)[row2index(number)]
         oldcell=row.getElementsByType(TableCell)[column2index(letter)]
         row.insertBefore(cell.generate(), oldcell)
         row.removeChild(oldcell)
-        
+
     def save(self, filename):
         if  filename==self.filename:
             print("You can't overwrite a readed ods")
@@ -200,32 +199,12 @@ class ODF:
 class ODT(ODF):
     def __init__(self, filename, template=None, language="es", country="ES"):
         def styleGraphics():
-#            >
-#    <style:style style:family="graphic" style:name="Graphics">
-#      <style:graphic-properties style:wrap="none" style:vertical-pos="top" style:horizontal-rel="paragraph" style:horizontal-pos="center" svg:x="0cm" style:vertical-rel="paragraph" svg:y="0cm" text:anchor-type="paragraph"/>
-#    </style:style>
             ga=Style(family="graphic", name="GraphicsParagraph")
             ga.addElement(GraphicProperties(verticalpos="top", horizontalpos="center", horizontalrel="paragraph",  verticalrel="paragraph", anchortype="paragraph"))
             self.doc.styles.addElement(ga)
-
-#    <style:style style:family="graphic" style:parent-style-name="Graphics" style:name="fr1">
-#      <style:graphic-properties draw:contrast="0%" fo:clip="rect(0cm 0cm 0cm 0cm)" draw:color-mode="standard" style:mirror="none" draw:gamma="100%" style:horizontal-rel="paragraph" draw:red="0%" draw:luminance="0%" draw:color-inversion="false" style:horizontal-pos="left" draw:blue="0%" draw:image-opacity="100%" draw:green="0%"/>
-#    </style:style>
             framea=Style(family="graphic", parentstylename="GraphicsParagraph", name="FrameParagraph")
             self.doc.automaticstyles.addElement(framea)
-            
         def stylePage():
-    #       <style:page-layout style:name="Mpm1">
-    #      <style:page-layout-properties fo:page-width="21.001cm" style:print-orientation="portrait" fo:margin-top="2cm"
-    #fo:margin-right="2cm" style:writing-mode="lr-tb" style:footnote-max-height="0cm" style:num-format="1" fo:page-height="29.7cm" fo:margin-left="2cm" fo:margin-bottom="2cm">
-    #        <style:footnote-sep style:color="#000000" style:width="0.018cm" style:line-style="solid" style:adjustment="left" style:rel-width="25%" style:distance-after-sep="0.101cm" style:distance-before-sep="0.101cm"/>
-    #      </style:page-layout-properties>
-    #      <style:header-style/>
-    #      <style:footer-style>
-    #        <style:header-footer-properties fo:min-height="0cm" fo:margin-top="0.499cm"/>
-    #      </style:footer-style>
-    #    </style:page-layout>
-
             pagelayout=PageLayout(name="PageLayout")
             plp=PageLayoutProperties(pagewidth="21cm",  pageheight="29.7cm",  margintop="2cm",  marginright="2cm",  marginleft="2cm",  marginbottom="2cm")
             fs=FooterStyle()
@@ -275,11 +254,6 @@ class ODT(ODF):
             self.doc.styles.addElement(letra12)
 
         def styleHeaders():
-    #        #Header1
-    #        #    <style:style style:auto-update="true" style:display-name="Heading 1" style:default-outline-level="1" style:family="paragraph" style:name="Heading_20_1" style:next-style-name="Text_20_body" style:parent-style-name="Heading" style:class="text">
-    #      <style:paragraph-properties fo:margin-top="0.423cm" fo:margin-right="0cm" fo:text-align="justify" fo:text-indent="0cm" ns42:contextual-spacing="false" style:writing-mode="page" fo:margin-left="0cm" fo:margin-bottom="0.212cm" style:auto-text-indent="false" style:justify-single-word="false"/>
-    #      <style:text-properties style:font-weight-complex="bold" fo:font-size="15pt" style:font-size-asian="130%" style:font-size-complex="130%" fo:font-weight="bold" style:font-weight-asian="bold"/>
-    #    </style:style>
             titlestyle = Style(name="Title", family="paragraph",  autoupdate="true", defaultoutlinelevel="0")
             titlestyle.addElement(ParagraphProperties(attributes={"margintop":"0.6cm", "textalign":"center", "marginbottom":"0.9cm"}))
             titlestyle.addElement(TextProperties(attributes={"fontsize": "16pt", "fontweight": "bold", "country": self.country, "language": self.language}))
@@ -298,12 +272,6 @@ class ODT(ODF):
             outl=OutlineLevelStyle(level=2, displaylevels="2", numformat="1", numsuffix="  ")
             out.addElement(outl)
             self.doc.styles.addElement(out)
-            #Standard
-            #            <style:style style:auto-update="true" style:name="Standard" style:family="paragraph" style:master-page-name="" style:class="text">
-            #      <style:paragraph-properties fo:margin-top="0.199cm" fo:margin-right="0cm" fo:text-align="justify" ns42:contextual-spacing="false" fo:text-indent="1cm" style:page-number="auto" style:writing-mode="page" fo:margin-left="0cm" fo:margin-bottom="0.199cm" style:auto-text-indent="false" style:justify-single-word="false"/>
-            #      <style:text-properties style:font-size-asian="10.5pt"/>
-            #    </style:style>
-            
 
         def styleList():
             liststandard= Style(name="ListStandard", family="paragraph",  autoupdate="true")
@@ -326,28 +294,11 @@ class ODT(ODF):
             self.doc.styles.addElement(numberedliststyle)
         
         def styleFooter():
-            #Footer
-    #            <style:style style:master-page-name="" style:class="extra" style:auto-update="true" style:parent-style-name="Standard" style:name="Footer" style:family="paragraph">
-    #      <style:paragraph-properties fo:text-align="center" fo:text-indent="0cm" style:auto-text-indent="false" fo:margin-left="0cm" style:writing-mode="page" style:justify-single-word="false" text:number-lines="false" text:line-number="0" fo:margin-right="0cm" style:page-number="auto">
-    #        <style:tab-stops>
-    #          <style:tab-stop style:position="8.5cm" style:type="center"/>
-    #          <style:tab-stop style:position="17cm" style:type="right"/>
-    #        </style:tab-stops>
-    #      </style:paragraph-properties>
-    #      <style:text-properties fo:font-size="8pt"/>
-    #    </style:style>
             s= Style(name="Footer", family="paragraph",  autoupdate="true")
             s.addElement(ParagraphProperties(attributes={"margintop":"0cm", "textalign":"center", "marginbottom":"0cm", "textindent":"0cm"}))
             s.addElement(TextProperties(attributes={"fontsize": "9pt", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(s)
 
-
-    #    <style:master-page style:name="Standard" style:page-layout-name="Mpm1">
-    #      <style:footer>
-    #        <text:p text:style-name="MP1">Página <text:page-number text:select-page="current">1</text:page-number> de <text:page-count>1</text:page-count></text:p>
-    #      </style:footer>
-    #    </style:master-page>
-            #Footer
         def styleMasterPage():
             foot=MasterPage(name="Standard", pagelayoutname="PageLayout")
             footer=Footer()

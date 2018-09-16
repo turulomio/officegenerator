@@ -20,14 +20,16 @@ try:
 except:
     _=str
 
-
-def main():
+## If arguments is None, launches with sys.argc parameters. Entry point is toomanyfiles:main
+## You can call with main(['--pretend']). It's equivalento to os.system('program --pretend')
+## @param arguments is an array with parser arguments. For example: ['--argument','9']. 
+def main(arguments=None):
     parser=argparse.ArgumentParser(prog='officegenerator', description=_('Create example files using officegenerator module'), epilog=argparse_epilog(), formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=__version__)
     group= parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--create', help="Create demo files", action="store_true",default=False)
     group.add_argument('--remove', help="Remove demo files", action="store_true", default=False)
-    args=parser.parse_args()
+    args=parser.parse_args(arguments)
 
     if args.remove==True:
         os.remove("officegenerator.ods")
@@ -36,43 +38,37 @@ def main():
         os.remove("officegenerator.xlsx")
 
     if args.create==True:
+        print(_("Generating example files"))
         demo_ods()
-        print(_("ODS Generated"))
+        print("  * " + _("ODS Generated"))
 
         demo_ods_readed()
-        print(_("ODS Readed and regenerated"))
+        print("  * " + _("ODS Readed and regenerated"))
 
         demo_odt()
-        print(_("ODT Generated"))
+        print("  * " + _("ODT Generated"))
 
         demo_xlsx()
-        print(_("XLSX Generated"))
+        print("  * " + _("XLSX Generated"))
 
 
 def demo_ods_readed():
     doc=ODS_Read("officegenerator.ods")
     s1=doc.getSheetElementByIndex(0)
-    print("Getting values from ODS:")
-    print("  + String", doc.getCellValue(s1, "A", "1"))
-    print("  + Percentage", doc.getCellValue(s1, "B", "2"))
-    print("  + Formula", doc.getCellValue(s1, "B", "4"))
-    print("  + Decimal", doc.getCellValue(s1, "B", "6"))
-    print("  + Decimal", doc.getCellValue(s1, "B", "7"))
-    s2=doc.getSheetElementByIndex(1)
-    print("  + Currency", doc.getCellValue(s2, "B", "2"))
-    print("  + Datetime", doc.getCellValue(s2, "B", "3"))
-    print("  + Date", doc.getCellValue(s2, "B", "4"))
 
     ##Sustituye celda
     odfcell=doc.getCell(s1, "B", "6")
     odfcell.object=1789.12
+    odfcell.setComment(_("This cell has been readed and modified"))
     doc.setCell(s1, "B", "6", odfcell)
-    doc.save("officegenerator_readed.ods")
 
+    #Added cell
     odfcell=doc.getCell(s1, "B", "10")
-    odfcell.object="TURULETE"
-    #    odfcell.setComment("Turulete")
+    odfcell.object=_("Created cell")
+    odfcell.setComment(_("This cell has been readed and modified"))
     doc.setCell(s1, "B", "10", odfcell )
+
+    doc.save("officegenerator_readed.ods")
 
 def demo_ods():
     doc=ODS_Write("officegenerator.ods")

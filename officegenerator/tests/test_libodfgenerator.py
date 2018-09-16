@@ -1,9 +1,11 @@
 ## @namespace officegenerator.tests.test_libodfgenerator
 ## @brief Test for officegenerator.libodfgenerator functions and classes
+import datetime
 import unittest
-from officegenerator.commons import Range, Percentage
-from officegenerator.libodfgenerator import guess_ods_style
-
+from decimal import Decimal
+from officegenerator.commons import Range, Percentage, Currency
+from officegenerator.demo import demo_ods, demo_ods_readed
+from officegenerator.libodfgenerator import ODS_Read, guess_ods_style
 
 ## Class to text Range operations. Class must begin with Test and modules with test_ too
 class TestFunctions(unittest.TestCase):
@@ -11,6 +13,21 @@ class TestFunctions(unittest.TestCase):
         s=Percentage(1,2)
         self.assertEqual(guess_ods_style("Orange", s), "OrangePercentage")
 
+## Class to text ODS_Read operations. Class must begin with Test and modules with test_ too
+class TestODS_Read(unittest.TestCase):
+    def test_guess_ods_style(self):
+        demo_ods()
+        doc=ODS_Read("officegenerator.ods")
+        s1=doc.getSheetElementByIndex(0)
+        self.assertEqual(doc.getCellValue(s1,"A","2"),"Percentage")
+        #self.assertEqual(doc.getCellValue(s1,"B","2").value, Percentage(21.43,100).value)
+        self.assertEqual(doc.getCellValue(s1,"B","4").upper(),"=SUM(B2:B3)")
+        self.assertEqual(doc.getCellValue(s1,"B","6"), Decimal("100.26"))
+
+        s3=doc.getSheetElementByIndex(2)
+        self.assertEqual(doc.getCellValue(s3,"B","2").__class__, datetime.datetime)
+        self.assertEqual(doc.getCellValue(s3,"C","2").__class__, datetime.date)
+        self.assertEqual(doc.getCellValue(s3,"E","2").string(), Currency(12.56, "EUR").string())
 
 if __name__ == '__main__':
     unittest.main()
