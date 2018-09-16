@@ -56,17 +56,17 @@ def demo_ods_readed():
     doc=ODS_Read("officegenerator.ods")
     s1=doc.getSheetElementByIndex(0)
 
-    ##Sustituye celda
-    odfcell=doc.getCell(s1, "B", "6")
+    #Sustituye celda
+    odfcell=doc.getCell(s1, "B6")
     odfcell.object=1789.12
     odfcell.setComment(_("This cell has been readed and modified"))
-    doc.setCell(s1, "B", "6", odfcell)
+    doc.setCell(s1, "B6", odfcell)
 
     #Added cell
-    odfcell=doc.getCell(s1, "B", "10")
+    odfcell=doc.getCell(s1, "B10")
     odfcell.object=_("Created cell")
     odfcell.setComment(_("This cell has been readed and modified"))
-    doc.setCell(s1, "B", "10", odfcell )
+    doc.setCell(s1, "B10", odfcell )
 
     doc.save("officegenerator_readed.ods")
 
@@ -95,12 +95,10 @@ def demo_ods():
     s1.addMerged("E10:F11", "Celda con Merged", "GrayDarkCenter")
     s1.setComment("E10", _("This is a comment"))
     
-    
-
     s4=doc.createSheet("Splitting")
     for letter in "ABCDEFGHIJ":
         for number in range(1, 11):
-            s4.add(letter, str(number), letter+str(number), "YellowLeft")
+            s4.add(letter + str(number), letter+str(number), "YellowLeft")
     s4.setCursorPosition("C3")
     s4.setSplitPosition("C3")
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-14 06:29+0200\n"
+"POT-Creation-Date: 2018-09-16 10:09+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -24,6 +24,9 @@ msgstr "Desarrollado por Mariano Muñoz 2015-{}"
 msgid "Create example files using officegenerator module"
 msgstr "Crea ficheros de ejemplo usando el módulo officegenerator"
 
+msgid "Generating example files"
+msgstr "Generando ficheros de ejemplo"
+
 msgid "ODS Generated"
 msgstr "ODS generado"
 
@@ -35,6 +38,12 @@ msgstr "ODT generado"
 
 msgid "XLSX Generated"
 msgstr "XLSX generado"
+
+msgid "This cell has been readed and modified"
+msgstr "Esta celda ha sido leída y modificada"
+
+msgid "Created cell"
+msgstr "Celda creada"
 
 msgid "This is a comment"
 msgstr "Esto es un comentario"
@@ -53,6 +62,9 @@ msgstr "Entero"
 
 msgid "Euros"
 msgstr "Euros"
+
+msgid "Dollars"
+msgstr "Dólares"
 
 msgid "Percentage"
 msgstr "Porcentaje"
@@ -95,6 +107,9 @@ msgstr "Esta celda va a ser unida desde con B13 y C13"
 
 msgid "This cell is going to be merged and aligned"
 msgstr "Esta celda va a ser unida y alineada"
+
+msgid "You can't overwrite a readed ods"
+msgstr "No puedes sobreescribir un ods leído"
 
 msgid "{} Class not found in '{}'"
 msgstr "No se encontró la clase {} en '{}'"

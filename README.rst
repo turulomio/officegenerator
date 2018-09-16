@@ -26,13 +26,14 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
-X.X.X
+1.0.0
   * [#7] Solved bug with charmap in Windows
   * [#10] Dependencies are installed when using pip
   * [#11] Now you can add diferent currencies
   * [#13] Now cells are vertical aligned
   * [#14] Added a normal style to predefined colors
   * [#15] officegenerator_demo --remove works now in Windows
+  * [#16] Moved missing functions with letter, number args to coord 
   * python setup.py uninstall works now in Windows
 0.13.0
   * Coord and Range addRow/Column functions now updates the object and doesn't create a new one

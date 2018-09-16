@@ -20,7 +20,7 @@ from odf.meta import InitialCreator
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
 
-from officegenerator.commons import makedirs,  column2index,  row2index,   number2column,  number2row,  Coord, Range,  Percentage, Currency
+from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -78,13 +78,11 @@ class ODS_Read:
         """
         return len(sheet_element.getElementsByType(TableColumn))
         
-        
-    def getCellValue(self, sheet_element, letter, number):
-        """
-            Returns the celll value
-        """
-        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
-        cell=row.getElementsByType(TableCell)[column2index(letter)]
+    ## Returns the cell value
+    def getCellValue(self, sheet_element, coord):
+        coord=Coord.assertCoord(coord)
+        row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
+        cell=row.getElementsByType(TableCell)[coord.letterIndex()]
         r=None
         
         if cell.getAttribute('valuetype')=='string':
@@ -103,17 +101,14 @@ class ODS_Read:
                 r=datetime.datetime.strptime(datevalue, "%Y-%m-%d").date()
             else:
                 r=datetime.datetime.strptime(datevalue, "%Y-%m-%dT%H:%M:%S")
-#        print(cell.allowed_attributes(), cell.getAttribute('datevalue'), cell.getAttribute('datatype'))
-#        print(cell.getAttribute('value'), cell.getAttribute('valuetype'),   r)
         return r
 
-    def getCell(self, sheet_element,  letter, number):
-        """
-            Returns an odfcell object
-        """
-        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
-        cell=row.getElementsByType(TableCell)[column2index(letter)]
-        object=self.getCellValue(sheet_element, letter, number)
+    ## Returns an odfcell object
+    def getCell(self, sheet_element,  coord):
+        coord=Coord.assertCoord(coord)
+        row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
+        cell=row.getElementsByType(TableCell)[coord.letterIndex()]
+        object=self.getCellValue(sheet_element, coord)
         #Get spanning
         spanning_columns=cell.getAttribute('numbercolumnsspanned')
         if spanning_columns==None:
@@ -131,20 +126,11 @@ class ODS_Read:
 
 
         #Odfcell
-        r=OdfCell(letter, number, object, stylename)
+        r=OdfCell(coord, object, stylename)
         r.setSpanning(spanning_columns, spanning_rows)
-        
-        #Get comment
-#        comment=cell.getElementsByType(Annotation)
-#        if len(comment)>0:
-#            print((comment[0].allowed_attributes()))
-#            comment_text=comment[0].getAttribute('name')
-#            r.setComment(comment_text)
-#            print(comment)
-
         return r
         
-    def setCell(self, sheet_element,  letter, number, cell):
+    def setCell(self, sheet_element,  coord, cell):
         """
             Updates a cell
             insertBefore(newchild, refchild) – Inserts the node newchild before the existing child node refchild.
@@ -155,15 +141,15 @@ removeChild(oldchild) – Re
         NO SE PUEDEN AÑADIR MAS CELDAS O FILAS
         PARA ESO USAR ODS_Write DE MOMENTO
         """
-
-        row=sheet_element.getElementsByType(TableRow)[row2index(number)]
-        oldcell=row.getElementsByType(TableCell)[column2index(letter)]
+        coord=Coord.assertCoord(coord)
+        row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
+        oldcell=row.getElementsByType(TableCell)[coord.letterIndex()]
         row.insertBefore(cell.generate(), oldcell)
         row.removeChild(oldcell)
 
     def save(self, filename):
         if  filename==self.filename:
-            print("You can't overwrite a readed ods")
+            print(_("You can't overwrite a readed ods"))
             return        
         self.doc.save( filename)
 
@@ -491,26 +477,12 @@ class ODT(ODF):
             p=P(stylename="PV")
         self.doc.text.addElement(p)
 
-## Creates a cell
-##  Constructor can be
-## 4 args letter, number, object, style
+## Manage Odf Cells
 class OdfCell:
-    def __init__(self, *args):
-        def init_letter_number(letter, number, object, style):
-            self.letter=letter
-            self.number=number
-            self.object=object
-            self.style=style
-            self.coord=Coord(self.letter+self.number)
-        def init_coord(coord, object, style):
-            self.coord=Coord.assertCoord(coord)
-            self.object=object
-            self.style=style
-        #######
-        if len(args)==4:
-            init_letter_number(*args)
-        elif len(args)==3:
-            init_coord(*args)
+    def __init__(self, coord,  object, style):
+        self.coord=Coord.assertCoord(coord)
+        self.object=object
+        self.style=style
 
         self.spannedColumns=1
         self.spannedRows=1
@@ -616,7 +588,6 @@ B1:
         self.positionBottom="0" if self.verticalSplitPosition=="0" else str(self.verticalSplitPosition)
         self.positionLeft="0"
         self.positionRight="0" if self.horizontalSplitPosition=="0" else str(self.horizontalSplitPosition)
-        ##print (letter,  number, ":", self.horizontalSplitPosition,  self.verticalSplitPosition,  self.activeSplitRange, self.positionTop, self.positionBottom,  self.positionLeft, self.positionRight)
 
     def setCursorPosition(self, coord):
         """
@@ -667,18 +638,8 @@ B1:
                 return c
         return None
 
-    ## Puede ser
-    ## - letter,number, result,style
-    ## - coord, result, style
-    def add(self, *args):
-        if len(args)==4:
-            coord=Coord.assertCoord(args[0]+args[1])
-            result=args[2]
-            style=args[3]
-        elif len(args)==3:
-            coord=Coord.assertCoord(args[0])
-            result=args[1]
-            style=args[2]
+    def add(self, coord, result, style):
+        coord=Coord.assertCoord(coord)
 
         if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal):#Un solo valor
             self.addCell(OdfCell(coord, result, style))
