@@ -843,26 +843,30 @@ class ODS(ODF):
 
 ## Class to manage color in Libreoffice Calc ODS. It generates all needed ODS styles needed for that color
 class Color:
-    def __init__(self, name, rgb):
+    def __init__(self, name, rgb, bold):
         self.name=name
         self.rgb=rgb
+        self.bold=bold
 
     def generate_ods_styles(self, doc):
         hs=Style(name=self.name + "Center", family="table-cell")
         hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000", verticalalign="middle", textalignsource="fix"))
-        hs.addElement(TextProperties( fontweight="bold"))
+        if self.bold==True:
+            hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="center"))
         doc.styles.addElement(hs)
 
         hs=Style(name=self.name + "Left", family="table-cell")
         hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000", verticalalign="middle", textalignsource="fix"))
-        hs.addElement(TextProperties( fontweight="bold"))
+        if self.bold==True:
+            hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="left"))
         doc.styles.addElement(hs)
 
         hs=Style(name=self.name + "Right", family="table-cell")
         hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000", verticalalign="middle", textalignsource="fix"))
-        hs.addElement(TextProperties( fontweight="bold"))
+        if self.bold==True:
+            hs.addElement(TextProperties( fontweight="bold"))
         hs.addElement(ParagraphProperties(textalign="end"))
         doc.styles.addElement(hs)
 
@@ -896,21 +900,13 @@ class ColorManager:
     def append(self, o):
         self.arr.append(o)
 
-    def generate_ods_styles(self, doc):
-        for o in self.arr:
-            o.generate_ods_styles(doc)
-
-
-## Class to write Libreoffice Calc ODS files
-class ODS_Write(ODS):
-    def __init__(self, filename):
-        ODS.__init__(self, filename)
-
+    ## Generate common styles used in all color styles
+    def __generate_ods_common_styles(self, doc):
         # Create the styles for $AUD format currency values
         ns1 = CurrencyStyle(name="EuroBlack", volatile="true")
         ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
         ns1.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
-        self.doc.styles.addElement(ns1)
+        doc.styles.addElement(ns1)
 
         # Create the main style.
         ns2 = CurrencyStyle(name="Euro")
@@ -919,14 +915,14 @@ class ODS_Write(ODS):
         ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
         ns2.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
         ns2.addElement(Map(condition="value()>=0", applystylename="EuroBlack"))
-        self.doc.styles.addElement(ns2)
+        doc.styles.addElement(ns2)
         
         #Percentage
         nonze = PercentageStyle(name='PercentageBlack')
         nonze.addElement(TextProperties(color="#000000"))
         nonze.addElement(Number(decimalplaces='2', minintegerdigits='1'))
         nonze.addElement(Text(text=' %'))
-        self.doc.styles.addElement(nonze)
+        doc.styles.addElement(nonze)
         
         nonze2 = PercentageStyle(name='Percentage')
         nonze2.addElement(TextProperties(color="#ff0000"))
@@ -934,7 +930,7 @@ class ODS_Write(ODS):
         nonze2.addElement(Number(decimalplaces='2', minintegerdigits='1'))
         nonze2.addElement(Text(text=' %'))
         nonze2.addElement(Map(condition="value()>=0", applystylename="PercentageBlack"))
-        self.doc.styles.addElement(nonze2)
+        doc.styles.addElement(nonze2)
         
         # Datetimes
         date_style = DateStyle(name="Datetime") #, language="lv", country="LV")
@@ -949,7 +945,7 @@ class ODS_Write(ODS):
         date_style.addElement(Minutes(style="long"))
         date_style.addElement(Text(text=":"))
         date_style.addElement(Seconds(style="long"))
-        self.doc.styles.addElement(date_style)#NO SERIA ESTE UN AUTOMATICO????
+        doc.styles.addElement(date_style)#NO SERIA ESTE UN AUTOMATICO????
 
         #Date
         date_style = DateStyle(name="Date") #, language="lv", country="LV")
@@ -958,53 +954,67 @@ class ODS_Write(ODS):
         date_style.addElement(Month(style="long"))
         date_style.addElement(Text(text="-"))
         date_style.addElement(Day(style="long"))
-        self.doc.styles.addElement(date_style)
+        doc.styles.addElement(date_style)
 
         #Integer
         ns1 = NumberStyle(name="IntegerBlack", volatile="true")
         ns1.addElement(Number(decimalplaces="0", minintegerdigits="1", grouping="true"))
-        self.doc.styles.addElement(ns1)
+        doc.styles.addElement(ns1)
 
         ns2 = NumberStyle(name="Integer")
         ns2.addElement(TextProperties(color="#ff0000"))
         ns2.addElement(Text(text="-"))
         ns2.addElement(Number(decimalplaces="0", minintegerdigits="1", grouping="true"))
         ns2.addElement(Map(condition="value()>=0", applystylename="IntegerBlack"))
-        self.doc.styles.addElement(ns2)
+        doc.styles.addElement(ns2)
             
         #Decimal 2
         ns1 = NumberStyle(name="Decimal2Black", volatile="true")
         ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
-        self.doc.styles.addElement(ns1)
+        doc.styles.addElement(ns1)
 
         ns2 = NumberStyle(name="Decimal2")
         ns2.addElement(TextProperties(color="#ff0000"))
         ns2.addElement(Text(text="-"))
         ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
         ns2.addElement(Map(condition="value()>=0", applystylename="Decimal2Black"))
-        self.doc.styles.addElement(ns2)
+        doc.styles.addElement(ns2)
             
         #Decimal 2
         ns1 = NumberStyle(name="Decimal6Black", volatile="true")
         ns1.addElement(Number(decimalplaces="6", minintegerdigits="1", grouping="true"))
-        self.doc.styles.addElement(ns1)
+        doc.styles.addElement(ns1)
 
         ns2 = NumberStyle(name="Decimal6")
         ns2.addElement(TextProperties(color="#ff0000"))
         ns2.addElement(Text(text="-"))
         ns2.addElement(Number(decimalplaces="6", minintegerdigits="1", grouping="true"))
         ns2.addElement(Map(condition="value()>=0", applystylename="Decimal6Black"))
-        self.doc.styles.addElement(ns2)
+        doc.styles.addElement(ns2)
             
+
+    def generate_ods_styles(self, doc):
+        self.__generate_ods_common_styles(doc)
+        for o in self.arr:
+            o.generate_ods_styles(doc)
+
+
+## Class to write Libreoffice Calc ODS files
+class ODS_Write(ODS):
+    def __init__(self, filename):
+        ODS.__init__(self, filename)
+
+
         self.colors=ColorManager()
-        self.colors.append(Color("Green", "#9bff9b"))
-        self.colors.append(Color("GrayDark", "#888888"))
-        self.colors.append(Color("GrayLight", "#bbbbbb"))
-        self.colors.append(Color("Orange", "#ffcc99"))
-        self.colors.append(Color("Yellow", "#ffff7f"))
-        self.colors.append(Color("White", "#ffffff"))
-        self.colors.append(Color("Blue", "#9b9bff"))
-        self.colors.append(Color("Red", "#ff9b9b"))
+        self.colors.append(Color("Green", "#9bff9b", True))
+        self.colors.append(Color("GrayDark", "#888888", True))
+        self.colors.append(Color("GrayLight", "#bbbbbb", True))
+        self.colors.append(Color("Orange", "#ffcc99", True))
+        self.colors.append(Color("Yellow", "#ffff7f", True))
+        self.colors.append(Color("White", "#ffffff", True))
+        self.colors.append(Color("Blue", "#9b9bff", True))
+        self.colors.append(Color("Red", "#ff9b9b", True))
+        self.colors.append(Color("Normal", "#ffffff", False))
         self.colors.generate_ods_styles(self.doc)
 
 

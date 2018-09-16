@@ -132,7 +132,7 @@ def demo_ods():
     s6.addMerged("B13:F14", _("This cell is going to be merged with B13 a F14"), "GreenCenter")
     s6.addMerged("B18:G18", _("This cell is going to be merged and aligned desde B18 a G18"), "YellowRight")
     s6.setCursorPosition("B11")
-    s6.setSplitPosition("A10")
+    s6.setSplitPosition("A11")
     
     
     doc.setActiveSheet(s6)
