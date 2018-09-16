@@ -106,25 +106,27 @@ def demo_ods():
 
 
     s6=doc.createSheet("Format number")
-    s6.setColumnsWidth([ColumnWidthODS.L, ColumnWidthODS.Datetime, ColumnWidthODS.Date, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.XL, ColumnWidthODS.XXL])
+    s6.setColumnsWidth([ColumnWidthODS.L, ColumnWidthODS.Datetime, ColumnWidthODS.Date, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.XL, ColumnWidthODS.XXL])
 
     s6.add("A1", _("Style name"), "OrangeCenter")
     s6.add("B1", _("Date and time"), "OrangeCenter")
     s6.add("C1", _("Date"), "OrangeCenter")
     s6.add("D1", _("Integer"), "OrangeCenter")
     s6.add("E1", _("Euros"), "OrangeCenter")
-    s6.add("F1", _("Percentage"), "OrangeCenter")
-    s6.add("G1", _("Number with 2 decimals"), "OrangeCenter")
-    s6.add("H1", _("Number with 6 decimals"), "OrangeCenter")
+    s6.add("F1", _("Dollars"), "OrangeCenter")
+    s6.add("G1", _("Percentage"), "OrangeCenter")
+    s6.add("H1", _("Number with 2 decimals"), "OrangeCenter")
+    s6.add("I1", _("Number with 6 decimals"), "OrangeCenter")
     for row, color in enumerate(doc.colors.arr):
         s6.add(Coord("A2").addRow(row), color.name, color.name + "Left")
         s6.add(Coord("B2").addRow(row), datetime.datetime.now(),  color.name +"Datetime")
         s6.add(Coord("C2").addRow(row), datetime.date.today(), color.name + "Date")
         s6.add(Coord("D2").addRow(row), pow(-1, row)*-10000000, color.name+ "Integer")
-        s6.add(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), color.name + "Euro")
-        s6.add(Coord("F2").addRow(row), Percentage(pow(-1, row)*1, 3), color.name+"Percentage")
-        s6.add(Coord("G2").addRow(row), pow(-1, row)*123456789.121212, color.name+"Decimal2")
-        s6.add(Coord("H2").addRow(row), pow(-1, row)*-12.121212, color.name+"Decimal6")
+        s6.add(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), color.name + "EUR")
+        s6.add(Coord("F2").addRow(row), Currency(pow(-1, row)*12345.56, "USD"), color.name + "USD")
+        s6.add(Coord("G2").addRow(row), Percentage(pow(-1, row)*1, 3), color.name+"Percentage")
+        s6.add(Coord("H2").addRow(row), pow(-1, row)*123456789.121212, color.name+"Decimal2")
+        s6.add(Coord("I2").addRow(row), pow(-1, row)*-12.121212, color.name+"Decimal6")
 
     s6.setComment("B2", _("This is a comment"))
     

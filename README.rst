@@ -29,6 +29,7 @@ Changelog
 X.X.X
   * [#7] Solved bug with charmap in Windows
   * [#10] Dependencies are installed when using pip
+  * [#11] Now you can add diferent currencies
   * [#13] Now cells are vertical aligned
   * [#14] Added a normal style to predefined colors
   * [#15] officegenerator_demo --remove works now in Windows

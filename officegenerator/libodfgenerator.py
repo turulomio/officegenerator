@@ -840,15 +840,39 @@ class ODS(ODF):
     def setActiveSheet(self, value):
         """value is OdfSheet"""
         self.activeSheet=value.title
+        
+        
+class ODSStyleCurrency:
+    def __init__(self, name, symbol):
+        self.name=name
+        self.symbol=symbol
+        
+    ## Generate currency styles
+    def generate_ods_styles(self, doc):
+        # Create the styles for $AUD format currency values
+        ns1 = CurrencyStyle(name=self.name + "Black", volatile="true")
+        ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
+        ns1.addElement(CurrencySymbol(language="es", country="ES", text=" "+ self.symbol))
+        doc.styles.addElement(ns1)
+
+        # Create the main style.
+        ns2 = CurrencyStyle(name=self.name)
+        ns2.addElement(TextProperties(color="#ff0000"))
+        ns2.addElement(Text(text="-"))
+        ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
+        ns2.addElement(CurrencySymbol(language="es", country="ES", text=" "+ self.symbol))
+        ns2.addElement(Map(condition="value()>=0", applystylename=self.name + "Black"))
+        doc.styles.addElement(ns2)
+        
 
 ## Class to manage color in Libreoffice Calc ODS. It generates all needed ODS styles needed for that color
-class Color:
+class ODSStyleColor:
     def __init__(self, name, rgb, bold):
         self.name=name
         self.rgb=rgb
         self.bold=bold
 
-    def generate_ods_styles(self, doc):
+    def generate_ods_styles(self, doc, currencymanager):
         hs=Style(name=self.name + "Center", family="table-cell")
         hs.addElement(TableCellProperties(backgroundcolor=self.rgb, border="0.06pt solid #000000", verticalalign="middle", textalignsource="fix"))
         if self.bold==True:
@@ -870,8 +894,9 @@ class Color:
         hs.addElement(ParagraphProperties(textalign="end"))
         doc.styles.addElement(hs)
 
-        moneycontents = Style(name=self.name+"Euro", family="table-cell",  datastylename="Euro",parentstylename=self.name+"Right")
-        doc.styles.addElement(moneycontents)
+        for currency in currencymanager.arr:
+            moneycontents = Style(name=self.name+currency.name, family="table-cell",  datastylename=currency.name ,parentstylename=self.name+"Right")
+            doc.styles.addElement(moneycontents)
 
         pourcent = Style(name=self.name+'Percentage', family='table-cell', datastylename='Percentage',parentstylename=self.name+"Right")
         doc.styles.addElement(pourcent)
@@ -892,8 +917,20 @@ class Color:
         doc.styles.addElement(decimal6)
 
 
-## Class to Mange Colors in libodfgenerator
-class ColorManager:
+## Class to Mange ODSStyleColors in libodfgenerator
+class ODSStyleCurrencyManager:
+    def __init__(self):
+        self.arr=[]
+
+    def append(self, o):
+        self.arr.append(o)
+
+    def generate_ods_styles(self, doc):
+        for o in self.arr:
+            o.generate_ods_styles(doc)
+
+## Class to Mange ODSStyleColors in libodfgenerator
+class ODSStyleColorManager:
     def __init__(self):
         self.arr=[]
 
@@ -902,21 +939,6 @@ class ColorManager:
 
     ## Generate common styles used in all color styles
     def __generate_ods_common_styles(self, doc):
-        # Create the styles for $AUD format currency values
-        ns1 = CurrencyStyle(name="EuroBlack", volatile="true")
-        ns1.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
-        ns1.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
-        doc.styles.addElement(ns1)
-
-        # Create the main style.
-        ns2 = CurrencyStyle(name="Euro")
-        ns2.addElement(TextProperties(color="#ff0000"))
-        ns2.addElement(Text(text="-"))
-        ns2.addElement(Number(decimalplaces="2", minintegerdigits="1", grouping="true"))
-        ns2.addElement(CurrencySymbol(language="es", country="ES", text=" €"))
-        ns2.addElement(Map(condition="value()>=0", applystylename="EuroBlack"))
-        doc.styles.addElement(ns2)
-        
         #Percentage
         nonze = PercentageStyle(name='PercentageBlack')
         nonze.addElement(TextProperties(color="#000000"))
@@ -993,10 +1015,10 @@ class ColorManager:
         doc.styles.addElement(ns2)
             
 
-    def generate_ods_styles(self, doc):
+    def generate_ods_styles(self, doc, currencymanager):
         self.__generate_ods_common_styles(doc)
         for o in self.arr:
-            o.generate_ods_styles(doc)
+            o.generate_ods_styles(doc, currencymanager)
 
 
 ## Class to write Libreoffice Calc ODS files
@@ -1004,24 +1026,26 @@ class ODS_Write(ODS):
     def __init__(self, filename):
         ODS.__init__(self, filename)
 
+        self.colors=ODSStyleColorManager()
+        self.colors.append(ODSStyleColor("Green", "#9bff9b", True))
+        self.colors.append(ODSStyleColor("GrayDark", "#888888", True))
+        self.colors.append(ODSStyleColor("GrayLight", "#bbbbbb", True))
+        self.colors.append(ODSStyleColor("Orange", "#ffcc99", True))
+        self.colors.append(ODSStyleColor("Yellow", "#ffff7f", True))
+        self.colors.append(ODSStyleColor("White", "#ffffff", True))
+        self.colors.append(ODSStyleColor("Blue", "#9b9bff", True))
+        self.colors.append(ODSStyleColor("Red", "#ff9b9b", True))
+        self.colors.append(ODSStyleColor("Normal", "#ffffff", False))
+        
+        self.currencies=ODSStyleCurrencyManager()
+        self.currencies.append(ODSStyleCurrency("EUR", "€"))
+        self.currencies.append(ODSStyleCurrency("USD", "$"))
 
-        self.colors=ColorManager()
-        self.colors.append(Color("Green", "#9bff9b", True))
-        self.colors.append(Color("GrayDark", "#888888", True))
-        self.colors.append(Color("GrayLight", "#bbbbbb", True))
-        self.colors.append(Color("Orange", "#ffcc99", True))
-        self.colors.append(Color("Yellow", "#ffff7f", True))
-        self.colors.append(Color("White", "#ffffff", True))
-        self.colors.append(Color("Blue", "#9b9bff", True))
-        self.colors.append(Color("Red", "#ff9b9b", True))
-        self.colors.append(Color("Normal", "#ffffff", False))
-        self.colors.generate_ods_styles(self.doc)
-
-
-    def createSheet(self, title):
-        s=OdfSheet(self.doc, title)
-        self.sheets.append(s)
-        return s
+    ## Generate color styles and currency styles and the save file
+    def save(self, filename=None):
+        self.currencies.generate_ods_styles(self.doc)
+        self.colors.generate_ods_styles(self.doc, self.currencies)
+        ODS.save(self, filename)
         
 
 ## Guess style from color and object class
