@@ -369,7 +369,7 @@ class ODT(ODF):
     ## @param data
     ## @param sizes
     ## @param font
-    def table(self, header, orientation,  data, sizes, font):
+    def table(self, header, data, sizes, font):
         def generate_table_styles():
             s=Style(name="Table.Size{}".format(sum(sizes)))
             s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center"))
@@ -435,9 +435,10 @@ class ODT(ODF):
         ######################################
         generate_table_styles()
         #Table columns
-        table = Table(stylename="Table.Size{}".format(sum(sizes)))
-        for i, head in enumerate(header):
-            table.addElement(TableColumn(stylename="Table.Column.Size{}".format(sizes[i])))
+        self.seqTables=self.seqTables+1
+        table = Table(name="Table.{}".format(self.seqTables),  stylename="Table.Size{}".format(sum(sizes)))
+        for size in sizes:
+            table.addElement(TableColumn(stylename="Table.Column.Size{}".format(size)))
         #Header rows
         headerrow=TableHeaderRows()
         tablerow=TableRow()

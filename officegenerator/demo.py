@@ -151,7 +151,6 @@ def demo_odt():
     doc.header(_("Tables"), 2)
     doc.simpleParagraph(_("We can create tables too:"))
     doc.table(  [_("Concept"), _("Value")], 
-                        ["<", "<"], 
                         [
                             [_("Text"), _("This is a text")], 
                             [_("Datetime"), datetime.datetime.now()], 
@@ -160,28 +159,26 @@ def demo_odt():
                             [_("Currency"), Currency(12.12, "EUR")], 
                             [_("Percentage"), Percentage(1, 3)], 
                         ], 
-                        [2, 2], 
+                        [2, 4], 
                         12
                     )    
     doc.simpleParagraph(_("Tables with the same size"))
     doc.table(  [_("Concept"), _("Value")], 
-                        ["<", "<"], 
                         [
                             [_("Text"), _("This is a text")], 
                             [_("Decimal"), Decimal("-12.121")], 
                             [_("Currency"), Currency(-12.12, "EUR")], 
                             [_("Percentage"), Percentage(-1, 3)], 
                         ], 
-                        [4, 4], 
+                        [4, 5], 
                         12
                     )    
     doc.simpleParagraph(_("Tables with different size"))
     doc.table(  [_("Concept"), _("Value")], 
-                        ["<", "<"], 
                         [
                             [_("Text"), _("This is a text")], 
                         ], 
-                        [3,3], 
+                        [3,12], 
                         8
                     )
     doc.header(_("Lists and numbered lists"), 2)
