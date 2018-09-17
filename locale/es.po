@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-16 10:09+0200\n"
+"POT-Creation-Date: 2018-09-17 08:53+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -95,6 +95,45 @@ msgstr "Crea estilos predefinidos que te permiten crear documentos vistosos sin 
 
 msgid "ODT Predefined styles"
 msgstr "Estilos predefinidos para ODT"
+
+msgid "OfficeGenerator has the following predefined styles"
+msgstr "OfficeGenerator tiene los siguientes estilos predefinidos"
+
+msgid "Tables"
+msgstr "Tablas"
+
+msgid "We can create tables too:"
+msgstr "Podemos crear tablas también:"
+
+msgid "Concept"
+msgstr "Concepto"
+
+msgid "Value"
+msgstr "Valor"
+
+msgid "Text"
+msgstr "Texto"
+
+msgid "This is a text"
+msgstr "Esto es un texto"
+
+msgid "Datetime"
+msgstr "Fecha y hora"
+
+msgid "Decimal"
+msgstr "Decimal"
+
+msgid "Currency"
+msgstr "Divisa"
+
+msgid "Tables with the same size"
+msgstr "Tablas con el mismo tamaño"
+
+msgid "Tables with different size"
+msgstr "Tablas con tamaño distinto"
+
+msgid "Lists and numbered lists"
+msgstr "Listas y listas numeradas"
 
 msgid "Styles"
 msgstr "Estilos"

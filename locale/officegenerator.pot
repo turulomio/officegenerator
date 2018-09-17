@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-16 10:10+0200\n"
+"POT-Creation-Date: 2018-09-17 08:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,6 +93,45 @@ msgid "It create predefined styles that allows to create nice documents without 
 msgstr ""
 
 msgid "ODT Predefined styles"
+msgstr ""
+
+msgid "OfficeGenerator has the following predefined styles"
+msgstr ""
+
+msgid "Tables"
+msgstr ""
+
+msgid "We can create tables too:"
+msgstr ""
+
+msgid "Concept"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
+msgid "Text"
+msgstr ""
+
+msgid "This is a text"
+msgstr ""
+
+msgid "Datetime"
+msgstr ""
+
+msgid "Decimal"
+msgstr ""
+
+msgid "Currency"
+msgstr ""
+
+msgid "Tables with the same size"
+msgstr ""
+
+msgid "Tables with different size"
+msgstr ""
+
+msgid "Lists and numbered lists"
 msgstr ""
 
 msgid "Styles"

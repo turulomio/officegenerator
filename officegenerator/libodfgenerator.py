@@ -355,21 +355,26 @@ class ODT(ODF):
             l.addElement(it)
         self.doc.text.addElement(l)
 
+
+    ## Creates the document title
+    ## @param text String with the title
     def title(self, text):
         p=P(stylename="Title", text=text)
         self.doc.text.addElement(p)
 
+    ## Creates a text header
+    ## @param text String with the header string
+    ## @Level Integer Level of the header
     def header(self, text, level):
         h=H(outlinelevel=level, stylename="Heading{}".format(level), text=text)
         self.doc.text.addElement(h)
 
-
-    ## @param header
-    ## @param orientation. Can be < or >
-    ## @param data
-    ## @param sizes
-    ## @param font
-    def table(self, header, data, sizes, font):
+    ## Creates a table adding it to self.doc
+    ## @param header List with all header strings
+    ## @param data Multidimension List with all data objects. Can be str, Decimal, int, datetime, date, Currency, Percentage
+    ## @param sizes Integer list with sizes in cm
+    ## @param fontsize Integer in pt
+    def table(self, header, data, sizes, fontsize):
         def generate_table_styles():
             s=Style(name="Table.Size{}".format(sum(sizes)))
             s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center"))
@@ -392,42 +397,46 @@ class ODT(ODF):
             self.doc.automaticstyles.addElement(sch)
 
             #TAble contents style
-            s= Style(name="Table.Heading.Font{}".format(font), family="paragraph" )
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font),  'fontweight':"bold"}))
+            s= Style(name="Table.Heading.Font{}".format(fontsize), family="paragraph" )
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize),  'fontweight':"bold"}))
             s.addElement(ParagraphProperties(attributes={'textalign':'center', }))
             self.doc.styles.addElement(s)
             
-            s = Style(name="Table.Contents.Font{}".format(font), family="paragraph")
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
+            s = Style(name="Table.Contents.Font{}".format(fontsize), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
             s.addElement(ParagraphProperties(attributes={'textalign':'justify', }))
             self.doc.styles.addElement(s)
             
-            s = Style(name="Table.ContentsRight.Font{}".format(font), family="paragraph")
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
+            s = Style(name="Table.ContentsRight.Font{}".format(fontsize), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
             s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
             self.doc.styles.addElement(s)
             
-            s = Style(name="Table.ContentsRight.FontRed{}".format(font), family="paragraph")
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), 'color':'#ff0000' }))
+            s = Style(name="Table.ContentsRight.FontRed{}".format(fontsize), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), 'color':'#ff0000' }))
             s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
             self.doc.styles.addElement(s)
 
-        def addTableCell(o, font):
+        ## Generate a TableCell guessing style, setting color if number is negative and setting alignment
+        ## @param o Object can be str, Decimal, int, float, datetime, date, Currency, Percentage
+        ## @param fontsize Integer with the size of the font
+        ## @return TableCell
+        def addTableCell(o, fontsize):
             tc = TableCell(stylename="Table.Cell")
             
             #Parses orientation
-            p = P(stylename="Table.ContentsRight.Font{}".format(font))
+            p = P(stylename="Table.ContentsRight.Font{}".format(fontsize))
             s=Span(text=o)
             if o.__class__ in (str, datetime.datetime, datetime.date ):
-                p = P(stylename="Table.Contents.Font{}".format(font))
+                p = P(stylename="Table.Contents.Font{}".format(fontsize))
                 s=Span(text=str(o))
             elif o.__class__ in (Currency,  Percentage):
                 if o.isLTZero():
-                    p = P(stylename="Table.ContentsRight.FontRed{}".format(font))
+                    p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
                 s=Span(text=o.string())
             elif o.__class__ in (int, Decimal,  float):
                 if o<0:
-                    p = P(stylename="Table.ContentsRight.FontRed{}".format(font))
+                    p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
             p.addElement(s)
             tc.addElement(p)
             return tc
@@ -444,7 +453,7 @@ class ODT(ODF):
         tablerow=TableRow()
         headerrow.addElement(tablerow)
         for i, head in enumerate(header):
-            p=P(stylename="Table.Heading.Font{}".format(font), text=head)
+            p=P(stylename="Table.Heading.Font{}".format(fontsize), text=head)
             tablecell=TableCell(stylename="Table.HeaderCell")
             tablecell.addElement(p)
             tablerow.addElement(tablecell)
@@ -455,7 +464,7 @@ class ODT(ODF):
             tr = TableRow()
             table.addElement(tr)
             for i, o in enumerate(row):
-                tr.addElement(addTableCell(o, font))
+                tr.addElement(addTableCell(o, fontsize))
         self.doc.text.addElement(table)
         
     ## @param href must bu added before with addImage
@@ -463,10 +472,10 @@ class ODT(ODF):
     ## @param height
     ## @return Frame element
     def image(self, href, width, height):
+        self.seqFrames=self.seqFrames+1
         f = Frame(name="Frame_{}".format(self.seqFrames), anchortype="as-char", width="{}cm".format(width), height="{}cm".format(height)) #, width="2cm", height="2cm", zindex="0")
         img = Image(href=self.images[href], type="simple", show="embed", actuate="onLoad")
         f.addElement(img)
-        self.seqFrames=self.seqFrames+1
         return f
 
     def pageBreak(self,  horizontal=False):    
