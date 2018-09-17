@@ -7,6 +7,7 @@ import gettext
 import os
 import pkg_resources
 
+from decimal import Decimal
 from officegenerator.commons import __version__
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, ColumnWidthODS
 from officegenerator.libxlsxgenerator import OpenPyXL
@@ -152,11 +153,37 @@ def demo_odt():
     doc.table(  [_("Concept"), _("Value")], 
                         ["<", "<"], 
                         [
-                            [_("Text"), _("This is a text")]
+                            [_("Text"), _("This is a text")], 
+                            [_("Datetime"), datetime.datetime.now()], 
+                            [_("Date"), datetime.date.today()], 
+                            [_("Decimal"), Decimal("12.121")], 
+                            [_("Currency"), Currency(12.12, "EUR")], 
+                            [_("Percentage"), Percentage(1, 3)], 
                         ], 
-                        [20, 20], 
+                        [2, 2], 
                         12
-                    )  #def table(self, header, orientation,  data, sizes, font):
+                    )    
+    doc.simpleParagraph(_("Tables with the same size"))
+    doc.table(  [_("Concept"), _("Value")], 
+                        ["<", "<"], 
+                        [
+                            [_("Text"), _("This is a text")], 
+                            [_("Decimal"), Decimal("-12.121")], 
+                            [_("Currency"), Currency(-12.12, "EUR")], 
+                            [_("Percentage"), Percentage(-1, 3)], 
+                        ], 
+                        [4, 4], 
+                        12
+                    )    
+    doc.simpleParagraph(_("Tables with different size"))
+    doc.table(  [_("Concept"), _("Value")], 
+                        ["<", "<"], 
+                        [
+                            [_("Text"), _("This is a text")], 
+                        ], 
+                        [3,3], 
+                        8
+                    )
     doc.header(_("Lists and numbered lists"), 2)
     doc.list(["Prueba hola no", "Adios", "Bienvenido"], style="BulletList")
     doc.simpleParagraph("Hola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todos")

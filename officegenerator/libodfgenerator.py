@@ -298,7 +298,6 @@ class ODT(ODF):
             footer.addElement(p1)   
             foot.addElement(footer)
             self.doc.masterstyles.addElement(foot)
-
         #######################################
         ODF.__init__(self, filename)
         self.setLanguage(language, country)
@@ -371,66 +370,81 @@ class ODT(ODF):
     ## @param sizes
     ## @param font
     def table(self, header, orientation,  data, sizes, font):
-        """Headerl text
-        Data: data
-        sizes: arr with column widths in cm
-        size=font size"""  
+        def generate_table_styles():
+            s=Style(name="Table.Size{}".format(sum(sizes)))
+            s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center"))
+            self.doc.automaticstyles.addElement(s)
 
-        self.seqTables=self.seqTables+1
-        tablesize=sum(sizes)
+            #Column sizes
+            for i, size in enumerate(sizes):
+                sc= Style(name="Table.Column.Size{}".format(size), family="table-column")
+                sc.addElement(TableColumnProperties(columnwidth="{}cm".format(size)))
+                self.doc.automaticstyles.addElement(sc)
 
-        s=Style(name="Tabla{}".format(self.seqTables))
-        s.addElement(TableProperties(width="{}cm".format(tablesize), align="center"))
-        self.doc.automaticstyles.addElement(s)
+            #Cell header style
+            sch=Style(name="Table.HeaderCell", family="table-cell")
+            sch.addElement(TableCellProperties(backgroundcolor="#999999",  border="0.05pt solid #000000", padding="0.15cm"))
+            self.doc.automaticstyles.addElement(sch)        
 
-        #Column sizes
-        for i, size in enumerate(sizes):
-            sc= Style(name="Tabla{}.{}".format(self.seqTables, chr(65+i)), family="table-column")
-            sc.addElement(TableColumnProperties(columnwidth="{}cm".format(sizes[i])))
-            self.doc.automaticstyles.addElement(sc)
+            #Cell normal
+            sch=Style(name="Table.Cell", family="table-cell")
+            sch.addElement(TableCellProperties(border="0.05pt solid #000000", padding="0.1cm"))
+            self.doc.automaticstyles.addElement(sch)
 
-        #Cell header style
-        sch=Style(name="Tabla{}.HeaderCell".format(self.seqTables, chr(65), 1), family="table-cell")
-        sch.addElement(TableCellProperties(border="0.05pt solid #000000"))
-        self.doc.automaticstyles.addElement(sch)        
+            #TAble contents style
+            s= Style(name="Table.Heading.Font{}".format(font), family="paragraph" )
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font),  'fontweight':"bold"}))
+            s.addElement(ParagraphProperties(attributes={'textalign':'center', }))
+            self.doc.styles.addElement(s)
+            
+            s = Style(name="Table.Contents.Font{}".format(font), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
+            s.addElement(ParagraphProperties(attributes={'textalign':'justify', }))
+            self.doc.styles.addElement(s)
+            
+            s = Style(name="Table.ContentsRight.Font{}".format(font), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
+            s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
+            self.doc.styles.addElement(s)
+            
+            s = Style(name="Table.ContentsRight.FontRed{}".format(font), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), 'color':'#ff0000' }))
+            s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
+            self.doc.styles.addElement(s)
 
-        #Cell normal
-        sch=Style(name="Tabla{}.Cell".format(self.seqTables), family="table-cell")
-        sch.addElement(TableCellProperties(border="0.05pt solid #000000"))
-        self.doc.automaticstyles.addElement(sch)
-
-        #TAble contents style
-        s= Style(name="Tabla{}.Heading{}".format(self.seqTables, font), family="paragraph",parentstylename='Table Heading' )
-        s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
-        s.addElement(ParagraphProperties(attributes={'textalign':'center', }))
-        self.doc.styles.addElement(s)
-        
-        s = Style(name="Tabla{}.TableContents{}".format(self.seqTables, font), family="paragraph")
-        s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
-        self.doc.styles.addElement(s)
-        
-        s = Style(name="Tabla{}.TableContentsRight{}".format(self.seqTables, font), family="paragraph")
-        s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font), }))
-        s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
-        self.doc.styles.addElement(s)
-        
-        #Table header style
-        s = Style(name="Tabla{}.HeaderCell{}".format(self.seqTables, font), family="paragraph")
-        s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(font+1),'fontweight':"bold" }))
-        self.doc.styles.addElement(s)
-
+        def addTableCell(o, font):
+            tc = TableCell(stylename="Table.Cell")
+            
+            #Parses orientation
+            p = P(stylename="Table.ContentsRight.Font{}".format(font))
+            s=Span(text=o)
+            if o.__class__ in (str, datetime.datetime, datetime.date ):
+                p = P(stylename="Table.Contents.Font{}".format(font))
+                s=Span(text=str(o))
+            elif o.__class__ in (Currency,  Percentage):
+                if o.isLTZero():
+                    p = P(stylename="Table.ContentsRight.FontRed{}".format(font))
+                s=Span(text=o.string())
+            elif o.__class__ in (int, Decimal,  float):
+                if o<0:
+                    p = P(stylename="Table.ContentsRight.FontRed{}".format(font))
+            p.addElement(s)
+            tc.addElement(p)
+            return tc
+                
+        ######################################
+        generate_table_styles()
         #Table columns
-        table = Table(stylename="Tabla{}".format(self.seqTables))
+        table = Table(stylename="Table.Size{}".format(sum(sizes)))
         for i, head in enumerate(header):
-            table.addElement(TableColumn(stylename="Tabla{}.{}".format(self.seqTables, chr(65+i))))  
-
+            table.addElement(TableColumn(stylename="Table.Column.Size{}".format(sizes[i])))
         #Header rows
         headerrow=TableHeaderRows()
         tablerow=TableRow()
         headerrow.addElement(tablerow)
         for i, head in enumerate(header):
-            p=P(stylename="Tabla{}.Heading{}".format(self.seqTables, font), text=head)
-            tablecell=TableCell(stylename="Tabla{}.HeaderCell{}".format(self.seqTables, font))
+            p=P(stylename="Table.Heading.Font{}".format(font), text=head)
+            tablecell=TableCell(stylename="Table.HeaderCell")
             tablecell.addElement(p)
             tablerow.addElement(tablecell)
         table.addElement(headerrow)
@@ -439,28 +453,8 @@ class ODT(ODF):
         for row in data:
             tr = TableRow()
             table.addElement(tr)
-            for i, col in enumerate(row):
-                tc = TableCell(stylename="Tabla{}.Cell".format(self.seqTables))
-                tr.addElement(tc)
-                
-                #Parses orientation
-                if orientation[i]=="<":
-                    p = P(stylename="Tabla{}.TableContents{}".format(self.seqTables, font))
-                elif orientation[i]==">":
-                    p = P(stylename="Tabla{}.TableContentsRight{}".format(self.seqTables, font))
-                
-                #Colorize numbers less than zero
-                try:#Formato 23 €
-                    if float(col.split(" ")[0])<0:
-                        s=Span(text=col, stylename="Rojo")
-                    else:
-                        s=Span(text=col)
-                except:
-                    s=Span(text=col)                    
-                p.addElement(s)
-                
-                tc.addElement(p)
-        
+            for i, o in enumerate(row):
+                tr.addElement(addTableCell(o, font))
         self.doc.text.addElement(table)
         
     ## @param href must bu added before with addImage
