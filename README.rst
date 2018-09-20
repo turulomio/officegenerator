@@ -28,7 +28,8 @@ Changelog
 =========
 X.X.X
   * ODT tables now work again
-  * Images and tables can be named now
+  * Images and tables can be named now in ODT documents
+  * Added subtitle, bold, underlined and illustrator styles in ODT documents
 1.0.0
   * [#7] Solved bug with charmap in Windows
   * [#10] Dependencies are installed when using pip

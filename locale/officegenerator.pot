@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-17 08:55+0200\n"
+"POT-Creation-Date: 2018-09-20 08:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,6 +83,9 @@ msgstr ""
 msgid "Manual of officegenerator"
 msgstr ""
 
+msgid "Version {}"
+msgstr ""
+
 msgid "ODT"
 msgstr ""
 
@@ -92,16 +95,46 @@ msgstr ""
 msgid "It create predefined styles that allows to create nice documents without worry about styles."
 msgstr ""
 
-msgid "ODT Predefined styles"
+msgid "OfficeGenerator predefined paragraph styles"
 msgstr ""
 
-msgid "OfficeGenerator has the following predefined styles"
+msgid "OfficeGenerator has headers and titles as you can see in the document structure."
+msgstr ""
+
+msgid "Morever, it has the following predefined styles:"
+msgstr ""
+
+msgid "This is the 'Standard' style"
+msgstr ""
+
+msgid "This is the 'StandardCenter' style"
+msgstr ""
+
+msgid "This is the 'StandardRight' style"
+msgstr ""
+
+msgid "This is the 'Illustration' style"
+msgstr ""
+
+msgid "This is the 'Bold18Center' style"
+msgstr ""
+
+msgid "This is the 'Bold16Center' style"
+msgstr ""
+
+msgid "This is the 'Bold14Center' style"
+msgstr ""
+
+msgid "This is the 'Bold12Center' style"
+msgstr ""
+
+msgid "This is the 'Bold12Underline' style"
 msgstr ""
 
 msgid "Tables"
 msgstr ""
 
-msgid "We can create tables too:"
+msgid "We can create tables too, for example with size 11pt:"
 msgstr ""
 
 msgid "Concept"
@@ -125,13 +158,31 @@ msgstr ""
 msgid "Currency"
 msgstr ""
 
-msgid "Tables with the same size"
+msgid "First"
 msgstr ""
 
-msgid "Tables with different size"
+msgid "Tables with the size 10pt:"
+msgstr ""
+
+msgid "Tables with 8pt size:"
+msgstr ""
+
+msgid "Third"
 msgstr ""
 
 msgid "Lists and numbered lists"
+msgstr ""
+
+msgid "Images"
+msgstr ""
+
+msgid "Horizontal page"
+msgstr ""
+
+msgid "By default OfficeGenerator uses a predefined A4 page."
+msgstr ""
+
+msgid "Morever, you can set a predefined A4 horizontal page, as you can see."
 msgstr ""
 
 msgid "Styles"

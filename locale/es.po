@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-17 08:53+0200\n"
+"POT-Creation-Date: 2018-09-20 08:40+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -84,6 +84,9 @@ msgstr "Esta celda va a unir y alinear el rango B18 a G18"
 msgid "Manual of officegenerator"
 msgstr "Manual de OfficeGenerator"
 
+msgid "Version {}"
+msgstr "Versión {}"
+
 msgid "ODT"
 msgstr "ODT"
 
@@ -93,17 +96,47 @@ msgstr "Los ficheros ODT son creados rápidamente con OfficeGenerator."
 msgid "It create predefined styles that allows to create nice documents without worry about styles."
 msgstr "Crea estilos predefinidos que te permiten crear documentos vistosos sin preocuparte de los estilos."
 
-msgid "ODT Predefined styles"
-msgstr "Estilos predefinidos para ODT"
+msgid "OfficeGenerator predefined paragraph styles"
+msgstr "Estilos predefenidos de párrafo en OfficeGenerator"
 
-msgid "OfficeGenerator has the following predefined styles"
-msgstr "OfficeGenerator tiene los siguientes estilos predefinidos"
+msgid "OfficeGenerator has headers and titles as you can see in the document structure."
+msgstr "OfficeGenerator tiene encabezados y titulos como puedes ver en la estructura del documento."
+
+msgid "Morever, it has the following predefined styles:"
+msgstr "Además, tiene los siguientes estilos predefinidos"
+
+msgid "This is the 'Standard' style"
+msgstr "Este es el estilo 'Standard'"
+
+msgid "This is the 'StandardCenter' style"
+msgstr "Este es el estilo 'StandardCenter'"
+
+msgid "This is the 'StandardRight' style"
+msgstr "Este es el estilo 'StandardRight'"
+
+msgid "This is the 'Illustration' style"
+msgstr ""
+
+msgid "This is the 'Bold18Center' style"
+msgstr ""
+
+msgid "This is the 'Bold16Center' style"
+msgstr ""
+
+msgid "This is the 'Bold14Center' style"
+msgstr ""
+
+msgid "This is the 'Bold12Center' style"
+msgstr ""
+
+msgid "This is the 'Bold12Underline' style"
+msgstr ""
 
 msgid "Tables"
 msgstr "Tablas"
 
-msgid "We can create tables too:"
-msgstr "Podemos crear tablas también:"
+msgid "We can create tables too, for example with size 11pt:"
+msgstr "También podemos crear tablas, por ejemplo con tamaño 11pt:"
 
 msgid "Concept"
 msgstr "Concepto"
@@ -126,14 +159,32 @@ msgstr "Decimal"
 msgid "Currency"
 msgstr "Divisa"
 
-msgid "Tables with the same size"
-msgstr "Tablas con el mismo tamaño"
+msgid "First"
+msgstr "Primero"
 
-msgid "Tables with different size"
-msgstr "Tablas con tamaño distinto"
+msgid "Tables with the size 10pt:"
+msgstr "Tablas con el tamaño 10pt:"
+
+msgid "Tables with 8pt size:"
+msgstr "Tablas con el tamaño 8pt:"
+
+msgid "Third"
+msgstr "Tercero"
 
 msgid "Lists and numbered lists"
 msgstr "Listas y listas numeradas"
+
+msgid "Images"
+msgstr "Imágenes"
+
+msgid "Horizontal page"
+msgstr "Página horizontal"
+
+msgid "By default OfficeGenerator uses a predefined A4 page."
+msgstr "Por defecto OfficeGenerator usa una página predefinida A4"
+
+msgid "Morever, you can set a predefined A4 horizontal page, as you can see."
+msgstr ""
 
 msgid "Styles"
 msgstr "Estilos"
@@ -164,6 +215,21 @@ msgstr "Fichero ODF a convertir"
 
 msgid "officegenerator_odf2xml only works on Linux"
 msgstr "officegenerator_odf2xml solo funciona en Linux"
+
+#~ msgid "ODT Predefined styles"
+#~ msgstr "Estilos predefinidos para ODT"
+
+#~ msgid "OfficeGenerator has the following predefined styles"
+#~ msgstr "OfficeGenerator tiene los siguientes estilos predefinidos"
+
+#~ msgid "We can create tables too:"
+#~ msgstr "Podemos crear tablas también:"
+
+#~ msgid "Tables with the same size"
+#~ msgstr "Tablas con el mismo tamaño"
+
+#~ msgid "Tables with different size"
+#~ msgstr "Tablas con tamaño distinto"
 
 #~ msgid "Developed by Mariano Muñoz 2018-{}"
 #~ msgstr "Desarrollado por Mariano Muñoz 2018-{}"

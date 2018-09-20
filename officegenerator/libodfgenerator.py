@@ -184,12 +184,6 @@ class ODF:
 ## Class used to generate a ODT file with predefined formats
 class ODT(ODF):
     def __init__(self, filename, template=None, language="es", country="ES"):
-        def styleGraphics():
-            ga=Style(family="graphic", name="GraphicsParagraph")
-            ga.addElement(GraphicProperties(verticalpos="top", horizontalpos="center", horizontalrel="paragraph",  verticalrel="paragraph", anchortype="paragraph"))
-            self.doc.styles.addElement(ga)
-            framea=Style(family="graphic", parentstylename="GraphicsParagraph", name="FrameParagraph")
-            self.doc.automaticstyles.addElement(framea)
         def stylePage():
             pagelayout=PageLayout(name="PageLayout")
             plp=PageLayoutProperties(pagewidth="21cm",  pageheight="29.7cm",  margintop="2cm",  marginright="2cm",  marginleft="2cm",  marginbottom="2cm")
@@ -199,7 +193,7 @@ class ODT(ODF):
             pagelayout.addElement(plp)
             pagelayout.addElement(fs)
             self.doc.automaticstyles.addElement(pagelayout)
-                    
+
         def styleParagraphs():
             #Pagebreak styles horizontal y vertical        
             s = Style(name="PH", family="paragraph",  parentstylename="Standard", masterpagename="Landscape")
@@ -208,50 +202,76 @@ class ODT(ODF):
             s = Style(name="PV", family="paragraph",  parentstylename="Standard", masterpagename="Standard")
             s.addElement(ParagraphProperties(pagenumber="auto"))
             self.doc.styles.addElement(s)
-            
+
             standard= Style(name="Standard", family="paragraph",  autoupdate="true")
-            standard.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"justify", "marginbottom":"0.2cm", "textindent":"1cm"}))
+            standard.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"justify", "marginbottom":"0.2cm", "textindent":"1.5cm"}))
             standard.addElement(TextProperties(attributes={"fontsize": "12pt", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(standard)   
-               
-            ImageCenter= Style(name="ImageCenter", family="paragraph",  autoupdate="true")
-            ImageCenter.addElement(ParagraphProperties(attributes={"margintop":"3cm", "textalign":"center", "marginbottom":"4cm"}))
-            ImageCenter.addElement(TextProperties(attributes={"fontsize": "12pt", "country": self.country, "language": self.language}))
+
+            ImageCenter= Style(name="Illustration", family="paragraph",  autoupdate="true")
+            ImageCenter.addElement(ParagraphProperties(attributes={"margintop":"1cm", "textalign":"center", "marginbottom":"1cm"}))
+            ImageCenter.addElement(TextProperties(fontsize="12pt", fontstyle="italic", country=self.country, language=self.language))
             self.doc.styles.addElement(ImageCenter)
-            
-            standardCenter= Style(name="standardCenter", family="paragraph",  autoupdate="true")
+
+            standardCenter= Style(name="StandardCenter", family="paragraph",  autoupdate="true")
             standardCenter.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"center", "marginbottom":"0.2cm", "textindent":"0cm"}))
             standardCenter.addElement(TextProperties(attributes={"fontsize": "12pt", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(standardCenter)
-            
+
+            standardRight= Style(name="StandardRight", family="paragraph",  autoupdate="true")
+            standardRight.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"right", "marginbottom":"0.2cm", "textindent":"0cm"}))
+            standardRight.addElement(TextProperties(attributes={"fontsize": "12pt", "country": self.country, "language": self.language}))
+            self.doc.styles.addElement(standardRight)
+
+
+
+            letra12= Style(name="Bold12Underline", family="paragraph",  autoupdate="true")
+            letra12.addElement(ParagraphProperties(attributes={"margintop":"0.4cm", "textalign":"justify", "marginbottom":"0.4cm", "textindent":"1.5cm"}))
+            letra12.addElement(TextProperties(attributes={"fontsize": "12pt", "fontweight": "bold", "country": self.country, "language": self.language, 'textunderlinecolor':"font-color", 'textunderlinewidth':"auto", 'textunderlinestyle':"solid"}))
+            self.doc.styles.addElement(letra12)
+
+
             letra18= Style(name="Bold18Center", family="paragraph",  autoupdate="true")
             letra18.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"center", "marginbottom":"0.2cm", "textindent":"0cm"}))
             letra18.addElement(TextProperties(attributes={"fontsize": "18pt", "fontweight": "bold", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(letra18)
-            
+
             letra16= Style(name="Bold16Center", family="paragraph",  autoupdate="true")
             letra16.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"center", "marginbottom":"0.2cm", "textindent":"0cm"}))
             letra16.addElement(TextProperties(attributes={"fontsize": "16pt", "fontweight": "bold", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(letra16)
-            
+
+            letra14= Style(name="Bold14Center", family="paragraph",  autoupdate="true")
+            letra14.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"center", "marginbottom":"0.2cm", "textindent":"0cm"}))
+            letra14.addElement(TextProperties(attributes={"fontsize": "14pt", "fontweight": "bold", "country": self.country, "language": self.language}))
+            self.doc.styles.addElement(letra14)
+
             letra12= Style(name="Bold12Center", family="paragraph",  autoupdate="true")
             letra12.addElement(ParagraphProperties(attributes={"margintop":"0.2cm", "textalign":"center", "marginbottom":"0.2cm", "textindent":"0cm"}))
             letra12.addElement(TextProperties(attributes={"fontsize": "12pt", "fontweight": "bold", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(letra12)
 
         def styleHeaders():
-            titlestyle = Style(name="Title", family="paragraph",  autoupdate="true", defaultoutlinelevel="0")
-            titlestyle.addElement(ParagraphProperties(attributes={"margintop":"0.6cm", "textalign":"center", "marginbottom":"0.9cm"}))
-            titlestyle.addElement(TextProperties(attributes={"fontsize": "16pt", "fontweight": "bold", "country": self.country, "language": self.language}))
-            self.doc.styles.addElement(titlestyle)
+            s = Style(name="Title", family="paragraph",  autoupdate="true", defaultoutlinelevel="0")
+            s.addElement(ParagraphProperties(attributes={"margintop":"0.7cm", "textalign":"center", "marginbottom":"0.7cm"}))
+            s.addElement(TextProperties(attributes={"fontsize": "18pt", "fontweight": "bold", "country": self.country, "language": self.language}))
+            self.doc.styles.addElement(s)
+
+            s = Style(name="Subtitle", family="paragraph",  autoupdate="true", defaultoutlinelevel="0")
+            s.addElement(ParagraphProperties(attributes={"margintop":"0cm", "textalign":"center", "marginbottom":"0.7cm"}))
+            s.addElement(TextProperties(attributes={"fontsize": "15pt", "fontstyle": "italic", "country": self.country, "language": self.language}))
+            self.doc.styles.addElement(s)
+
             h1style = Style(name="Heading1", family="paragraph",  autoupdate="true", defaultoutlinelevel="1")
             h1style.addElement(ParagraphProperties(attributes={"margintop":"0.6cm", "textalign":"justify", "marginbottom":"0.3cm"}))
             h1style.addElement(TextProperties(attributes={"fontsize": "15pt", "fontweight": "bold", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(h1style)
+
             h2style = Style(name="Heading2", family="paragraph",  autoupdate="true", defaultoutlinelevel="2")
             h2style.addElement(ParagraphProperties(attributes={"margintop":"0.5cm", "textalign":"justify", "marginbottom":"0.25cm"}))
             h2style.addElement(TextProperties(attributes={"fontsize": "14pt", "fontweight": "bold", "country": self.country, "language": self.language}))
             self.doc.styles.addElement(h2style)
+
             out=OutlineStyle(name="Outline")
             outl=OutlineLevelStyle(level=1, numformat="1", numsuffix="  ")
             out.addElement(outl)
@@ -323,7 +343,6 @@ class ODT(ODF):
         styleMasterPage()
         styleHeaders()
         styleList()
-        styleGraphics()
 
     def emptyParagraph(self, style="Standard", number=1):
         for i in range(number):
@@ -360,6 +379,12 @@ class ODT(ODF):
     ## @param text String with the title
     def title(self, text):
         p=P(stylename="Title", text=text)
+        self.doc.text.addElement(p)
+
+    ## Creates the document title
+    ## @param text String with the title
+    def subtitle(self, text):
+        p=P(stylename="Subtitle", text=text)
         self.doc.text.addElement(p)
 
     ## Creates a text header

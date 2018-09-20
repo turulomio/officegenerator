@@ -143,11 +143,26 @@ def demo_ods():
 def demo_odt():
     doc=ODT("officegenerator.odt", language="fr", country="FR")
     doc.setMetadata("Officegenerator manual",  "officegenerator documentation", "Mariano Muñoz")
-    doc.title(_("Manual of officegenerator v{}".format(__version__)))
+    doc.title(_("Manual of officegenerator"))
+    doc.subtitle(_("Version {}".format(__version__)))
+
     doc.header(_("ODT"), 1)
     doc.simpleParagraph(_("ODT files can be quickly generated with OfficeGenerator.") + " " + _("It create predefined styles that allows to create nice documents without worry about styles."))
-    doc.header(_("ODT Predefined styles"), 2)
-    doc.simpleParagraph(_("OfficeGenerator has the following predefined styles"))
+
+    doc.header(_("OfficeGenerator predefined paragraph styles"), 2)
+    doc.simpleParagraph(_("OfficeGenerator has headers and titles as you can see in the document structure.") + " " + 
+                        _("Morever, it has the following predefined styles:"))
+    doc.simpleParagraph(_("This is the 'Standard' style"))
+    doc.simpleParagraph(_("This is the 'StandardCenter' style"), style='StandardCenter')
+    doc.simpleParagraph(_("This is the 'StandardRight' style"), style='StandardRight')
+    doc.simpleParagraph(_("This is the 'Illustration' style"), style='Illustration')
+    doc.simpleParagraph(_("This is the 'Bold18Center' style"), style='Bold18Center')
+    doc.simpleParagraph(_("This is the 'Bold16Center' style"), style='Bold16Center')
+    doc.simpleParagraph(_("This is the 'Bold14Center' style"), style='Bold14Center')
+    doc.simpleParagraph(_("This is the 'Bold12Center' style"), style='Bold12Center')
+    doc.simpleParagraph(_("This is the 'Bold12Underline' style"), style='Bold12Underline')
+    doc.pageBreak()
+
     doc.header(_("Tables"), 2)
     doc.simpleParagraph(_("We can create tables too, for example with size 11pt:"))
     doc.table(  [_("Concept"), _("Value")], 
@@ -183,6 +198,8 @@ def demo_odt():
                         8,
                         name=_("Third")
                     )
+    doc.pageBreak()
+
     doc.header(_("Lists and numbered lists"), 2)
     doc.list(["Prueba hola no", "Adios", "Bienvenido"], style="BulletList")
     doc.simpleParagraph("Hola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todosHola a todos")
@@ -190,24 +207,36 @@ def demo_odt():
     doc.simpleParagraph("Con officegenerator podemos")
     doc.simpleParagraph("This library create several default styles for writing ODT files:")
     doc.list(["Title: Generates a title with 18pt and bold font", "Header1: Generates a Level 1 header"], style="BulletList")
-    pngfile = pkg_resources.resource_filename(__name__, 'images/crown.png')
-    doc.addImage(pngfile,"images/crown.png")
+    doc.pageBreak()
+
+    doc.header(_("Images"), 2)
+    pngfile = pkg_resources.resource_filename(__name__, 'images/crown.png')#Gets package filename
+    doc.addImage(pngfile,"images/crown.png")#Add image to the doc, adding a key "images/crown.png"
     p = P(stylename="Standard")
     p.addText("Este es un ejemplo de imagen as char: ")
     p.addElement(doc.image("images/crown.png", "3cm", "3cm"))
     p.addText(". Ahora sigo escribiendo sin problemas.")
     doc.doc.text.addElement(p)
     doc.simpleParagraph("Como ves puedo repetirla mil veces sin que me aumente el tamaño del fichero, porque uso referencias")
-    p=P(stylename="Standard")
+    p=P(stylename="Illustration")
     for i in range(100):
         p.addElement(doc.image("images/crown.png", "4cm", "4cm", name="Crown.{}".format(i)))
-    p.addText(". Se acabó.")
     doc.doc.text.addElement(p)
+
+    doc.pageBreak(horizontal=True)
+    doc.header(_("Horizontal page"), 2)
+    doc.simpleParagraph(_("By default OfficeGenerator uses a predefined A4 page.") + " " +  _("Morever, you can set a predefined A4 horizontal page, as you can see."))
     doc.pageBreak()
+
     doc.header("ODS Writing", 1)
     doc.simpleParagraph("This library create several default styles for writing ODS files. You can see examples in officegenerator.ods.")
-    doc.pageBreak(horizontal=True)
+    doc.pageBreak()
+
     doc.header("ODS Reading", 1)
+    doc.pageBreak()
+
+    doc.header("XLSX", 1)
+
     doc.save()
 
 
