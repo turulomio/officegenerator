@@ -160,7 +160,8 @@ def demo_odt():
                             [_("Percentage"), Percentage(1, 3)], 
                         ],
                         [3, 4],
-                        11
+                        11,
+                        name=_("First"),
                     )
     doc.simpleParagraph(_("Tables with the size 10pt:"))
     doc.table(  [_("Concept"), _("Value")], 
@@ -179,7 +180,8 @@ def demo_odt():
                             [_("Text"), _("This is a text")], 
                         ], 
                         [4,12], 
-                        8
+                        8,
+                        name=_("Third")
                     )
     doc.header(_("Lists and numbered lists"), 2)
     doc.list(["Prueba hola no", "Adios", "Bienvenido"], style="BulletList")
@@ -198,7 +200,7 @@ def demo_odt():
     doc.simpleParagraph("Como ves puedo repetirla mil veces sin que me aumente el tamaño del fichero, porque uso referencias")
     p=P(stylename="Standard")
     for i in range(100):
-        p.addElement(doc.image("images/crown.png", "4cm", "4cm"))
+        p.addElement(doc.image("images/crown.png", "4cm", "4cm", name="Crown.{}".format(i)))
     p.addText(". Se acabó.")
     doc.doc.text.addElement(p)
     doc.pageBreak()

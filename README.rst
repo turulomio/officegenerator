@@ -26,6 +26,9 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
+X.X.X
+  * ODT tables now work again
+  * Images and tables can be named now
 1.0.0
   * [#7] Solved bug with charmap in Windows
   * [#10] Dependencies are installed when using pip

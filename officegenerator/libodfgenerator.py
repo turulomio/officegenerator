@@ -374,10 +374,11 @@ class ODT(ODF):
     ## @param data Multidimension List with all data objects. Can be str, Decimal, int, datetime, date, Currency, Percentage
     ## @param sizes Integer list with sizes in cm
     ## @param fontsize Integer in pt
-    def table(self, header, data, sizes, fontsize):
+    ## @param name str or None. Sets the object name. Appears in LibreOffice navigator. If none table will be named to "Table.Sequence"
+    def table(self, header, data, sizes, fontsize, name=None):
         def generate_table_styles():
             s=Style(name="Table.Size{}".format(sum(sizes)), family='table')
-            s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center"))
+            s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center", margintop="0.6cm", marginbottom="0.6cm"))
             self.doc.automaticstyles.addElement(s)
 
             #Column sizes
@@ -445,7 +446,8 @@ class ODT(ODF):
         self.seqTables=self.seqTables+1
         generate_table_styles()
         #Table columns
-        table = Table(name="Table.{}".format(self.seqTables),  stylename="Table.Size{}".format(sum(sizes)))
+        name=name if name!=None else "Table.{}".format(self.seqTables)
+        table = Table(name=name, stylename="Table.Size{}".format(sum(sizes)))
         for size in sizes:
             table.addElement(TableColumn(stylename="Table.Column.Size{}".format(size)))
         #Header rows
@@ -469,11 +471,13 @@ class ODT(ODF):
         
     ## @param href must bu added before with addImage
     ## @param width Int or float value
-    ## @param height
+    ## @param height Int or float value to set the images height
     ## @return Frame element
-    def image(self, href, width, height):
+    def image(self, href, width, height, name=None):
         self.seqFrames=self.seqFrames+1
-        f = Frame(name="Frame_{}".format(self.seqFrames), anchortype="as-char", width="{}cm".format(width), height="{}cm".format(height)) #, width="2cm", height="2cm", zindex="0")
+        name=name if name!=None else "Frame.{}".format(self.seqFrames)
+
+        f = Frame(name=name, anchortype="as-char", width="{}cm".format(width), height="{}cm".format(height))
         img = Image(href=self.images[href], type="simple", show="embed", actuate="onLoad")
         f.addElement(img)
         return f
