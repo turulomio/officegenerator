@@ -143,13 +143,13 @@ def demo_ods():
 def demo_odt():
     doc=ODT("officegenerator.odt", language="fr", country="FR")
     doc.setMetadata("Officegenerator manual",  "officegenerator documentation", "Mariano Muñoz")
-    doc.title(_("Manual of officegenerator"))
+    doc.title(_("Manual of officegenerator v{}".format(__version__)))
     doc.header(_("ODT"), 1)
     doc.simpleParagraph(_("ODT files can be quickly generated with OfficeGenerator.") + " " + _("It create predefined styles that allows to create nice documents without worry about styles."))
     doc.header(_("ODT Predefined styles"), 2)
     doc.simpleParagraph(_("OfficeGenerator has the following predefined styles"))
     doc.header(_("Tables"), 2)
-    doc.simpleParagraph(_("We can create tables too:"))
+    doc.simpleParagraph(_("We can create tables too, for example with size 11pt:"))
     doc.table(  [_("Concept"), _("Value")], 
                         [
                             [_("Text"), _("This is a text")], 
@@ -158,11 +158,11 @@ def demo_odt():
                             [_("Decimal"), Decimal("12.121")], 
                             [_("Currency"), Currency(12.12, "EUR")], 
                             [_("Percentage"), Percentage(1, 3)], 
-                        ], 
-                        [2, 4], 
-                        12
-                    )    
-    doc.simpleParagraph(_("Tables with the same size"))
+                        ],
+                        [3, 4],
+                        11
+                    )
+    doc.simpleParagraph(_("Tables with the size 10pt:"))
     doc.table(  [_("Concept"), _("Value")], 
                         [
                             [_("Text"), _("This is a text")], 
@@ -171,14 +171,14 @@ def demo_odt():
                             [_("Percentage"), Percentage(-1, 3)], 
                         ], 
                         [4, 5], 
-                        12
-                    )    
-    doc.simpleParagraph(_("Tables with different size"))
+                        10
+                    )
+    doc.simpleParagraph(_("Tables with 8pt size:"))
     doc.table(  [_("Concept"), _("Value")], 
                         [
                             [_("Text"), _("This is a text")], 
                         ], 
-                        [3,12], 
+                        [4,12], 
                         8
                     )
     doc.header(_("Lists and numbered lists"), 2)

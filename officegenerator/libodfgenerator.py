@@ -376,7 +376,7 @@ class ODT(ODF):
     ## @param fontsize Integer in pt
     def table(self, header, data, sizes, fontsize):
         def generate_table_styles():
-            s=Style(name="Table.Size{}".format(sum(sizes)))
+            s=Style(name="Table.Size{}".format(sum(sizes)), family='table')
             s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center"))
             self.doc.automaticstyles.addElement(s)
 
@@ -440,11 +440,11 @@ class ODT(ODF):
             p.addElement(s)
             tc.addElement(p)
             return tc
-                
+
         ######################################
+        self.seqTables=self.seqTables+1
         generate_table_styles()
         #Table columns
-        self.seqTables=self.seqTables+1
         table = Table(name="Table.{}".format(self.seqTables),  stylename="Table.Size{}".format(sum(sizes)))
         for size in sizes:
             table.addElement(TableColumn(stylename="Table.Column.Size{}".format(size)))
