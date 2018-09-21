@@ -9,7 +9,7 @@ import os
 import pkg_resources
 from decimal import Decimal
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
-from odf.style import Footer, FooterStyle, GraphicProperties, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
+from odf.style import Footer, FooterStyle, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
 from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds
 from odf.text import P,  H,  Span, ListStyle,  ListLevelStyleBullet,  List,  ListItem, ListLevelStyleNumber,  OutlineLevelStyle,  OutlineStyle,  PageNumber,  PageCount
 from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
@@ -182,8 +182,35 @@ class ODF:
         self.country="ES"
 
 ## Class used to generate a ODT file with predefined formats
+## @param filename String with the name of the filename to create
+## @param template String with the name of the filename used as template
+## @param language String with language. For example es
+## @param country String with the country. For example ES
+## @param predefinedstyles Boolean that sets if predefined styles are going to be loaded. True by default
 class ODT(ODF):
-    def __init__(self, filename, template=None, language="es", country="ES"):
+    def __init__(self, filename, template=None, language="es", country="ES", predefinedstyles=True):
+        ODF.__init__(self, filename)
+        self.setLanguage(language, country)
+        self.doc=OpenDocumentText()
+        
+        self.seqTables=0#Sequence of tables
+        self.seqFrames=0#If a frame is repeated it doesn't show its
+        if predefinedstyles:
+            self.load_predefined_styles()
+        if template:
+            templatedoc= load(template)
+            for style in templatedoc.styles.childNodes[:]:
+                self.doc.styles.addElement(style)
+          
+            for autostyle in templatedoc.automaticstyles.childNodes[:]:
+                self.doc.automaticstyles.addElement(autostyle)
+                
+            for master in templatedoc.masterstyles.childNodes[:]:
+                self.doc.masterstyles.addElement(master)
+
+    
+    ## Loads predefined styles. If you want to change them you need to make a class with ODT as its parent and override this method or to load a template
+    def load_predefined_styles(self):
         def stylePage():
             pagelayout=PageLayout(name="PageLayout")
             plp=PageLayoutProperties(pagewidth="21cm",  pageheight="29.7cm",  margintop="2cm",  marginright="2cm",  marginleft="2cm",  marginbottom="2cm")
@@ -318,25 +345,7 @@ class ODT(ODF):
             footer.addElement(p1)   
             foot.addElement(footer)
             self.doc.masterstyles.addElement(foot)
-        #######################################
-        ODF.__init__(self, filename)
-        self.setLanguage(language, country)
-        self.doc=OpenDocumentText()
-        
-        self.seqTables=0#Sequence of tables
-        self.seqFrames=0#If a frame is repeated it doesn't show its
-        if template!=None:
-            templatedoc= load(template)
-            for style in templatedoc.styles.childNodes[:]:
-                self.doc.styles.addElement(style)
-          
-            for autostyle in templatedoc.automaticstyles.childNodes[:]:
-                self.doc.automaticstyles.addElement(autostyle)
-                
-            for master in templatedoc.masterstyles.childNodes[:]:
-                self.doc.masterstyles.addElement(master)
-                
-
+        #######################################                
         stylePage()
         styleParagraphs()
         styleFooter()

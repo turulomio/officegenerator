@@ -35,6 +35,7 @@ def main(arguments=None):
     if args.remove==True:
         os.remove("officegenerator.ods")
         os.remove("officegenerator.odt")
+        os.remove("officegenerator_from_template_standard.odt")
         os.remove("officegenerator_readed.ods")
         os.remove("officegenerator.xlsx")
 
@@ -48,6 +49,9 @@ def main(arguments=None):
 
         demo_odt()
         print("  * " + _("ODT Generated"))
+        
+        demo_odt_readed()
+        print("  * " + _("ODT Generated from Standard template"))
 
         demo_xlsx()
         print("  * " + _("XLSX Generated"))
@@ -138,20 +142,19 @@ def demo_ods():
     
     doc.setActiveSheet(s6)
     doc.save()
-    
-
-def demo_odt():
-    doc=ODT("officegenerator.odt", language="fr", country="FR")
+   
+def demo_odt_commands(doc):
     doc.setMetadata("Officegenerator manual",  "officegenerator documentation", "Mariano Muñoz")
     doc.title(_("Manual of officegenerator"))
     doc.subtitle(_("Version {}".format(__version__)))
 
     doc.header(_("ODT"), 1)
-    doc.simpleParagraph(_("ODT files can be quickly generated with OfficeGenerator.") + " " + _("It create predefined styles that allows to create nice documents without worry about styles."))
+    doc.simpleParagraph(_("ODT files can be quickly generated with OfficeGenerator.") + " " + 
+                                       _("It create predefined styles that allows to create nice documents without worry about styles."))
 
     doc.header(_("OfficeGenerator predefined paragraph styles"), 2)
     doc.simpleParagraph(_("OfficeGenerator has headers and titles as you can see in the document structure.") + " " + 
-                        _("Morever, it has the following predefined styles:"))
+                                       _("Morever, it has the following predefined styles:"))
     doc.simpleParagraph(_("This is the 'Standard' style"))
     doc.simpleParagraph(_("This is the 'StandardCenter' style"), style='StandardCenter')
     doc.simpleParagraph(_("This is the 'StandardRight' style"), style='StandardRight')
@@ -237,6 +240,16 @@ def demo_odt():
 
     doc.header("XLSX", 1)
 
+def demo_odt():
+    doc=ODT("officegenerator.odt", language="fr", country="FR")
+    doc.load_predefined_styles()
+    demo_odt_commands(doc)
+    doc.save()
+    
+def demo_odt_readed():
+    template=pkg_resources.resource_filename("officegenerator","templates/odt/standard_es.odt")
+    doc=ODT("officegenerator_from_template_standard.odt", template=template, predefinedstyles=False)
+    demo_odt_commands(doc)
     doc.save()
 
 
