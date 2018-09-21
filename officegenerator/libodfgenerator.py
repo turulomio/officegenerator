@@ -16,6 +16,7 @@ from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
 from odf.draw import Frame, Image
 from odf.dc import Creator, Description, Title, Date
 from odf.meta import InitialCreator
+import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
@@ -180,35 +181,151 @@ class ODF:
         """Set the main language of the document"""
         self.language="es"
         self.country="ES"
+        
+    def showElement(self, e):
+        print("ATTRIBUTE_NODE: {}".format(e.ATTRIBUTE_NODE))
+        print("CDATA_SECTION_NODE: {}".format(e.CDATA_SECTION_NODE))
+        print("TEXT_NODE: {}".format(e.TEXT_NODE))
+        print("Atributes: {}".format(e.attributes))
+        print("QNAME: {}".format(e.qname))
+        print("tagName: {}".format(e.tagName))
+        print("Allowed attributes: {}".format(e.allowed_attributes()))
+        
+        print(e)
 
+class ODT(ODF):
+    def __init__(self, filename, language="es", country="ES"):
+        ODF.__init__(self, filename)
+        self.setLanguage(language, country)
+
+        
+    ## @param href must bu added before with addImage
+    ## @param width Int or float value
+    ## @param height Int or float value to set the images height
+    ## @return Frame element
+    def image(self, href, width, height, name=None):
+        self.seqFrames=self.seqFrames+1
+        name=name if name!=None else "Frame.{}".format(self.seqFrames)
+
+        f = Frame(name=name, anchortype="as-char", width="{}cm".format(width), height="{}cm".format(height))
+        img = Image(href=self.images[href], type="simple", show="embed", actuate="onLoad")
+        f.addElement(img)
+        return f
+
+    ## Extracts odf document structure
+    def odf_dump_nodes(self, start_node, level=0):
+        if start_node.nodeType==3:
+            # text node
+            print ("  "*level, "NODE:", start_node.nodeType, ":(text):")
+        else:
+            # element node
+            attrs= []
+            for k in start_node.attributes.keys():
+                attrs.append( str(k[1]) + ':' + str(start_node.attributes[k]  ))
+#            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ", str(start_node))
+#            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ")
+            print("{} NODE: {}:{} ATTR: {}".format(" "*level,  str(start_node.nodeType), str(start_node.qname[1]), attrs))
+
+            for n in start_node.childNodes:
+                self.odf_dump_nodes(n, level+1)
+        return
+
+    def simpleParagraph(self, text, style="Standard"):
+        return P(stylename=style, text=text)
+        
 ## Class used to generate a ODT file with predefined formats
-## @param filename String with the name of the filename to create
+## @param filename String with the name of the filename to read, then will be saved with a different name
 ## @param template String with the name of the filename used as template
 ## @param language String with language. For example es
 ## @param country String with the country. For example ES
 ## @param predefinedstyles Boolean that sets if predefined styles are going to be loaded. True by default
-class ODT(ODF):
-    def __init__(self, filename, template=None, language="es", country="ES", predefinedstyles=True):
-        ODF.__init__(self, filename)
+class ODT_Read(ODT):
+    def __init__(self, filename, language="es", country="ES"):
+        ODT.__init__(self, filename, language, country)
         self.setLanguage(language, country)
-        self.doc=OpenDocumentText()
+        
+        self.doc=load(filename)
+        ## After inserting an element it sets the new element as cursor to append 
+        self.cursor=None
+
+    def __insertAfterCursorElement(self, o):
+        index = self.cursor.parentNode.childNodes.index(self.cursor)
+        self.cursor.parentNode.childNodes.insert(index, o)
+
+    ## Search for a tag in doc an returns element
+    def search_and_replace(self, tag, replace):
+        e=self.search(tag)
+        self.showElement(e)
+        e.appendChild(odf.element.Text(str(e).replace(tag, replace)))
+        e.removeChild(e.childNodes[0])
+        self.showElement(e)
+        self.cursor=e
+
+    def simpleParagraph(self, text, style="Standard"):
+        p=ODT.simpleParagraph(self, text, style)
+        self.__insertAfterCursorElement(p)
+
+    ## Searchs for the item with a tag. Perhaps is its paren where I'll have to append
+    def search(self, tag):
+        for e in self.doc.text.childNodes:
+            if str(e)==tag:
+                self.cursor=e
+                return e
+
+#                newElement=e
+#                parent.insertBefore()
+#                e.addCD
+##        row.insertBefore(cell.generate(), oldcell)
+##        row.removeChild(oldcell)
+#        if start_node.nodeType==3:
+#            # text node
+#            print ("  "*level, "NODE:", start_node.nodeType, ":(text):")
+#        else:
+#            # element node
+#            attrs= []
+#            for k in start_node.attributes.keys():
+#                attrs.append( str(k[1]) + ':' + str(start_node.attributes[k]  ))
+##            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ", str(start_node))
+##            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ")
+#            print("{} NODE: {}:{} ATTR: {}".format(" "*level,  str(start_node.nodeType), str(start_node.qname[1]), attrs))
+#
+#            for n in start_node.childNodes:
+#                self.odf_dump_nodes(n, level+1)
+#        return
+    def save(self, filename):
+        if  filename==self.filename:
+            print(_("You can't overwrite a readed odt"))
+            return        
+        self.doc.save( filename)
+## Class used to generate a ODT file with predefined formats. It creates only styles. The rest you have to build it.
+## @param filename String with the name of the filename to create
+## @param template String with the name of the filename used as template. Only to copy styles
+## @param language String with language. For example es
+## @param country String with the country. For example ES
+## @param predefinedstyles Boolean that sets if predefined styles are going to be loaded. True by default and used when templatestyles=None
+class ODT_Write(ODT):
+    def __init__(self, filename, templatestyles=None, language="es", country="ES", predefinedstyles=True):
+        ODT.__init__(self, filename, language, country)
+        self.setLanguage(language, country)
         
         self.seqTables=0#Sequence of tables
         self.seqFrames=0#If a frame is repeated it doesn't show its
-        if predefinedstyles:
-            self.load_predefined_styles()
-        if template:
-            templatedoc= load(template)
-            for style in templatedoc.styles.childNodes[:]:
-                self.doc.styles.addElement(style)
-          
-            for autostyle in templatedoc.automaticstyles.childNodes[:]:
-                self.doc.automaticstyles.addElement(autostyle)
-                
-            for master in templatedoc.masterstyles.childNodes[:]:
-                self.doc.masterstyles.addElement(master)
+        self.doc=OpenDocumentText()
+        if templatestyles==None:
+            if predefinedstyles==True:
+                    self.load_predefined_styles()
+            else:     
+                templatedoc= load(templatestyles)
+                for style in templatedoc.styles.childNodes[:]:
+                    self.doc.styles.addElement(style)
+              
+                for autostyle in templatedoc.automaticstyles.childNodes[:]:
+                    self.doc.automaticstyles.addElement(autostyle)
+                    
+                for master in templatedoc.masterstyles.childNodes[:]:
+                    self.doc.masterstyles.addElement(master)
 
-    
+
     ## Loads predefined styles. If you want to change them you need to make a class with ODT as its parent and override this method or to load a template
     def load_predefined_styles(self):
         def stylePage():
@@ -356,14 +473,13 @@ class ODT(ODF):
     def emptyParagraph(self, style="Standard", number=1):
         for i in range(number):
             self.simpleParagraph("",style)
-                
+
+
+
     def save(self):
         makedirs(os.path.dirname(self.filename))
         self.doc.save(self.filename)
 
-    def simpleParagraph(self, text, style="Standard"):
-        p=P(stylename=style, text=text)
-        self.doc.text.addElement(p)
         
     def list(self, arr, style="BulletList"):
         l=List(stylename=style)
@@ -388,6 +504,10 @@ class ODT(ODF):
     ## @param text String with the title
     def title(self, text):
         p=P(stylename="Title", text=text)
+        self.doc.text.addElement(p)
+
+    def simpleParagraph(self, text, style="Standard"):
+        p=ODT.simpleParagraph(self, text, style)
         self.doc.text.addElement(p)
 
     ## Creates the document title
@@ -502,19 +622,7 @@ class ODT(ODF):
             for i, o in enumerate(row):
                 tr.addElement(addTableCell(o, fontsize))
         self.doc.text.addElement(table)
-        
-    ## @param href must bu added before with addImage
-    ## @param width Int or float value
-    ## @param height Int or float value to set the images height
-    ## @return Frame element
-    def image(self, href, width, height, name=None):
-        self.seqFrames=self.seqFrames+1
-        name=name if name!=None else "Frame.{}".format(self.seqFrames)
 
-        f = Frame(name=name, anchortype="as-char", width="{}cm".format(width), height="{}cm".format(height))
-        img = Image(href=self.images[href], type="simple", show="embed", actuate="onLoad")
-        f.addElement(img)
-        return f
 
     def pageBreak(self,  horizontal=False):    
         p=P(stylename="PageBreak")#Is an automatic style

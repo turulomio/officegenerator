@@ -9,7 +9,7 @@ import pkg_resources
 
 from decimal import Decimal
 from officegenerator.commons import __version__
-from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT, OdfCell, ColumnWidthODS
+from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Write, ODT_Read, OdfCell, ColumnWidthODS
 from officegenerator.libxlsxgenerator import OpenPyXL
 from officegenerator.commons import argparse_epilog, Coord, Percentage,  Currency
 from odf.text import P
@@ -47,11 +47,14 @@ def main(arguments=None):
         demo_ods_readed()
         print("  * " + _("ODS Readed and regenerated"))
 
-        demo_odt()
+        demo_odt_with_predefined_styles()
         print("  * " + _("ODT Generated"))
         
-        demo_odt_readed()
+        demo_odt_with_template_styles()
         print("  * " + _("ODT Generated from Standard template"))
+
+        demo_odt_readed_and_replaced()
+        print("  * " + _("ODT Generated from Replace template"))
 
         demo_xlsx()
         print("  * " + _("XLSX Generated"))
@@ -240,18 +243,30 @@ def demo_odt_commands(doc):
 
     doc.header("XLSX", 1)
 
-def demo_odt():
-    doc=ODT("officegenerator.odt", language="fr", country="FR")
-    doc.load_predefined_styles()
+def demo_odt_with_predefined_styles():
+    doc=ODT_Write("officegenerator.odt", language="fr", country="FR", predefinedstyles=True)
     demo_odt_commands(doc)
     doc.save()
     
-def demo_odt_readed():
+def demo_odt_with_template_styles():
     template=pkg_resources.resource_filename("officegenerator","templates/odt/standard_es.odt")
-    doc=ODT("officegenerator_from_template_standard.odt", template=template, predefinedstyles=False)
+    doc=ODT_Write("officegenerator_from_template_standard.odt", templatestyles=template, predefinedstyles=False)
     demo_odt_commands(doc)
     doc.save()
 
+    
+def demo_odt_readed_and_replaced():
+    template=pkg_resources.resource_filename("officegenerator","templates/odt/replace_es.odt")
+    doc=ODT_Read(template)
+    doc.setMetadata("OfficeGenerator replaced example",  "officegenerator documentation", "Mariano Muñoz")
+    doc.search_and_replace("$$TITLE$$", "MI TITULO")
+    doc.search('$$LAST$$')
+    doc.simpleParagraph("Esto es una inserción")
+    doc.search('$$SUBTITLE$$')
+    doc.simpleParagraph("Esto es una inserción")
+    doc.simpleParagraph("Esto es una segunda inserción")
+    doc.odf_dump_nodes(doc.doc.text)
+    doc.save("officegenerator_replaced.odt")
 
 def demo_xlsx():
     xlsx=OpenPyXL("officegenerator.xlsx")
