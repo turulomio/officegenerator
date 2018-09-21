@@ -9,7 +9,7 @@ import pkg_resources
 
 from decimal import Decimal
 from officegenerator.commons import __version__
-from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Write, ODT_Read, OdfCell, ColumnWidthODS
+from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT,  OdfCell, ColumnWidthODS
 from officegenerator.libxlsxgenerator import OpenPyXL
 from officegenerator.commons import argparse_epilog, Coord, Percentage,  Currency
 from odf.text import P
@@ -244,29 +244,30 @@ def demo_odt_commands(doc):
     doc.header("XLSX", 1)
 
 def demo_odt_with_predefined_styles():
-    doc=ODT_Write("officegenerator.odt", language="fr", country="FR", predefinedstyles=True)
+    doc=ODT("officegenerator.odt", language="fr", country="FR")
+    doc.load_predefined_styles()
     demo_odt_commands(doc)
     doc.save()
     
 def demo_odt_with_template_styles():
     template=pkg_resources.resource_filename("officegenerator","templates/odt/standard_es.odt")
-    doc=ODT_Write("officegenerator_from_template_standard.odt", templatestyles=template, predefinedstyles=False)
+    doc=ODT("officegenerator_from_template_standard.odt", template)
     demo_odt_commands(doc)
     doc.save()
 
     
 def demo_odt_readed_and_replaced():
     template=pkg_resources.resource_filename("officegenerator","templates/odt/replace_es.odt")
-    doc=ODT_Read(template)
+    doc=ODT("officegenerator_replaced.odt",  template)
     doc.setMetadata("OfficeGenerator replaced example",  "officegenerator documentation", "Mariano Muñoz")
-    doc.search_and_replace("$$TITLE$$", "MI TITULO")
+    doc.search_and_replace("$$TITLE$$", _("My title"))
     doc.search('$$LAST$$')
-    doc.simpleParagraph("Esto es una inserción")
-    doc.search('$$SUBTITLE$$')
-    doc.simpleParagraph("Esto es una inserción")
-    doc.simpleParagraph("Esto es una segunda inserción")
-    doc.odf_dump_nodes(doc.doc.text)
-    doc.save("officegenerator_replaced.odt")
+    doc.simpleParagraph(_("These is my first text appended in a searched tag."))
+    doc.search_and_replace('$$SUBTITLE$$',  _("My subtítle"))
+    doc.search('$$LAST$$')
+    doc.simpleParagraph(_("This is my second text, after sarching the tag again"))
+    doc.simpleParagraph(_("This is my third text."))
+    doc.save()
 
 def demo_xlsx():
     xlsx=OpenPyXL("officegenerator.xlsx")

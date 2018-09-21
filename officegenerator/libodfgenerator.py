@@ -193,11 +193,26 @@ class ODF:
         
         print(e)
 
+## Class used to generate a ODT file with predefined formats
+## @param filename String with the name of the filename to read, then will be saved with a different name
+## @param template String with the name of the filename used as template
+## @param language String with language. For example es
+## @param country String with the country. For example ES
+## @param predefinedstyles Boolean that sets if predefined styles are going to be loaded. True by default
 class ODT(ODF):
-    def __init__(self, filename, language="es", country="ES"):
+    def __init__(self, filename, template=None, language="es", country="ES"):
         ODF.__init__(self, filename)
         self.setLanguage(language, country)
-
+        ## After inserting an element it sets the new element as cursor to append 
+        
+        self.seqTables=0#Sequence of tables
+        self.seqFrames=0#If a frame is repeated it doesn't show its
+        self.template=template
+        if template==None:
+            self.doc=OpenDocumentText()
+        else:
+            self.doc= load(template)
+        self.cursor=self.doc.text
         
     ## @param href must bu added before with addImage
     ## @param width Int or float value
@@ -231,26 +246,20 @@ class ODT(ODF):
         return
 
     def simpleParagraph(self, text, style="Standard"):
-        return P(stylename=style, text=text)
-        
-## Class used to generate a ODT file with predefined formats
-## @param filename String with the name of the filename to read, then will be saved with a different name
-## @param template String with the name of the filename used as template
-## @param language String with language. For example es
-## @param country String with the country. For example ES
-## @param predefinedstyles Boolean that sets if predefined styles are going to be loaded. True by default
-class ODT_Read(ODT):
-    def __init__(self, filename, language="es", country="ES"):
-        ODT.__init__(self, filename, language, country)
-        self.setLanguage(language, country)
-        
-        self.doc=load(filename)
-        ## After inserting an element it sets the new element as cursor to append 
-        self.cursor=None
+        p= P(stylename=style, text=text)
+        self.__insertAfterCursorElement(p)
+
 
     def __insertAfterCursorElement(self, o):
-        index = self.cursor.parentNode.childNodes.index(self.cursor)
-        self.cursor.parentNode.childNodes.insert(index, o)
+        parent=self.cursor.parentNode
+        if parent==None:
+            self.doc.text.addElement(o)
+            print("Maybe bad")
+        else:
+            index = parent.childNodes.index(self.cursor)
+            print(index,  dir(parent.childNodes))
+            parent.childNodes.insert(index, o)
+            self.cursor=o
 
     ## Search for a tag in doc an returns element
     def search_and_replace(self, tag, replace):
@@ -260,10 +269,6 @@ class ODT_Read(ODT):
         e.removeChild(e.childNodes[0])
         self.showElement(e)
         self.cursor=e
-
-    def simpleParagraph(self, text, style="Standard"):
-        p=ODT.simpleParagraph(self, text, style)
-        self.__insertAfterCursorElement(p)
 
     ## Searchs for the item with a tag. Perhaps is its paren where I'll have to append
     def search(self, tag):
@@ -292,38 +297,13 @@ class ODT_Read(ODT):
 #            for n in start_node.childNodes:
 #                self.odf_dump_nodes(n, level+1)
 #        return
-    def save(self, filename):
-        if  filename==self.filename:
+    def save(self):
+        if  self.filename==self.template:
             print(_("You can't overwrite a readed odt"))
             return        
-        self.doc.save( filename)
-## Class used to generate a ODT file with predefined formats. It creates only styles. The rest you have to build it.
-## @param filename String with the name of the filename to create
-## @param template String with the name of the filename used as template. Only to copy styles
-## @param language String with language. For example es
-## @param country String with the country. For example ES
-## @param predefinedstyles Boolean that sets if predefined styles are going to be loaded. True by default and used when templatestyles=None
-class ODT_Write(ODT):
-    def __init__(self, filename, templatestyles=None, language="es", country="ES", predefinedstyles=True):
-        ODT.__init__(self, filename, language, country)
-        self.setLanguage(language, country)
-        
-        self.seqTables=0#Sequence of tables
-        self.seqFrames=0#If a frame is repeated it doesn't show its
-        self.doc=OpenDocumentText()
-        if templatestyles==None:
-            if predefinedstyles==True:
-                    self.load_predefined_styles()
-            else:     
-                templatedoc= load(templatestyles)
-                for style in templatedoc.styles.childNodes[:]:
-                    self.doc.styles.addElement(style)
-              
-                for autostyle in templatedoc.automaticstyles.childNodes[:]:
-                    self.doc.automaticstyles.addElement(autostyle)
-                    
-                for master in templatedoc.masterstyles.childNodes[:]:
-                    self.doc.masterstyles.addElement(master)
+        self.doc.save( self.filename)
+
+
 
 
     ## Loads predefined styles. If you want to change them you need to make a class with ODT as its parent and override this method or to load a template
@@ -475,11 +455,6 @@ class ODT_Write(ODT):
             self.simpleParagraph("",style)
 
 
-
-    def save(self):
-        makedirs(os.path.dirname(self.filename))
-        self.doc.save(self.filename)
-
         
     def list(self, arr, style="BulletList"):
         l=List(stylename=style)
@@ -506,9 +481,6 @@ class ODT_Write(ODT):
         p=P(stylename="Title", text=text)
         self.doc.text.addElement(p)
 
-    def simpleParagraph(self, text, style="Standard"):
-        p=ODT.simpleParagraph(self, text, style)
-        self.doc.text.addElement(p)
 
     ## Creates the document title
     ## @param text String with the title
