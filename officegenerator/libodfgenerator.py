@@ -2,6 +2,9 @@
 ## @brief Package that allows to read and write Libreoffice ods and odt files
 ## This file is from the Xulpymoney project. If you want to change it. Ask for project administrator
 
+## odf Element and Text inherits from Node and inherits from xml.Dom.Node https://docs.python.org/3.5/library/xml.dom.html
+## Text can't have children
+
 import datetime
 import gettext
 import logging
@@ -213,6 +216,7 @@ class ODT(ODF):
         else:
             self.doc= load(template)
         self.cursor=self.doc.text
+        self.cursorParent=self.doc.text
         
     ## @param href must bu added before with addImage
     ## @param width Int or float value
@@ -245,66 +249,65 @@ class ODT(ODF):
                 self.odf_dump_nodes(n, level+1)
         return
 
-    def simpleParagraph(self, text, style="Standard"):
+    def simpleParagraph(self, text, style="Standard", after=True):
         p= P(stylename=style, text=text)
-        self.__insertAfterCursorElement(p)
+        self.insertInCursor(p, after)
 
+    ## Inserts after or before the Cursor, and sets the Cursor to the o element
+    def insertInCursor(self, o, after):
+        if after==True:
+            indexcursor=self.cursorParent.childNodes.index(self.cursor)
+            if len(self.cursorParent.childNodes)==indexcursor+1:
+                self.cursorParent.insertBefore(o, None)
+            else:
+                siguiente=self.cursorParent.childNodes[indexcursor+1]
+                self.cursorParent.insertBefore(o, siguiente)
+        else:#After = False
+            self.cursorParent.insertBefore(o, self.cursor)
+        self.__setCursor(o)
 
-    def __insertAfterCursorElement(self, o):
-        parent=self.cursor.parentNode
-        if parent==None:
-            self.doc.text.addElement(o)
-            print("Maybe bad")
-        else:
-            index = parent.childNodes.index(self.cursor)
-            print(index,  dir(parent.childNodes))
-            parent.childNodes.insert(index, o)
-            self.cursor=o
-
-    ## Search for a tag in doc an returns element
+    ## Search for a tag in doc an returns element and its index. With it, inserts new with replaced text and removes old
+    ##
+    ## Cursor doesn't change because we replace Text objects in Element Text
+    ## @param tag String to search
+    ## @param replace String to replace. If None removes the tag without adding an element
     def search_and_replace(self, tag, replace):
-        e=self.search(tag)
-        self.showElement(e)
-        e.appendChild(odf.element.Text(str(e).replace(tag, replace)))
-        e.removeChild(e.childNodes[0])
-        self.showElement(e)
-        self.cursor=e
+        e,  textindex=self.search(tag) #Places cursor to element
+        to_remove=e.childNodes[textindex]
+        if replace==None:#Removes text
+            e.removeChild(to_remove)
+            if len(e.childNodes)==0:#Removes element
+                self.cursorParent.removeChild(e)
+        else: #Replace
+            e.insertBefore( odf.element.Text(str(to_remove).replace(tag, replace)), to_remove)
+            e.removeChild(to_remove)
 
-    ## Searchs for the item with a tag. Perhaps is its paren where I'll have to append
+
+    ## Searchs for the item with a tag. Perhaps is its paren where I'll have to append. Only finds the first one
+    ## Returns the element p and the position in its text children
     def search(self, tag):
-        for e in self.doc.text.childNodes:
-            if str(e)==tag:
-                self.cursor=e
-                return e
+        for e in self.doc.getElementsByType(P):
+            if str(e).find(tag)!=-1:
+                self.__setCursor(e)
+                for index, child in enumerate(e.childNodes):
+                    #print(index, child)
+                    if str(child).find(tag)!=-1:
+                        #print("SEARCH RETURN",  e, index)
+                        return e, index
+        print ("tag {} not found".format(tag))
 
-#                newElement=e
-#                parent.insertBefore()
-#                e.addCD
-##        row.insertBefore(cell.generate(), oldcell)
-##        row.removeChild(oldcell)
-#        if start_node.nodeType==3:
-#            # text node
-#            print ("  "*level, "NODE:", start_node.nodeType, ":(text):")
-#        else:
-#            # element node
-#            attrs= []
-#            for k in start_node.attributes.keys():
-#                attrs.append( str(k[1]) + ':' + str(start_node.attributes[k]  ))
-##            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ", str(start_node))
-##            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ")
-#            print("{} NODE: {}:{} ATTR: {}".format(" "*level,  str(start_node.nodeType), str(start_node.qname[1]), attrs))
-#
-#            for n in start_node.childNodes:
-#                self.odf_dump_nodes(n, level+1)
-#        return
+        
+    def __setCursor(self, e):
+        self.cursor=e
+        self.cursorParent=e.parentNode
+        if self.cursorParent==None:
+            print("Parent of '{}' is None".format(self.cursor))
+
     def save(self):
         if  self.filename==self.template:
             print(_("You can't overwrite a readed odt"))
             return        
         self.doc.save( self.filename)
-
-
-
 
     ## Loads predefined styles. If you want to change them you need to make a class with ODT as its parent and override this method or to load a template
     def load_predefined_styles(self):
@@ -450,50 +453,50 @@ class ODT(ODF):
         styleHeaders()
         styleList()
 
-    def emptyParagraph(self, style="Standard", number=1):
+    def emptyParagraph(self, style="Standard", number=1, after=True):
         for i in range(number):
-            self.simpleParagraph("",style)
+            self.simpleParagraph("",style, after=True)
 
 
         
-    def list(self, arr, style="BulletList"):
+    def list(self, arr, style="BulletList", after=True):
         l=List(stylename=style)
         for item in arr:
             it=ListItem()
             p=P(stylename="ListStandard", text=item)
             it.addElement(p)
             l.addElement(it)
-        self.doc.text.addElement(l)
+        self.insertInCursor(l, after)
                 
-    def numberedList(self, arr, style="NumberedList"):
+    def numberedList(self, arr, style="NumberedList", after=True):
         l=List(stylename=style)
         for item in arr:
             it=ListItem()
             p=P(stylename="ListStandard", text=item)
             it.addElement(p)
             l.addElement(it)
-        self.doc.text.addElement(l)
+        self.insertInCursor(l, after)
 
 
     ## Creates the document title
     ## @param text String with the title
-    def title(self, text):
+    def title(self, text, after=True):
         p=P(stylename="Title", text=text)
-        self.doc.text.addElement(p)
+        self.insertInCursor(p, after)
 
 
     ## Creates the document title
     ## @param text String with the title
-    def subtitle(self, text):
+    def subtitle(self, text, after=True):
         p=P(stylename="Subtitle", text=text)
-        self.doc.text.addElement(p)
+        self.insertInCursor(p, after)
 
     ## Creates a text header
     ## @param text String with the header string
     ## @Level Integer Level of the header
-    def header(self, text, level):
+    def header(self, text, level, after=True):
         h=H(outlinelevel=level, stylename="Heading{}".format(level), text=text)
-        self.doc.text.addElement(h)
+        self.insertInCursor(h, after)
 
     ## Creates a table adding it to self.doc
     ## @param header List with all header strings
@@ -501,7 +504,7 @@ class ODT(ODF):
     ## @param sizes Integer list with sizes in cm
     ## @param fontsize Integer in pt
     ## @param name str or None. Sets the object name. Appears in LibreOffice navigator. If none table will be named to "Table.Sequence"
-    def table(self, header, data, sizes, fontsize, name=None):
+    def table(self, header, data, sizes, fontsize, name=None, after=True):
         def generate_table_styles():
             s=Style(name="Table.Size{}".format(sum(sizes)), family='table')
             s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center", margintop="0.6cm", marginbottom="0.6cm"))
@@ -593,17 +596,17 @@ class ODT(ODF):
             table.addElement(tr)
             for i, o in enumerate(row):
                 tr.addElement(addTableCell(o, fontsize))
-        self.doc.text.addElement(table)
+        self.insertInCursor(table, after)
 
 
-    def pageBreak(self,  horizontal=False):    
+    def pageBreak(self,  horizontal=False, after=True):    
         p=P(stylename="PageBreak")#Is an automatic style
         self.doc.text.addElement(p)
         if horizontal==True:
             p=P(stylename="PH")
         else:
             p=P(stylename="PV")
-        self.doc.text.addElement(p)
+        self.insertInCursor(p, after)
 
 ## Manage Odf Cells
 class OdfCell:

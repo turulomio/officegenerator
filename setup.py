@@ -1,5 +1,4 @@
 from setuptools import setup, Command
-import shutil
 import site
 import os
 import platform

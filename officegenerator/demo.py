@@ -40,24 +40,24 @@ def main(arguments=None):
         os.remove("officegenerator.xlsx")
 
     if args.create==True:
-        print(_("Generating example files"))
-        demo_ods()
-        print("  * " + _("ODS Generated"))
-
-        demo_ods_readed()
-        print("  * " + _("ODS Readed and regenerated"))
-
-        demo_odt_with_predefined_styles()
-        print("  * " + _("ODT Generated"))
-        
-        demo_odt_with_template_styles()
-        print("  * " + _("ODT Generated from Standard template"))
+#        print(_("Generating example files"))
+#        demo_ods()
+#        print("  * " + _("ODS Generated"))
+#
+#        demo_ods_readed()
+#        print("  * " + _("ODS Readed and regenerated"))
+#
+#        demo_odt_with_predefined_styles()
+#        print("  * " + _("ODT Generated"))
+#        
+#        demo_odt_with_template_styles()
+#        print("  * " + _("ODT Generated from Standard template"))
 
         demo_odt_readed_and_replaced()
         print("  * " + _("ODT Generated from Replace template"))
 
-        demo_xlsx()
-        print("  * " + _("XLSX Generated"))
+#        demo_xlsx()
+#        print("  * " + _("XLSX Generated"))
 
 
 def demo_ods_readed():
@@ -222,12 +222,13 @@ def demo_odt_commands(doc):
     p.addText("Este es un ejemplo de imagen as char: ")
     p.addElement(doc.image("images/crown.png", "3cm", "3cm"))
     p.addText(". Ahora sigo escribiendo sin problemas.")
-    doc.doc.text.addElement(p)
+    doc.insertInCursor(p, after=True)
+
     doc.simpleParagraph("Como ves puedo repetirla mil veces sin que me aumente el tamaño del fichero, porque uso referencias")
     p=P(stylename="Illustration")
     for i in range(100):
         p.addElement(doc.image("images/crown.png", "4cm", "4cm", name="Crown.{}".format(i)))
-    doc.doc.text.addElement(p)
+    doc.insertInCursor(p, after=True)
 
     doc.pageBreak(horizontal=True)
     doc.header(_("Horizontal page"), 2)
@@ -261,12 +262,23 @@ def demo_odt_readed_and_replaced():
     doc=ODT("officegenerator_replaced.odt",  template)
     doc.setMetadata("OfficeGenerator replaced example",  "officegenerator documentation", "Mariano Muñoz")
     doc.search_and_replace("$$TITLE$$", _("My title"))
+    doc.search_and_replace('$$SUBTITLE$$',  _("My subtitle"))
+    doc.search_and_replace('$$ESTO$$',  _("ESTO"))
     doc.search('$$LAST$$')
-    doc.simpleParagraph(_("These is my first text appended in a searched tag."))
-    doc.search_and_replace('$$SUBTITLE$$',  _("My subtítle"))
-    doc.search('$$LAST$$')
-    doc.simpleParagraph(_("This is my second text, after sarching the tag again"))
-    doc.simpleParagraph(_("This is my third text."))
+    doc.simpleParagraph(str(10))
+    doc.simpleParagraph(str(11))
+    doc.search('9')
+    doc.simpleParagraph(str(8), after=False)
+    doc.search('5')
+    doc.simpleParagraph(str(6), after=True)
+    
+    doc.search('2')
+    doc.simpleParagraph(str(3), after=True)
+    doc.simpleParagraph(str(4), after=True)
+    doc.search_and_replace('$$LAST$$', None)
+    doc.search('THE END')
+    doc.pageBreak()
+    demo_odt_commands(doc)
     doc.save()
 
 def demo_xlsx():
