@@ -40,24 +40,24 @@ def main(arguments=None):
         os.remove("officegenerator.xlsx")
 
     if args.create==True:
-#        print(_("Generating example files"))
-#        demo_ods()
-#        print("  * " + _("ODS Generated"))
-#
-#        demo_ods_readed()
-#        print("  * " + _("ODS Readed and regenerated"))
-#
-#        demo_odt_with_predefined_styles()
-#        print("  * " + _("ODT Generated"))
-#        
-#        demo_odt_with_template_styles()
-#        print("  * " + _("ODT Generated from Standard template"))
+        print(_("Generating example files"))
+        demo_ods()
+        print("  * " + _("ODS Generated"))
+
+        demo_ods_readed()
+        print("  * " + _("ODS Readed and regenerated"))
+
+        demo_odt_with_predefined_styles()
+        print("  * " + _("ODT Generated"))
+        
+        demo_odt_with_template_styles()
+        print("  * " + _("ODT Generated from Standard template"))
 
         demo_odt_readed_and_replaced()
         print("  * " + _("ODT Generated from Replace template"))
 
-#        demo_xlsx()
-#        print("  * " + _("XLSX Generated"))
+        demo_xlsx()
+        print("  * " + _("XLSX Generated"))
 
 
 def demo_ods_readed():

@@ -215,7 +215,7 @@ class ODT(ODF):
             self.doc=OpenDocumentText()
         else:
             self.doc= load(template)
-        self.cursor=self.doc.text
+        self.cursor=None
         self.cursorParent=self.doc.text
         
     ## @param href must bu added before with addImage
@@ -255,7 +255,9 @@ class ODT(ODF):
 
     ## Inserts after or before the Cursor, and sets the Cursor to the o element
     def insertInCursor(self, o, after):
-        if after==True:
+        if self.cursor==None:# First insert
+            self.doc.text.addElement(o)
+        elif after==True:
             indexcursor=self.cursorParent.childNodes.index(self.cursor)
             if len(self.cursorParent.childNodes)==indexcursor+1:
                 self.cursorParent.insertBefore(o, None)
