@@ -164,10 +164,20 @@ class ODF:
         self.filename=filename
         self.images={}
         
-    def setMetadata(self, title,  description, creator):
+                
+    def setMetadata(self, title,  subject, creator):
+        print(len(self.doc.meta.childNodes))
+        for e in self.doc.meta.childNodes:
+            print(self.showElement(e))
+            self.doc.meta.removeChild(e)
+        print(len(self.doc.meta.childNodes))
+        self.doc.meta.addElement(Description(text=_("This document has been generated with OfficeGenerator v{}".format(__version__))))
         self.doc.meta.addElement(Title(text=title))
-        self.doc.meta.addElement(Description(text=description))
+        self.doc.meta.addElement(Subject(text=subject))
         self.doc.meta.addElement(Creator(text=creator))
+        self.doc.meta.addElement(InitialCreator(text=creator))
+        self.doc.meta.ownerDocument.clear_caches()
+        print(len(self.doc.meta.childNodes))
 
     ## Adds an image to self.images dictionary. We add to a dictionary in order to reuse the same image in a directory
     ##
@@ -216,18 +226,7 @@ class ODT(ODF):
             self.doc= load(self.template)
         self.cursor=None
         self.cursorParent=self.doc.text
-                
-    def setMetadata(self, title,  subject, creator):
-        print(len(self.doc.meta.childNodes))
-        for e in self.doc.meta.childNodes:
-            self.doc.meta.removeChild(e)
-        print(len(self.doc.meta.childNodes))
-        self.doc.meta.addElement(Description(text=_("This document has been generated with OfficeGenerator v{}".format(__version__))))
-        self.doc.meta.addElement(Title(text=title))
-        self.doc.meta.addElement(Subject(text=subject))
-        self.doc.meta.addElement(Creator(text=creator))
-        self.doc.meta.addElement(InitialCreator(text=creator))
-        print(len(self.doc.meta.childNodes))
+
 
     ## @param href must bu added before with addImage
     ## @param width Int or float value

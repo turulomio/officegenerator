@@ -40,24 +40,24 @@ def main(arguments=None):
         os.remove("officegenerator.xlsx")
 
     if args.create==True:
-#        print(_("Generating example files"))
-#        demo_ods()
-#        print("  * " + _("ODS Generated"))
-#
-#        demo_ods_readed()
-#        print("  * " + _("ODS Readed and regenerated"))
+        print(_("Generating example files"))
+        demo_ods()
+        print("  * " + _("ODS Generated"))
+
+        demo_ods_readed()
+        print("  * " + _("ODS Readed and regenerated"))
 
         demo_odt_with_predefined_styles()
         print("  * " + _("ODT Generated"))
         
-#        demo_odt_with_template_styles()
-#        print("  * " + _("ODT Generated from Standard template"))
-#
-#        demo_odt_readed_and_replaced()
-#        print("  * " + _("ODT Generated from Replace template"))
-#
-#        demo_xlsx()
-#        print("  * " + _("XLSX Generated"))
+        demo_odt_with_template_styles()
+        print("  * " + _("ODT Generated from Standard template"))
+
+        demo_odt_readed_and_replaced()
+        print("  * " + _("ODT Generated from Replace template"))
+
+        demo_xlsx()
+        print("  * " + _("XLSX Generated"))
 
 
 def demo_ods_readed():
@@ -260,7 +260,6 @@ def demo_odt_with_template_styles():
 def demo_odt_readed_and_replaced():
     template=pkg_resources.resource_filename("officegenerator","templates/odt/replace_es.odt")
     doc=ODT("officegenerator_replaced.odt",  template)
-    doc.setMetadata("OfficeGenerator replaced example",  "officegenerator documentation", "Mariano Muñoz")
     doc.search_and_replace("$$TITLE$$", _("My title"))
     doc.search_and_replace('$$SUBTITLE$$',  _("My subtitle"))
     doc.search_and_replace('$$ESTO$$',  _("ESTO"))
