@@ -211,10 +211,10 @@ class ODT(ODF):
         self.seqTables=0#Sequence of tables
         self.seqFrames=0#If a frame is repeated it doesn't show its
         self.template=template
-        if template==None:
+        if self.template==None:
             self.doc=OpenDocumentText()
         else:
-            self.doc= load(template)
+            self.doc= load(self.template)
         self.cursor=None
         self.cursorParent=self.doc.text
         
@@ -273,8 +273,11 @@ class ODT(ODF):
     ## Cursor doesn't change because we replace Text objects in Element Text
     ## @param tag String to search
     ## @param replace String to replace. If None removes the tag without adding an element
-    def search_and_replace(self, tag, replace):
-        e,  textindex=self.search(tag) #Places cursor to element
+    ## @return tuple (Element, Index). If Element==None it doesn't find anything
+    def search_and_replace(self, tag, replace, type=P):
+        e,  textindex=self.search(tag, type) #Places cursor to element
+        if e==None:
+            return
         to_remove=e.childNodes[textindex]
         if replace==None:#Removes text
             e.removeChild(to_remove)
@@ -287,8 +290,8 @@ class ODT(ODF):
 
     ## Searchs for the item with a tag. Perhaps is its paren where I'll have to append. Only finds the first one
     ## Returns the element p and the position in its text children
-    def search(self, tag):
-        for e in self.doc.getElementsByType(P):
+    def search(self, tag, type=P):
+        for e in self.doc.getElementsByType(type):
             if str(e).find(tag)!=-1:
                 self.__setCursor(e)
                 for index, child in enumerate(e.childNodes):
@@ -297,7 +300,12 @@ class ODT(ODF):
                         #print("SEARCH RETURN",  e, index)
                         return e, index
         print ("tag {} not found".format(tag))
+        return None, None
 
+        
+    ##
+    def convert_to_pdf(self):
+        os.system("lowriter --headless --convert-to pdf {}".format(self.filename))
         
     def __setCursor(self, e):
         self.cursor=e
