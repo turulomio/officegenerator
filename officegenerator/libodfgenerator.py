@@ -17,14 +17,14 @@ from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Tex
 from odf.text import P,  H,  Span, ListStyle,  ListLevelStyleBullet,  List,  ListItem, ListLevelStyleNumber,  OutlineLevelStyle,  OutlineStyle,  PageNumber,  PageCount
 from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
 from odf.draw import Frame, Image
-from odf.dc import Creator, Description, Title, Date
+from odf.dc import Creator, Description, Title, Date, Subject
 from odf.meta import InitialCreator
 import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
 
-from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency
+from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency,  __version__
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -167,7 +167,6 @@ class ODF:
     def setMetadata(self, title,  description, creator):
         self.doc.meta.addElement(Title(text=title))
         self.doc.meta.addElement(Description(text=description))
-        self.doc.meta.addElement(InitialCreator(text=creator))
         self.doc.meta.addElement(Creator(text=creator))
 
     ## Adds an image to self.images dictionary. We add to a dictionary in order to reuse the same image in a directory
@@ -217,7 +216,19 @@ class ODT(ODF):
             self.doc= load(self.template)
         self.cursor=None
         self.cursorParent=self.doc.text
-        
+                
+    def setMetadata(self, title,  subject, creator):
+        print(len(self.doc.meta.childNodes))
+        for e in self.doc.meta.childNodes:
+            self.doc.meta.removeChild(e)
+        print(len(self.doc.meta.childNodes))
+        self.doc.meta.addElement(Description(text=_("This document has been generated with OfficeGenerator v{}".format(__version__))))
+        self.doc.meta.addElement(Title(text=title))
+        self.doc.meta.addElement(Subject(text=subject))
+        self.doc.meta.addElement(Creator(text=creator))
+        self.doc.meta.addElement(InitialCreator(text=creator))
+        print(len(self.doc.meta.childNodes))
+
     ## @param href must bu added before with addImage
     ## @param width Int or float value
     ## @param height Int or float value to set the images height
