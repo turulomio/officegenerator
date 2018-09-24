@@ -166,18 +166,13 @@ class ODF:
         
                 
     def setMetadata(self, title,  subject, creator):
-        print(len(self.doc.meta.childNodes))
         for e in self.doc.meta.childNodes:
-            print(self.showElement(e))
             self.doc.meta.removeChild(e)
-        print(len(self.doc.meta.childNodes))
         self.doc.meta.addElement(Description(text=_("This document has been generated with OfficeGenerator v{}".format(__version__))))
         self.doc.meta.addElement(Title(text=title))
         self.doc.meta.addElement(Subject(text=subject))
         self.doc.meta.addElement(Creator(text=creator))
         self.doc.meta.addElement(InitialCreator(text=creator))
-        self.doc.meta.ownerDocument.clear_caches()
-        print(len(self.doc.meta.childNodes))
 
     ## Adds an image to self.images dictionary. We add to a dictionary in order to reuse the same image in a directory
     ##
@@ -217,6 +212,8 @@ class ODT(ODF):
         self.setLanguage(language, country)
         ## After inserting an element it sets the new element as cursor to append 
         
+        
+        
         self.seqTables=0#Sequence of tables
         self.seqFrames=0#If a frame is repeated it doesn't show its
         self.template=template
@@ -226,6 +223,8 @@ class ODT(ODF):
             self.doc= load(self.template)
         self.cursor=None
         self.cursorParent=self.doc.text
+        
+
 
 
     ## @param href must bu added before with addImage
@@ -240,6 +239,42 @@ class ODT(ODF):
         img = Image(href=self.images[href], type="simple", show="embed", actuate="onLoad")
         f.addElement(img)
         return f
+
+    ## List_20_1 is a list style. Don't get wrong with List_20_1 paragraph style
+    ## @param arr List of strings and other list. You must take care that level2 list are included in list-item of level 1.
+    ## @param style is a list style not a paragraph style. In standard configured styles are "List_20_1" and "Numbering_20_123"
+    ## @param boolean To insert before or after the current cursor.
+    ## @code multilevel
+    ##    doc.list(   [   ["1", ["1.1", "1.2"]], 
+    ##                    ["2"], 
+    ##                    ["3",  ["3.1", ["3.1.1", "3.1.2"]]]
+    ##                ],  style="List_20_1")   
+    ## @endcode
+    ## @code unilevel
+    ##    doc.list(   [   ["1",], 
+    ##                        ["2",], 
+    ##                        ["3",],
+    ##                ],  style="List_20_1")   
+    ## @endcode
+    def list(self, arr, list_style="List_20_1", paragraph_style="Text_20_body", after=True):
+        def get_items(list_o, list_style, paragraph_style):
+            r=[]
+            for o in list_o:
+                print(o)
+                it=ListItem()
+                if o.__class__==str:
+                    it.addElement(P(stylename=paragraph_style, text=o))
+                else:
+                    it.addElement(get_list(o, list_style, paragraph_style))
+                r.append(it)
+            return r
+        def get_list(arr, list_style, paragraph_style):
+            ls=List(stylename=list_style)
+            for listitem in get_items(arr, list_style, paragraph_style):
+                ls.addElement(listitem)
+            return ls
+        # #########################
+        self.insertInCursor(get_list(arr, list_style, paragraph_style), after)    
 
     ## Extracts odf document structure
     def odf_dump_nodes(self, start_node, level=0):
@@ -329,6 +364,189 @@ class ODT(ODF):
             return        
         self.doc.save( self.filename)
 
+
+    def emptyParagraph(self, style="Standard", number=1, after=True):
+        for i in range(number):
+            self.simpleParagraph("",style, after=True)
+
+
+
+
+
+    ## Creates the document title
+    ## @param text String with the title
+    def title(self, text, after=True):
+        p=P(stylename="Title", text=text)
+        self.insertInCursor(p, after)
+
+
+    ## Creates the document title
+    ## @param text String with the title
+    def subtitle(self, text, after=True):
+        p=P(stylename="Subtitle", text=text)
+        self.insertInCursor(p, after)
+
+
+
+    ## Creates a table adding it to self.doc
+    ## @param header List with all header strings
+    ## @param data Multidimension List with all data objects. Can be str, Decimal, int, datetime, date, Currency, Percentage
+    ## @param sizes Integer list with sizes in cm
+    ## @param fontsize Integer in pt
+    ## @param name str or None. Sets the object name. Appears in LibreOffice navigator. If none table will be named to "Table.Sequence"
+    def table(self, header, data, sizes, fontsize, name=None, after=True):
+        def generate_table_styles():
+            s=Style(name="Table.Size{}".format(sum(sizes)), family='table')
+            s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center", margintop="0.6cm", marginbottom="0.6cm"))
+            self.doc.automaticstyles.addElement(s)
+
+            #Column sizes
+            for i, size in enumerate(sizes):
+                sc= Style(name="Table.Column.Size{}".format(size), family="table-column")
+                sc.addElement(TableColumnProperties(columnwidth="{}cm".format(size)))
+                self.doc.automaticstyles.addElement(sc)
+
+            #Cell header style
+            sch=Style(name="Table.HeaderCell", family="table-cell")
+            sch.addElement(TableCellProperties(backgroundcolor="#999999",  border="0.05pt solid #000000", padding="0.15cm"))
+            self.doc.automaticstyles.addElement(sch)        
+
+            #Cell normal
+            sch=Style(name="Table.Cell", family="table-cell")
+            sch.addElement(TableCellProperties(border="0.05pt solid #000000", padding="0.1cm"))
+            self.doc.automaticstyles.addElement(sch)
+
+            #TAble contents style
+            s= Style(name="Table.Heading.Font{}".format(fontsize), family="paragraph" )
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize),  'fontweight':"bold"}))
+            s.addElement(ParagraphProperties(attributes={'textalign':'center', }))
+            self.doc.styles.addElement(s)
+            
+            s = Style(name="Table.Contents.Font{}".format(fontsize), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
+            s.addElement(ParagraphProperties(attributes={'textalign':'justify', }))
+            self.doc.styles.addElement(s)
+            
+            s = Style(name="Table.ContentsRight.Font{}".format(fontsize), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
+            s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
+            self.doc.styles.addElement(s)
+            
+            s = Style(name="Table.ContentsRight.FontRed{}".format(fontsize), family="paragraph")
+            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), 'color':'#ff0000' }))
+            s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
+            self.doc.styles.addElement(s)
+
+        ## Generate a TableCell guessing style, setting color if number is negative and setting alignment
+        ## @param o Object can be str, Decimal, int, float, datetime, date, Currency, Percentage
+        ## @param fontsize Integer with the size of the font
+        ## @return TableCell
+        def addTableCell(o, fontsize):
+            tc = TableCell(stylename="Table.Cell")
+            
+            #Parses orientation
+            p = P(stylename="Table.ContentsRight.Font{}".format(fontsize))
+            s=Span(text=o)
+            if o.__class__ in (str, datetime.datetime, datetime.date ):
+                p = P(stylename="Table.Contents.Font{}".format(fontsize))
+                s=Span(text=str(o))
+            elif o.__class__ in (Currency,  Percentage):
+                if o.isLTZero():
+                    p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
+                s=Span(text=o.string())
+            elif o.__class__ in (int, Decimal,  float):
+                if o<0:
+                    p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
+            p.addElement(s)
+            tc.addElement(p)
+            return tc
+
+        ######################################
+        self.seqTables=self.seqTables+1
+        generate_table_styles()
+        #Table columns
+        name=name if name!=None else "Table.{}".format(self.seqTables)
+        table = Table(name=name, stylename="Table.Size{}".format(sum(sizes)))
+        for size in sizes:
+            table.addElement(TableColumn(stylename="Table.Column.Size{}".format(size)))
+        #Header rows
+        headerrow=TableHeaderRows()
+        tablerow=TableRow()
+        headerrow.addElement(tablerow)
+        for i, head in enumerate(header):
+            p=P(stylename="Table.Heading.Font{}".format(fontsize), text=head)
+            tablecell=TableCell(stylename="Table.HeaderCell")
+            tablecell.addElement(p)
+            tablerow.addElement(tablecell)
+        table.addElement(headerrow)
+
+        #Data rows
+        for row in data:
+            tr = TableRow()
+            table.addElement(tr)
+            for i, o in enumerate(row):
+                tr.addElement(addTableCell(o, fontsize))
+        self.insertInCursor(table, after)
+
+
+
+
+## Class with starndard.odt template
+class ODT_Standard(ODT):
+    def __init__(self, filename, language="es", country="es"):
+        template=pkg_resources.resource_filename("officegenerator","templates/odt/standard.odt")
+        ODT.__init__(self, filename, template, language, country)
+
+    ## Creates a text header
+    ## @param text String with the header string
+    ## @Level Integer Level of the header
+    def header(self, text, level, after=True):
+        h=H(outlinelevel=level, stylename="Heading_20_{}".format(level), text=text)
+        self.insertInCursor(h, after)
+        
+#    ## Text body has no space between paragraph
+#    def list(self, arr, style='Standard', after=True):
+#        def item(o, style):
+#            it=ListItem()
+#            for obj in o:
+#                if obj==str:
+#                    p=P(stylename=style, text=item)
+#                    it.addElement(p)
+#                elif obj==List:
+#                    ls=List(stylename="List_20_1")
+#                    ls.addElement(item(obj, style))
+#                    it.addElement(ls)
+#            return it
+#        # #########################
+#        
+#        print("LIST MAL IN STANDARD")
+#        l=List(stylename="List_20_1", )
+#        for o in arr:
+#            l.addElement(item(o, style))
+#        self.insertInCursor(l, after)
+#        return l
+
+
+
+    ## PH and PV styles are deffined in standard.odtg
+    def pageBreak(self,  horizontal=False, after=True):    
+        if horizontal==True:
+            p=P(stylename="PH")
+        else:
+            p=P(stylename="PV")
+        self.insertInCursor(p, after)
+## Class with starndard.odt template
+class ODT_Manual_Styles(ODT):
+    def __init__(self, filename, language="es", country="es"):
+        ODT.__init__(self, filename, None, language, country)
+        self.load_predefined_styles()
+
+    ## Creates a text header
+    ## @param text String with the header string
+    ## @Level Integer Level of the header
+    def header(self, text, level, after=True):
+        h=H(outlinelevel=level, stylename="Heading{}".format(level), text=text)
+        self.insertInCursor(h, after)
     ## Loads predefined styles. If you want to change them you need to make a class with ODT as its parent and override this method or to load a template
     def load_predefined_styles(self):
         def stylePage():
@@ -433,8 +651,20 @@ class ODT(ODF):
             self.doc.styles.addElement(liststandard)
             
             # For Bulleted list
-            bulletedliststyle = ListStyle(name="BulletList")
+            bulletedliststyle = ListStyle(name="BulletList1")
             bulletlistproperty = ListLevelStyleBullet(level="1", bulletchar=u"•")
+            bulletlistproperty.addElement(ListLevelProperties( minlabelwidth="1cm"))
+            bulletedliststyle.addElement(bulletlistproperty)
+            self.doc.styles.addElement(bulletedliststyle)
+            # For Bulleted list
+            bulletedliststyle = ListStyle(name="BulletList2")
+            bulletlistproperty = ListLevelStyleBullet(level="2", bulletchar=u"#")
+            bulletlistproperty.addElement(ListLevelProperties( minlabelwidth="1cm"))
+            bulletedliststyle.addElement(bulletlistproperty)
+            self.doc.styles.addElement(bulletedliststyle)
+            # For Bulleted list
+            bulletedliststyle = ListStyle(name="BulletList2")
+            bulletlistproperty = ListLevelStyleBullet(level="2", bulletchar=u"·")
             bulletlistproperty.addElement(ListLevelProperties( minlabelwidth="1cm"))
             bulletedliststyle.addElement(bulletlistproperty)
             self.doc.styles.addElement(bulletedliststyle)
@@ -473,151 +703,11 @@ class ODT(ODF):
         styleHeaders()
         styleList()
 
-    def emptyParagraph(self, style="Standard", number=1, after=True):
-        for i in range(number):
-            self.simpleParagraph("",style, after=True)
-
+    ## This function always use manual Bulletlist and liststandard styles by coherence with manual styles
+    def list(self, arr, list_style=None, paragraph_style=None,  after=True):
+        ODT.list(self, arr, "BulletList", "ListStandard", after)
 
         
-    def list(self, arr, style="BulletList", after=True):
-        l=List(stylename=style)
-        for item in arr:
-            it=ListItem()
-            p=P(stylename="ListStandard", text=item)
-            it.addElement(p)
-            l.addElement(it)
-        self.insertInCursor(l, after)
-                
-    def numberedList(self, arr, style="NumberedList", after=True):
-        l=List(stylename=style)
-        for item in arr:
-            it=ListItem()
-            p=P(stylename="ListStandard", text=item)
-            it.addElement(p)
-            l.addElement(it)
-        self.insertInCursor(l, after)
-
-
-    ## Creates the document title
-    ## @param text String with the title
-    def title(self, text, after=True):
-        p=P(stylename="Title", text=text)
-        self.insertInCursor(p, after)
-
-
-    ## Creates the document title
-    ## @param text String with the title
-    def subtitle(self, text, after=True):
-        p=P(stylename="Subtitle", text=text)
-        self.insertInCursor(p, after)
-
-    ## Creates a text header
-    ## @param text String with the header string
-    ## @Level Integer Level of the header
-    def header(self, text, level, after=True):
-        h=H(outlinelevel=level, stylename="Heading{}".format(level), text=text)
-        self.insertInCursor(h, after)
-
-    ## Creates a table adding it to self.doc
-    ## @param header List with all header strings
-    ## @param data Multidimension List with all data objects. Can be str, Decimal, int, datetime, date, Currency, Percentage
-    ## @param sizes Integer list with sizes in cm
-    ## @param fontsize Integer in pt
-    ## @param name str or None. Sets the object name. Appears in LibreOffice navigator. If none table will be named to "Table.Sequence"
-    def table(self, header, data, sizes, fontsize, name=None, after=True):
-        def generate_table_styles():
-            s=Style(name="Table.Size{}".format(sum(sizes)), family='table')
-            s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center", margintop="0.6cm", marginbottom="0.6cm"))
-            self.doc.automaticstyles.addElement(s)
-
-            #Column sizes
-            for i, size in enumerate(sizes):
-                sc= Style(name="Table.Column.Size{}".format(size), family="table-column")
-                sc.addElement(TableColumnProperties(columnwidth="{}cm".format(size)))
-                self.doc.automaticstyles.addElement(sc)
-
-            #Cell header style
-            sch=Style(name="Table.HeaderCell", family="table-cell")
-            sch.addElement(TableCellProperties(backgroundcolor="#999999",  border="0.05pt solid #000000", padding="0.15cm"))
-            self.doc.automaticstyles.addElement(sch)        
-
-            #Cell normal
-            sch=Style(name="Table.Cell", family="table-cell")
-            sch.addElement(TableCellProperties(border="0.05pt solid #000000", padding="0.1cm"))
-            self.doc.automaticstyles.addElement(sch)
-
-            #TAble contents style
-            s= Style(name="Table.Heading.Font{}".format(fontsize), family="paragraph" )
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize),  'fontweight':"bold"}))
-            s.addElement(ParagraphProperties(attributes={'textalign':'center', }))
-            self.doc.styles.addElement(s)
-            
-            s = Style(name="Table.Contents.Font{}".format(fontsize), family="paragraph")
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
-            s.addElement(ParagraphProperties(attributes={'textalign':'justify', }))
-            self.doc.styles.addElement(s)
-            
-            s = Style(name="Table.ContentsRight.Font{}".format(fontsize), family="paragraph")
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
-            s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
-            self.doc.styles.addElement(s)
-            
-            s = Style(name="Table.ContentsRight.FontRed{}".format(fontsize), family="paragraph")
-            s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), 'color':'#ff0000' }))
-            s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
-            self.doc.styles.addElement(s)
-
-        ## Generate a TableCell guessing style, setting color if number is negative and setting alignment
-        ## @param o Object can be str, Decimal, int, float, datetime, date, Currency, Percentage
-        ## @param fontsize Integer with the size of the font
-        ## @return TableCell
-        def addTableCell(o, fontsize):
-            tc = TableCell(stylename="Table.Cell")
-            
-            #Parses orientation
-            p = P(stylename="Table.ContentsRight.Font{}".format(fontsize))
-            s=Span(text=o)
-            if o.__class__ in (str, datetime.datetime, datetime.date ):
-                p = P(stylename="Table.Contents.Font{}".format(fontsize))
-                s=Span(text=str(o))
-            elif o.__class__ in (Currency,  Percentage):
-                if o.isLTZero():
-                    p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
-                s=Span(text=o.string())
-            elif o.__class__ in (int, Decimal,  float):
-                if o<0:
-                    p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
-            p.addElement(s)
-            tc.addElement(p)
-            return tc
-
-        ######################################
-        self.seqTables=self.seqTables+1
-        generate_table_styles()
-        #Table columns
-        name=name if name!=None else "Table.{}".format(self.seqTables)
-        table = Table(name=name, stylename="Table.Size{}".format(sum(sizes)))
-        for size in sizes:
-            table.addElement(TableColumn(stylename="Table.Column.Size{}".format(size)))
-        #Header rows
-        headerrow=TableHeaderRows()
-        tablerow=TableRow()
-        headerrow.addElement(tablerow)
-        for i, head in enumerate(header):
-            p=P(stylename="Table.Heading.Font{}".format(fontsize), text=head)
-            tablecell=TableCell(stylename="Table.HeaderCell")
-            tablecell.addElement(p)
-            tablerow.addElement(tablecell)
-        table.addElement(headerrow)
-
-        #Data rows
-        for row in data:
-            tr = TableRow()
-            table.addElement(tr)
-            for i, o in enumerate(row):
-                tr.addElement(addTableCell(o, fontsize))
-        self.insertInCursor(table, after)
-
 
     def pageBreak(self,  horizontal=False, after=True):    
         p=P(stylename="PageBreak")#Is an automatic style
@@ -627,7 +717,7 @@ class ODT(ODF):
         else:
             p=P(stylename="PV")
         self.insertInCursor(p, after)
-
+        
 ## Manage Odf Cells
 class OdfCell:
     def __init__(self, coord,  object, style):
