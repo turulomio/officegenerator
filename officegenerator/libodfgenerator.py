@@ -256,11 +256,11 @@ class ODT(ODF):
     ##                        ["3",],
     ##                ],  style="List_20_1")   
     ## @endcode
+    ## Se genera un nivel más de list no se porque pero queda bien.
     def list(self, arr, list_style="List_20_1", paragraph_style="Text_20_body", after=True):
         def get_items(list_o, list_style, paragraph_style):
             r=[]
             for o in list_o:
-                print(o)
                 it=ListItem()
                 if o.__class__==str:
                     it.addElement(P(stylename=paragraph_style, text=o))
