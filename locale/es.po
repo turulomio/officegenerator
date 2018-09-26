@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-20 08:40+0200\n"
+"POT-Creation-Date: 2018-09-26 11:28+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -35,6 +35,9 @@ msgstr "ODS leído y regenerado"
 
 msgid "ODT Generated"
 msgstr "ODT generado"
+
+msgid "ODT Generated from Manual Styles"
+msgstr "ODT Generado con estilos manuales"
 
 msgid "XLSX Generated"
 msgstr "XLSX generado"
@@ -115,22 +118,22 @@ msgid "This is the 'StandardRight' style"
 msgstr "Este es el estilo 'StandardRight'"
 
 msgid "This is the 'Illustration' style"
-msgstr ""
+msgstr "Este es el estilo 'Ilustración'"
 
 msgid "This is the 'Bold18Center' style"
-msgstr ""
+msgstr "Este es el estilo 'Bold18Center'"
 
 msgid "This is the 'Bold16Center' style"
-msgstr ""
+msgstr "Este es el estilo 'Bold16Center'"
 
 msgid "This is the 'Bold14Center' style"
-msgstr ""
+msgstr "Este es el estilo 'Bold14Center'"
 
 msgid "This is the 'Bold12Center' style"
-msgstr ""
+msgstr "Este es el estilo 'Bold12Center'"
 
 msgid "This is the 'Bold12Underline' style"
-msgstr ""
+msgstr "Este es el estilo 'Bold12Underline'"
 
 msgid "Tables"
 msgstr "Tablas"
@@ -174,6 +177,15 @@ msgstr "Tercero"
 msgid "Lists and numbered lists"
 msgstr "Listas y listas numeradas"
 
+msgid "Simple list"
+msgstr "Lista simle"
+
+msgid "Multilevel list with bullets"
+msgstr "Lista multinivel con decoradores"
+
+msgid "Multilevel list with Numbers"
+msgstr "Lista multinivel con números"
+
 msgid "Images"
 msgstr "Imágenes"
 
@@ -184,7 +196,7 @@ msgid "By default OfficeGenerator uses a predefined A4 page."
 msgstr "Por defecto OfficeGenerator usa una página predefinida A4"
 
 msgid "Morever, you can set a predefined A4 horizontal page, as you can see."
-msgstr ""
+msgstr "Ademas, puedes añadir páginas horizontales A4 predefinidas, como puedes ver."
 
 msgid "Styles"
 msgstr "Estilos"
@@ -200,6 +212,15 @@ msgstr "Esta celda va a ser unida y alineada"
 
 msgid "You can't overwrite a readed ods"
 msgstr "No puedes sobreescribir un ods leído"
+
+msgid "This document has been generated with OfficeGenerator v{}"
+msgstr "Este documento ha sido creado con OfficeGenerator v{}"
+
+msgid "Tag {} hasn't been found"
+msgstr "La etiqueta {} no ha sido encontrada"
+
+msgid "You can't overwrite a readed odt"
+msgstr "No puedes sobreescribir un odt leído"
 
 msgid "{} Class not found in '{}'"
 msgstr "No se encontró la clase {} en '{}'"

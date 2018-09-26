@@ -34,7 +34,7 @@ def main(arguments=None):
     if args.remove==True:
         os.remove("officegenerator.ods")
         os.remove("officegenerator.odt")
-        os.remove("officegenerator_from_template_standard.odt")
+        os.remove("officegenerator_manual_styles.odt")
         os.remove("officegenerator_readed.ods")
         os.remove("officegenerator.xlsx")
 
