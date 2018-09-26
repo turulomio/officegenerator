@@ -211,9 +211,7 @@ class ODT(ODF):
         ODF.__init__(self, filename)
         self.setLanguage(language, country)
         ## After inserting an element it sets the new element as cursor to append 
-        
-        
-        
+
         self.seqTables=0#Sequence of tables
         self.seqFrames=0#If a frame is repeated it doesn't show its
         self.template=template
@@ -223,9 +221,6 @@ class ODT(ODF):
             self.doc= load(self.template)
         self.cursor=None
         self.cursorParent=self.doc.text
-        
-
-
 
     ## @param href must bu added before with addImage
     ## @param width Int or float value
@@ -274,7 +269,7 @@ class ODT(ODF):
                 ls.addElement(listitem)
             return ls
         # #########################
-        self.insertInCursor(get_list(arr, list_style, paragraph_style), after)    
+        return self.insertInCursor(get_list(arr, list_style, paragraph_style), after)    
 
     ## Extracts odf document structure
     def odf_dump_nodes(self, start_node, level=0):
@@ -286,22 +281,28 @@ class ODT(ODF):
             attrs= []
             for k in start_node.attributes.keys():
                 attrs.append( str(k[1]) + ':' + str(start_node.attributes[k]  ))
-#            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ", str(start_node))
-#            print ("  "*level, "NODE:", start_node.nodeType, ":", start_node.qname[1], " ATTR:(", ",".join(attrs), ") ")
             print("{} NODE: {}:{} ATTR: {}".format(" "*level,  str(start_node.nodeType), str(start_node.qname[1]), attrs))
 
             for n in start_node.childNodes:
                 self.odf_dump_nodes(n, level+1)
-        return
 
+    ## Adds a paragraph
+    ## @param text to add
+    ## @param style Style to use
+    ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
     def simpleParagraph(self, text, style="Standard", after=True):
         p= P(stylename=style, text=text)
-        self.insertInCursor(p, after)
+        return self.insertInCursor(p, after)
 
     ## Inserts after or before the Cursor, and sets the Cursor to the o element
+    ## @param o Object to insert
+    ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
     def insertInCursor(self, o, after):
+        if after==None:# It doesn't insert, just return item
+            return o
+
         if self.cursor==None:# First insert
-            self.doc.text.addElement(o)
+            self.cursorParent.addElement(o)
         elif after==True:
             indexcursor=self.cursorParent.childNodes.index(self.cursor)
             if len(self.cursorParent.childNodes)==indexcursor+1:
@@ -312,17 +313,25 @@ class ODT(ODF):
         else:#After = False
             self.cursorParent.insertBefore(o, self.cursor)
         self.__setCursor(o)
+        return o
 
-    ## Search for a tag in doc an returns element and its index. With it, inserts new with replaced text and removes old
+    ## Search for a tag type elementes  an returns element and its index. With it, inserts new with replaced text and removes old
     ##
     ## Cursor doesn't change because we replace Text objects in Element Text
     ## @param tag String to search
-    ## @param replace String to replace. If None removes the tag without adding an element
-    ## @return tuple (Element, Index). If Element==None it doesn't find anything
+    ## @param replace String to replace. Can't be None
     def search_and_replace(self, tag, replace, type=P):
         e,  textindex=self.search(tag, type) #Places cursor to element
         if e==None:
+            print(_("Tag {} hasn't been found"))
             return
+
+
+        if replace==None:#Remove paragraph
+            print("Replace parameter can't be None. Use '' instead or use search_and_replace_element")
+            return
+
+        #Replace text with the same style as found paragraph
         to_remove=e.childNodes[textindex]
         if replace==None:#Removes text
             e.removeChild(to_remove)
@@ -331,6 +340,25 @@ class ODT(ODF):
         else: #Replace
             e.insertBefore( odf.element.Text(str(to_remove).replace(tag, replace)), to_remove)
             e.removeChild(to_remove)
+
+    ## Search for a tag in doc an replaces its elemente with the parameter element
+    ##
+    ## @param tag String to search
+    ## @param replace ELement. OdfPy element
+    def search_and_replace_element(self, tag, newelement, type=P):
+        e,  textindex=self.search(tag, type) #Places cursor to element
+        if e==None:
+            print(_("Tag {} hasn't been found"))
+            return
+
+
+        if newelement==None:#Remove paragraph
+            print("New element can't be None")
+            return
+
+        self.cursorParent.insertBefore(newelement,e)
+        self.cursorParent.removeChild(e)
+        self.__setCursor(newelement)
 
 
     ## Searchs for the item with a tag. Perhaps is its paren where I'll have to append. Only finds the first one
@@ -367,7 +395,7 @@ class ODT(ODF):
 
     def emptyParagraph(self, style="Standard", number=1, after=True):
         for i in range(number):
-            self.simpleParagraph("",style, after=True)
+            self.simpleParagraph("",style, after)
 
 
 
@@ -377,14 +405,14 @@ class ODT(ODF):
     ## @param text String with the title
     def title(self, text, after=True):
         p=P(stylename="Title", text=text)
-        self.insertInCursor(p, after)
+        return self.insertInCursor(p, after)
 
 
     ## Creates the document title
     ## @param text String with the title
     def subtitle(self, text, after=True):
         p=P(stylename="Subtitle", text=text)
-        self.insertInCursor(p, after)
+        return self.insertInCursor(p, after)
 
 
 
@@ -486,7 +514,7 @@ class ODT(ODF):
             table.addElement(tr)
             for i, o in enumerate(row):
                 tr.addElement(addTableCell(o, fontsize))
-        self.insertInCursor(table, after)
+        return self.insertInCursor(table, after)
 
 
 
@@ -502,7 +530,7 @@ class ODT_Standard(ODT):
     ## @Level Integer Level of the header
     def header(self, text, level, after=True):
         h=H(outlinelevel=level, stylename="Heading_20_{}".format(level), text=text)
-        self.insertInCursor(h, after)
+        return self.insertInCursor(h, after)
         
 #    ## Text body has no space between paragraph
 #    def list(self, arr, style='Standard', after=True):
@@ -534,7 +562,7 @@ class ODT_Standard(ODT):
             p=P(stylename="PH")
         else:
             p=P(stylename="PV")
-        self.insertInCursor(p, after)
+        return self.insertInCursor(p, after)
 ## Class with starndard.odt template
 class ODT_Manual_Styles(ODT):
     def __init__(self, filename, language="es", country="es"):
@@ -546,7 +574,7 @@ class ODT_Manual_Styles(ODT):
     ## @Level Integer Level of the header
     def header(self, text, level, after=True):
         h=H(outlinelevel=level, stylename="Heading{}".format(level), text=text)
-        self.insertInCursor(h, after)
+        return self.insertInCursor(h, after)
     ## Loads predefined styles. If you want to change them you need to make a class with ODT as its parent and override this method or to load a template
     def load_predefined_styles(self):
         def stylePage():
@@ -705,9 +733,7 @@ class ODT_Manual_Styles(ODT):
 
     ## This function always use manual Bulletlist and liststandard styles by coherence with manual styles
     def list(self, arr, list_style=None, paragraph_style=None,  after=True):
-        ODT.list(self, arr, "BulletList", "ListStandard", after)
-
-        
+        return ODT.list(self, arr, "BulletList", "ListStandard", after)
 
     def pageBreak(self,  horizontal=False, after=True):    
         p=P(stylename="PageBreak")#Is an automatic style
@@ -716,8 +742,8 @@ class ODT_Manual_Styles(ODT):
             p=P(stylename="PH")
         else:
             p=P(stylename="PV")
-        self.insertInCursor(p, after)
-        
+        return self.insertInCursor(p, after)
+
 ## Manage Odf Cells
 class OdfCell:
     def __init__(self, coord,  object, style):
