@@ -386,10 +386,12 @@ class ODT(ODF):
         if self.cursorParent==None:
             print("Parent of '{}' is None".format(self.cursor))
 
+    ## Check if self.filename is different to self.template, create directory and saves the file
     def save(self):
         if  self.filename==self.template:
             print(_("You can't overwrite a readed odt"))
             return        
+        makedirs(os.path.dirname(filename))
         self.doc.save( self.filename)
 
 
