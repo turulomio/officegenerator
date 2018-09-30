@@ -390,8 +390,8 @@ class ODT(ODF):
     def save(self):
         if  self.filename==self.template:
             print(_("You can't overwrite a readed odt"))
-            return        
-        makedirs(os.path.dirname(filename))
+            return
+        makedirs(os.path.dirname(self.filename))
         self.doc.save( self.filename)
 
 

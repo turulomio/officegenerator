@@ -26,7 +26,7 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
-X.X.X
+1.2.0
   * Added ODT_Standard and ODT_Manual_Styles to package visibility
 1.1.0
   * ODT tables now work again
