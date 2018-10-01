@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
+1.2.1
+  * Now add in odssheet can guess the style if a color is passed
 1.2.0
   * Added ODT_Standard and ODT_Manual_Styles to package visibility
 1.1.0

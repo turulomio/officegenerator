@@ -11,8 +11,8 @@ import warnings
 from decimal import Decimal
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.2.0'
-__versiondate__=datetime.date(2018,9,30)
+__version__ = '1.2.1'
+__versiondate__=datetime.date(2018,10,1)
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))

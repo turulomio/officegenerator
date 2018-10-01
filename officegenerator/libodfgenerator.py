@@ -907,20 +907,21 @@ B1:
                 return c
         return None
 
-    def add(self, coord, result, style):
+    def add(self, coord, result, color_or_style="Normal"):
         coord=Coord.assertCoord(coord)
 
-        if result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal):#Un solo valor
-            self.addCell(OdfCell(coord, result, style))
-        elif result.__class__ in (list,):#Una lista
+        if result.__class__ in (list,):#Una lista
             for i,row in enumerate(result):
-                if row.__class__ in (int, str, float, datetime.datetime,  datetime.date):#Una lista de una columna
-                    self.addCell(OdfCell(coord.addRow(i), result[i], style))
-                elif row.__class__ in (list, ):#Una lista de varias columnas
+                if row.__class__ in (list, ):#Una lista de varias columnas
                     for j, column in enumerate(row):
-                        self.addCell(OdfCell(coord.addColumn(j).addRow(i), result[i][j], style))
-                else:
-                    logging.warning(_("{} Class not found in '{}'").format(row.__class__, row))
+                        style=guess_ods_style(color_or_style, result[i][j])
+                        self.addCell(OdfCell(Coord(coord.string()).addColumn(j).addRow(i), result[i][j], style))
+                else: #Any value not list if row.__class__ in (int, str, float, datetime.datetime,  datetime.date, Currency, Percentage,  Decimal):#Una lista de una columna
+                    style=guess_ods_style(color_or_style, result[i])
+                    self.addCell(OdfCell(Coord(coord.string()).addRow(i), result[i], style))
+        else: #Any value not list#result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal):#Un solo valor
+            style=guess_ods_style(color_or_style, result)  
+            self.addCell(OdfCell(coord, result, style))
 
     ## Adds a cell to self.arr with merge, content and style information
     ## @param range Range
@@ -1279,19 +1280,26 @@ class ODS_Write(ODS):
         
 
 ## Guess style from color and object class
-def guess_ods_style(color, object):
-    if object.__class__==str:
-        return color + "Left"
-    if object.__class__==int:
-        return color + "Integer"
-    if object.__class__==Currency:
-        return color + "Euro"
-    if object.__class__==Percentage:
-        return color + "Percentage"
-    if object.__class__ in (Decimal, float):
-        return color +  "Decimal2"
-    if object.__class__==datetime.datetime:
-        return color + "Datetime"
-    if object.__class__==datetime.date:
-        return color + "Date"
-    print("guess_ods_style not guessed",  object.__class__)
+## @param color_or_style String with a Color name or a style. If it's a color returns the style corresponding to the object. If it's a style returns the same style
+## @return String with the style 
+def guess_ods_style(color_or_style, object):
+    if color_or_style in ["Green", "GrayDark", "GrayLight", "Orange", "Yellow", "White", "Blue", "Red", "Normal"]:
+        if object.__class__==str:
+            return color_or_style + "Left"
+        elif object.__class__==int:
+            return color_or_style + "Integer"
+        elif object.__class__==Currency:
+            return color_or_style + object.currency
+        elif object.__class__==Percentage:
+            return color_or_style + "Percentage"
+        elif object.__class__ in (Decimal, float):
+            return color_or_style +  "Decimal2"
+        elif object.__class__==datetime.datetime:
+            return color_or_style + "Datetime"
+        elif object.__class__==datetime.date:
+            return color_or_style + "Date"
+        else:
+            logging.info("guess_ods_style not guessed",  object.__class__)
+            return "NormalLeft"
+    else:
+        return color_or_style

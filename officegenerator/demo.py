@@ -95,10 +95,15 @@ def demo_ods():
     cell.setSpanning(2, 2)
     s1.addCell(cell)
     
-    #Better wy
+    #Better way
     s1.addMerged("E10:F11", "Celda con Merged", "GrayDarkCenter")
     s1.setComment("E10", _("This is a comment"))
-    
+
+    #Using lists in arr
+    s1.add("A13", [["Una fila"]*3], "Orange")
+    s1.add("A15", [[12.3]*3, [12.3]*3])
+
+
     s4=doc.createSheet("Splitting")
     for letter in "ABCDEFGHIJ":
         for number in range(1, 11):
@@ -137,8 +142,7 @@ def demo_ods():
     s6.addMerged("B18:G18", _("This cell is going to be merged and aligned desde B18 a G18"), "YellowRight")
     s6.setCursorPosition("B11")
     s6.setSplitPosition("A11")
-    
-    
+
     doc.setActiveSheet(s6)
     doc.save()
    
