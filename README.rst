@@ -28,6 +28,7 @@ Changelog
 =========
 1.2.1
   * Now add in odssheet can guess the style if a color is passed
+  * Solved bug adding lists to sheets
 1.2.0
   * Added ODT_Standard and ODT_Manual_Styles to package visibility
 1.1.0

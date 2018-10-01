@@ -913,6 +913,11 @@ B1:
                 return c
         return None
 
+
+    ## Adds a cell to the sheet using its coord, an object and a color or a style
+    ## @param coord Coord where the cell is going to be created
+    ## @param result Object to add to the Cell. Can be int, str, float, datetime.datetime, datetime.date, Currency, Percentage, Decimal, None (will be converted to " - ")
+    ## @param color_or_style String with a color: Normal, White, Yellow, Orange, Blue, Red, GrayLight, GrayDark. Or a style WhiteInteger, YellowLeft, OrangeCenter, OrangeEUR, RedPercentage...
     def add(self, coord, result, color_or_style="Normal"):
         coord=Coord.assertCoord(coord)
 
@@ -1077,8 +1082,7 @@ class ODS(ODF):
     def setActiveSheet(self, value):
         """value is OdfSheet"""
         self.activeSheet=value.title
-        
-        
+
 class ODSStyleCurrency:
     def __init__(self, name, symbol):
         self.name=name
