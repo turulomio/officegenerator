@@ -1288,7 +1288,7 @@ def guess_ods_style(color, object):
         return color + "Euro"
     if object.__class__==Percentage:
         return color + "Percentage"
-    if object.__class__in (Decimal, float):
+    if object.__class__ in (Decimal, float):
         return color +  "Decimal2"
     if object.__class__==datetime.datetime:
         return color + "Datetime"
