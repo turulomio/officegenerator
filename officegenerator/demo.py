@@ -302,6 +302,9 @@ def demo_xlsx():
     xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
     xlsx.setSelectedCell("B10")
     xlsx.freezePanels("A8")
+    
+    
+    xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
 
 
     xlsx.save()

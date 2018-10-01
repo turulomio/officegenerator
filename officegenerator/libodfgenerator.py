@@ -761,6 +761,8 @@ class OdfCell:
         return "OdfCell <{}{}>".format(self.coord.letter, self.coord.number)
 
     def generate(self):
+        if self.object==None:
+            self.object=" - "
         if self.object.__class__==Currency:
             odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
         elif self.object.__class__==Percentage:
@@ -772,8 +774,12 @@ class OdfCell:
         elif self.object.__class__ in (Decimal, float,  int):
             odfcell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
         else:#strings
-            if self.object[:1]=="=":#Formula
-                odfcell = TableCell(formula="of:"+self.object,  stylename=self.style)
+            if len(self.object)>0:
+                if self.object[:1]=="=":#Formula
+                    odfcell = TableCell(formula="of:"+self.object,  stylename=self.style)
+                else:
+                    odfcell = TableCell(valuetype="string", value=self.object,  stylename=self.style)
+                    odfcell.addElement(P(text = self.object))
             else:#Cadena
                 odfcell = TableCell(valuetype="string", value=self.object,  stylename=self.style)
                 odfcell.addElement(P(text = self.object))

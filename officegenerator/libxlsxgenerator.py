@@ -176,11 +176,11 @@ class OpenPyXL:
             for i,row in enumerate(result):
                 if row.__class__ in (list, ):#Una lista de varias columnas
                     for j,column in enumerate(row):
-                        cell=self.cell(coord.addColumn(j).addRow(i))
+                        cell=self.cell(Coord(coord.string()).addColumn(j).addRow(i))
                         self.__setValue(cell, result[i][j], style, decimals, alignment)
                         self.__setBorder(cell)
                 else:#Una lista de una columna
-                    cell=self.cell(coord.addRow(i))
+                    cell=self.cell(Coord(coord.string()).addRow(i))
                     self.__setValue(cell, result[i], style, decimals, alignment)
                     self.__setBorder(cell)
         else:#Un solo valor
