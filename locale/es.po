@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-26 11:28+0200\n"
+"POT-Creation-Date: 2018-10-06 09:07+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -41,6 +41,9 @@ msgstr "ODT Generado con estilos manuales"
 
 msgid "XLSX Generated"
 msgstr "XLSX generado"
+
+msgid "XLSX Readed and regenerated"
+msgstr "XLSX leído y regenerado"
 
 msgid "This cell has been readed and modified"
 msgstr "Esta celda ha sido leída y modificada"
@@ -210,6 +213,15 @@ msgstr "Esta celda va a ser unida desde con B13 y C13"
 msgid "This cell is going to be merged and aligned"
 msgstr "Esta celda va a ser unida y alineada"
 
+msgid "Orange"
+msgstr "Naranja"
+
+msgid "Yellow"
+msgstr "Amarillo"
+
+msgid "White"
+msgstr "Blanco"
+
 msgid "You can't overwrite a readed ods"
 msgstr "No puedes sobreescribir un ods leído"
 
@@ -222,9 +234,6 @@ msgstr "La etiqueta {} no ha sido encontrada"
 msgid "You can't overwrite a readed odt"
 msgstr "No puedes sobreescribir un odt leído"
 
-msgid "{} Class not found in '{}'"
-msgstr "No se encontró la clase {} en '{}'"
-
 msgid "*** ERROR: File wasn't generated ***"
 msgstr "*** ERROR: El fichero no ha sido generado ***"
 
@@ -236,6 +245,9 @@ msgstr "Fichero ODF a convertir"
 
 msgid "officegenerator_odf2xml only works on Linux"
 msgstr "officegenerator_odf2xml solo funciona en Linux"
+
+#~ msgid "{} Class not found in '{}'"
+#~ msgstr "No se encontró la clase {} en '{}'"
 
 #~ msgid "ODT Predefined styles"
 #~ msgstr "Estilos predefinidos para ODT"

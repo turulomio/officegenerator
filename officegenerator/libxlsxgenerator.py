@@ -137,7 +137,7 @@ class OpenPyXL:
         if value.__class__ in (int, ):#Un solo valor
             cell.number_format="#.###;[RED]-#.###"
         elif value.__class__ in (float, Decimal):#Un solo valor
-            cell.number_format="#.##0,00;[RED]-#.##0,00"
+            cell.number_format="#.###,00;[RED]-#.###,00"
         elif value.__class__ in (datetime.datetime, ):
             cell.number_format="YYYY-MM-DD HH:mm"
         elif value.__class__ in (datetime.date, ):
@@ -161,7 +161,13 @@ class OpenPyXL:
             cell.value=value
 
 
-    def setCell(self, coord, value, style=None, decimals=2, alignment=None):
+    ## Internal method to set a not merged cell
+    ## @param cell is a cell object
+    ## @param value Value to add to the cell
+    ## @param style Color or None. If None this function it's ignored
+    ## @param decimals Number of decimals
+    ## @param alignment Cell alignment
+    def __setCell(self, coord, value, style=None, decimals=2, alignment=None):
         coord=Coord.assertCoord(coord)
         cell=self.cell(coord.string())
         self.__setValue(cell, value, style, decimals, alignment)
@@ -187,21 +193,23 @@ class OpenPyXL:
                 alignment='right'
         cell.alignment=openpyxl.styles.Alignment(horizontal=alignment, vertical='center')
 
-    ## Writes a cell
-    ## @param alignment String None by default. Can be "right","left","center"
+    ## Writes a cell or a list of cell or a list of list of cells
+    ## @param coord Can be a Coord or a string with text coords
+    ## @param result Can be a value, a list of values or a list of lists of values
     ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGrayDark, stGrayLight, stOrange, stYellow, stWhite or None. None is used to preserve template cell and the value is the only thing will be changed
     ## @param decimals Integer with the number of decimals. 2 by default
+    ## @param alignment String None by default. Can be "right","left","center"
     def overwrite(self, coord, result, style=None,  decimals=2, alignment=None):
         coord=Coord.assertCoord(coord)
         if result.__class__== list:#Una lista
             for i,row in enumerate(result):
                 if row.__class__ in (list, ):#Una lista de varias columnas
                     for j,column in enumerate(row):
-                        self.setCell(Coord(coord.string()).addRow(i).addColumn(j), result[i][j], style, decimals, alignment )   
+                        self.__setCell(Coord(coord.string()).addRow(i).addColumn(j), result[i][j], style, decimals, alignment )   
                 else:#Una lista de una columna
-                    self.setCell(Coord(coord.string()).addRow(i), result[i], style, decimals, alignment )
+                    self.__setCell(Coord(coord.string()).addRow(i), result[i], style, decimals, alignment )
         else:#Un solo valor
-            self.setCell(coord, result, style, decimals, alignment )
+            self.__setCell(coord, result, style, decimals, alignment )
 
 
     ##Sets border to a cell not merged
@@ -227,16 +235,21 @@ class OpenPyXL:
         for i in range(len(arrWidths)):
             self.ws_current.column_dimensions[columnAdd("A", i)].width=arrWidths[i]
 
-    ## Result must be the value only for the first cell
-    def overwrite_and_merge(self, range_string,  result, style=None,  decimals=2, alignment=None):
-        range=Range.assertRange(range_string)
+    ## Create a merged cell
+    ## @param range_string Can be a Range or a range string 
+    ## @param value Can be a value. Must be the value only for the first cell
+    ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGrayDark, stGrayLight, stOrange, stYellow, stWhite or None. None is used to preserve template cell and the value is the only thing will be changed
+    ## @param decimals Integer with the number of decimals. 2 by default
+    ## @param alignment String None by default. Can be "right","left","center"
+    def overwrite_and_merge(self, range,  value, style=None,  decimals=2, alignment=None):
+        range=Range.assertRange(range)
         self.ws_current.merge_cells(range.string())
         top = openpyxl.styles.Border(top=openpyxl.styles.Side(border_style='thin'))
         left = openpyxl.styles.Border(left=openpyxl.styles.Side(border_style='thin'))
         right = openpyxl.styles.Border(right=openpyxl.styles.Side(border_style='thin'))
         bottom = openpyxl.styles.Border(bottom=openpyxl.styles.Side(border_style='thin'))
 
-        self.setCell(range.start.string(), result, style, decimals, alignment)
+        self.__setCell(range.start.string(), value, style, decimals, alignment)
 
         rows = self.ws_current[range.string()]
 

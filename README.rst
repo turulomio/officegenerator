@@ -26,6 +26,9 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
+1.3.0
+  * Style None now preserve template style
+  * Used libreoffice number formats in libxlsxgenerator
 1.2.1
   * Now add in odssheet can guess the style if a color is passed
   * Solved bug adding lists to sheets

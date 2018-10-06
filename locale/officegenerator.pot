@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-30 16:44+0200\n"
+"POT-Creation-Date: 2018-10-06 09:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,6 +39,9 @@ msgid "ODT Generated from Manual Styles"
 msgstr ""
 
 msgid "XLSX Generated"
+msgstr ""
+
+msgid "XLSX Readed and regenerated"
 msgstr ""
 
 msgid "This cell has been readed and modified"
@@ -209,6 +212,15 @@ msgstr ""
 msgid "This cell is going to be merged and aligned"
 msgstr ""
 
+msgid "Orange"
+msgstr ""
+
+msgid "Yellow"
+msgstr ""
+
+msgid "White"
+msgstr ""
+
 msgid "You can't overwrite a readed ods"
 msgstr ""
 
@@ -219,9 +231,6 @@ msgid "Tag {} hasn't been found"
 msgstr ""
 
 msgid "You can't overwrite a readed odt"
-msgstr ""
-
-msgid "{} Class not found in '{}'"
 msgstr ""
 
 msgid "*** ERROR: File wasn't generated ***"
