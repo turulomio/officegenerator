@@ -37,6 +37,7 @@ def main(arguments=None):
         os.remove("officegenerator_manual_styles.odt")
         os.remove("officegenerator_readed.ods")
         os.remove("officegenerator.xlsx")
+        os.remove("officegenerator_readed.xlsx")
 
     if args.create==True:
         print(_("Generating example files"))
@@ -54,6 +55,8 @@ def main(arguments=None):
 
         demo_xlsx()
         print("  * " + _("XLSX Generated"))
+        demo_xlsx_readed()
+        print("  * " + _("XLSX Readed and regenerated"))
 
 
 def demo_ods_readed():
@@ -281,7 +284,7 @@ def demo_xlsx():
     xlsx.overwrite("F1", _("Percentage"), style=xlsx.stOrange,  alignment="center")
     xlsx.overwrite("G1", _("Number with 2 decimals"), style=xlsx.stOrange,  alignment="center")
     xlsx.overwrite("H1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
-    for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, None]):
+    for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, xlsx.stWhite, None]):
         name= [ k for k,v in locals().items() if v is style][0]
         xlsx.overwrite(Coord("A2").addRow(row), name, style=style)
         xlsx.overwrite(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
@@ -300,8 +303,8 @@ def demo_xlsx():
     #Merge cells
     xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
     xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
-    xlsx.setSelectedCell("B10")
-    xlsx.freezePanels("A8")
+    xlsx.setSelectedCell("B11")
+    xlsx.freezePanels("A9")
     
     
     xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
@@ -309,6 +312,21 @@ def demo_xlsx():
 
     xlsx.save()
 
+def demo_xlsx_readed():
+    xlsx=OpenPyXL("officegenerator_readed.xlsx", "officegenerator.xlsx")
+    xlsx.setCurrentSheet(0)
+    
+    xlsx.overwrite("A2", _("Orange"))
+    xlsx.overwrite("A5", _("Yellow"))
+    xlsx.overwrite("A7", _("White"), style=xlsx.stWhite, alignment="center")
+    xlsx.overwrite("D4", 1223)
+    #Merge cells
+    xlsx.overwrite_and_merge("A20:C21", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
+    xlsx.overwrite_and_merge("A23:G23", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
+
+
+
+    xlsx.save()
 
 if __name__ == "__main__":
     main()

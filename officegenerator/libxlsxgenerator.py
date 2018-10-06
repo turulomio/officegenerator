@@ -45,6 +45,7 @@ class OpenPyXL:
         self.stGreen=openpyxl.styles.Color('FFC0FFC0')
         self.stGrayLight=openpyxl.styles.Color('FFDCDCDC')
         self.stGrayDark=openpyxl.styles.Color('FFC3C3C3')
+        self.stWhite=openpyxl.styles.Color('FFFFFFFF')
 
     ## Freezes panels
     ## @param strcell String For example "A2"
@@ -125,50 +126,70 @@ class OpenPyXL:
         coord=Coord.assertCoord(coord)
         return self.ws_current[coord.string()]
 
-    ## Internat function to set a cell. All properties except border that it's setted in overwrite functions (merged and no merged)
+    ## Internal function to set the number format
     ## @param cell is a cell object
-    def __setValue(self, cell, value, style, decimals, alignment):
+    ## @param value Value to add to the cell
+    ## @param style Color or None. If None this function it's ignored
+    ## @param decimals Number of decimals
+    def __setNumberFormat(self, cell, value, style, decimals):     
+        if style==None:
+            return
         if value.__class__ in (int, ):#Un solo valor
-            cell.value=value
             cell.number_format="#.###;[RED]-#.###"
-            alignment='right' if alignment==None else alignment
         elif value.__class__ in (float, Decimal):#Un solo valor
-            cell.value=value
-            alignment='right' if alignment==None else alignment
             cell.number_format="#.##0,00;[RED]-#.##0,00"
-        elif value.__class__ in (str, ):#Un solo valor
-            cell.value=value
-            alignment='left' if alignment==None else alignment
         elif value.__class__ in (datetime.datetime, ):
-            cell.value=value
-            alignment='left' if alignment==None else alignment
             cell.number_format="YYYY-MM-DD HH:mm"
         elif value.__class__ in (datetime.date, ):
-            cell.value=value
-            alignment='left' if alignment==None else alignment
             cell.number_format="YYYY-MM-DD"
         elif value.__class__ in (Currency, ):
-            cell.value=value.amount
-            alignment='right' if alignment==None else alignment
             #zeros=decimals*"0"
             cell.number_format="#.##0,00 {0};[RED]-#.##0,00 {0}".format(value.currency)
         elif value.__class__ in (Percentage, ):
-            cell.value=value.value
-            alignment='right' if alignment==None else alignment
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
-        elif value==None:
+
+    ## Internat function to set a cell. All properties except border that it's setted in overwrite functions (merged and no merged)
+    ## @param cell is a cell object
+    def __setValue(self, cell, value, style, decimals, alignment):     
+        if value==None:
             return
+        elif value.__class__ in (Currency, ):
+            cell.value=value.amount
+        elif value.__class__ in (Percentage, ):
+            cell.value=value.value
         else:
-            print(value.__class__, "VALUE CLASS NOT FOUND")
+            cell.value=value
+
+
+    def setCell(self, coord, value, style=None, decimals=2, alignment=None):
+        coord=Coord.assertCoord(coord)
+        cell=self.cell(coord.string())
+        self.__setValue(cell, value, style, decimals, alignment)
+        self.__setBorder(cell, style)
+        self.__setAlignment(cell, value, style, alignment)
+        self.__setNumberFormat(cell, value, style, decimals)      
+
         if style!=None:
             cell.fill=openpyxl.styles.PatternFill("solid", fgColor=style)
-        bold=False if style==None else True
-        cell.font=openpyxl.styles.Font(name='Arial', size=10, bold=bold)
+            bold=False if style==self.stWhite else True
+            cell.font=openpyxl.styles.Font(name='Arial', size=10, bold=bold)
+
+    ## Internat function to set cell alignment
+    ## @param cell is a cell object
+    ## @style Color or None. This method is ignored if style=None
+    def __setAlignment(self, cell, value,  style, alignment):  
+        if style==None:
+            return
+        if alignment==None:
+            if value.__class__ in (str, datetime.datetime, datetime.date):#Un solo valor
+                alignment='left'
+            else:
+                alignment='right'
         cell.alignment=openpyxl.styles.Alignment(horizontal=alignment, vertical='center')
 
     ## Writes a cell
     ## @param alignment String None by default. Can be "right","left","center"
-    ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGrayDark, stGrayLight, stOrange, stYellow
+    ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGrayDark, stGrayLight, stOrange, stYellow, stWhite or None. None is used to preserve template cell and the value is the only thing will be changed
     ## @param decimals Integer with the number of decimals. 2 by default
     def overwrite(self, coord, result, style=None,  decimals=2, alignment=None):
         coord=Coord.assertCoord(coord)
@@ -176,21 +197,19 @@ class OpenPyXL:
             for i,row in enumerate(result):
                 if row.__class__ in (list, ):#Una lista de varias columnas
                     for j,column in enumerate(row):
-                        cell=self.cell(Coord(coord.string()).addColumn(j).addRow(i))
-                        self.__setValue(cell, result[i][j], style, decimals, alignment)
-                        self.__setBorder(cell)
+                        self.setCell(Coord(coord.string()).addRow(i).addColumn(j), result[i][j], style, decimals, alignment )   
                 else:#Una lista de una columna
-                    cell=self.cell(Coord(coord.string()).addRow(i))
-                    self.__setValue(cell, result[i], style, decimals, alignment)
-                    self.__setBorder(cell)
+                    self.setCell(Coord(coord.string()).addRow(i), result[i], style, decimals, alignment )
         else:#Un solo valor
-            cell=self.cell(coord)
-            self.__setValue(cell, result, style, decimals, alignment)
-            self.__setBorder(cell)
+            self.setCell(coord, result, style, decimals, alignment )
 
 
-    #Sets border to a cell not merged
-    def __setBorder(self, cell):
+    ##Sets border to a cell not merged
+    ## @param cell is a cell object
+    ## @param style Color or None. If None this function it's ignored
+    def __setBorder(self, cell, style):
+        if style==None:
+            return
         cell.border=openpyxl.styles.Border(
             left=openpyxl.styles.Side(border_style='thin'),
             top=openpyxl.styles.Side(border_style='thin'),
@@ -217,8 +236,7 @@ class OpenPyXL:
         right = openpyxl.styles.Border(right=openpyxl.styles.Side(border_style='thin'))
         bottom = openpyxl.styles.Border(bottom=openpyxl.styles.Side(border_style='thin'))
 
-        first_cell = self.ws_current[range.start.string()]
-        self.__setValue(first_cell, result, style, decimals, alignment)
+        self.setCell(range.start.string(), result, style, decimals, alignment)
 
         rows = self.ws_current[range.string()]
 
