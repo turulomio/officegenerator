@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-06 09:07+0200\n"
+"POT-Creation-Date: 2018-10-07 10:19+0200\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -191,6 +191,12 @@ msgstr "Lista multinivel con números"
 
 msgid "Images"
 msgstr "Imágenes"
+
+msgid "As you can see, I can reuse it one hundred times. File size will not be increased because I used reference names."
+msgstr "Como puedes ver, puedo reutilizar la imagen cien veces. El tamaño del fichero no aumentará porque uso referencias."
+
+msgid "The next paragraph is generated with the illustration method"
+msgstr "El siguiente párrafo es generado con el método illustration"
 
 msgid "Horizontal page"
 msgstr "Página horizontal"

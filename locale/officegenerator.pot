@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-06 09:08+0200\n"
+"POT-Creation-Date: 2018-10-07 10:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -189,6 +189,12 @@ msgid "Multilevel list with Numbers"
 msgstr ""
 
 msgid "Images"
+msgstr ""
+
+msgid "As you can see, I can reuse it one hundred times. File size will not be increased because I used reference names."
+msgstr ""
+
+msgid "The next paragraph is generated with the illustration method"
 msgstr ""
 
 msgid "Horizontal page"
