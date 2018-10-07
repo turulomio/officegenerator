@@ -28,6 +28,7 @@ Changelog
 =========
 X.X.X
   * [#28] Removed deprecation warning when removing OpenPyXL Sheets. Added test to check it.
+  * [#19] Added illustration method to add a paragraph with a list of images with the same size.
 1.3.0
   * Style None now preserve template style
   * Used libreoffice number formats in libxlsxgenerator
