@@ -23,11 +23,11 @@ try:
 except:
     _=str
 
-    
+
 class ColumnWidthXLSX:
     Date=40
     Detetime=60
-    
+
 class OpenPyXL:
     def __init__(self,filename,template=None):
         self.filename=filename
@@ -83,13 +83,13 @@ class OpenPyXL:
                                                 start_type='percentile', start_value=0, start_color='00FF00',
                                                 mid_type='percentile', mid_value=50, mid_color='FFFFFF',
                                                 end_type='percentile', end_value=100, end_color='FF0000'
-                                                )   
+                                                )
                                             )
     ## Returns sheet_name
     def sheet_name(self, id=None):
         if id==None:
             id=self.ws_current_id
-        return self.wb.sheetnames()[id]
+        return self.wb.sheetnames[id]
 
 
     ## It returns a sheet object with the index id
@@ -106,7 +106,7 @@ class OpenPyXL:
     ## After removing it sets current sheet to 0 index
     def remove_sheet_by_id(self, id):
         ws=self.get_sheet_by_id(id)
-        self.wb.remove_sheet(ws)
+        self.wb.remove(ws)
         self.setCurrentSheet(0)
 
     def save(self, filename=None):
