@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
+X.X.X
+  * [#28] Removed deprecation warning when removing OpenPyXL Sheets. Added test to check it.
 1.3.0
   * Style None now preserve template style
   * Used libreoffice number formats in libxlsxgenerator
