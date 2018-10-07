@@ -404,6 +404,7 @@ class ODT(ODF):
 
     ## Creates the document title
     ## @param text String with the title
+    ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
     def title(self, text, after=True):
         p=P(stylename="Title", text=text)
         return self.insertInCursor(p, after)
@@ -411,6 +412,7 @@ class ODT(ODF):
 
     ## Creates the document title
     ## @param text String with the title
+    ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
     def subtitle(self, text, after=True):
         p=P(stylename="Subtitle", text=text)
         return self.insertInCursor(p, after)
@@ -423,6 +425,7 @@ class ODT(ODF):
     ## @param sizes Integer list with sizes in cm
     ## @param fontsize Integer in pt
     ## @param name str or None. Sets the object name. Appears in LibreOffice navigator. If none table will be named to "Table.Sequence"
+    ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
     def table(self, header, data, sizes, fontsize, name=None, after=True):
         def generate_table_styles():
             s=Style(name="Table.Size{}".format(sum(sizes)), family='table')
@@ -517,6 +520,11 @@ class ODT(ODF):
         return self.insertInCursor(table, after)
 
     ## Adds a paragraph with illustration style, with a list with image keys. All images will have the same width and height
+    ## @param image_key_list List with image keys to add to the paragraph
+    ## @param width Integer or float with number of width centimeters of the image in the document
+    ## @param height Integer or float with number of height centimeters of the image in the document
+    ## @param name String With the root name of the images in the paragraph. The root will be appended with a sequential number
+    ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
     def illustration(self, image_key_list, width, height, name, after=True):
         p = P(stylename="Illustration")
         for i, image_key in enumerate(image_key_list):
