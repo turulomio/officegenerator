@@ -375,11 +375,11 @@ class ODT(ODF):
         print ("tag {} not found".format(tag))
         return None, None
 
-        
-    ##
+
+    ## Converts saved odt to pdf. It will have the same file name but with .pdf extension
     def convert_to_pdf(self):
         os.system("lowriter --headless --convert-to pdf {}".format(self.filename))
-        
+
     def __setCursor(self, e):
         self.cursor=e
         self.cursorParent=e.parentNode
@@ -394,14 +394,13 @@ class ODT(ODF):
         makedirs(os.path.dirname(self.filename))
         self.doc.save( self.filename)
 
-
+    ## Adds an empty paragraph
+    ## @param style String with the style name
+    ## @param number Integer with the number of times to repeat the empty paragraph
+    ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
     def emptyParagraph(self, style="Standard", number=1, after=True):
         for i in range(number):
             self.simpleParagraph("",style, after)
-
-
-
-
 
     ## Creates the document title
     ## @param text String with the title
@@ -451,17 +450,17 @@ class ODT(ODF):
             s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize),  'fontweight':"bold"}))
             s.addElement(ParagraphProperties(attributes={'textalign':'center', }))
             self.doc.styles.addElement(s)
-            
+
             s = Style(name="Table.Contents.Font{}".format(fontsize), family="paragraph")
             s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
             s.addElement(ParagraphProperties(attributes={'textalign':'justify', }))
             self.doc.styles.addElement(s)
-            
+
             s = Style(name="Table.ContentsRight.Font{}".format(fontsize), family="paragraph")
             s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), }))
             s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
             self.doc.styles.addElement(s)
-            
+
             s = Style(name="Table.ContentsRight.FontRed{}".format(fontsize), family="paragraph")
             s.addElement(TextProperties(attributes={'fontsize':"{}pt".format(fontsize), 'color':'#ff0000' }))
             s.addElement(ParagraphProperties(attributes={'textalign':'end', }))
@@ -473,7 +472,6 @@ class ODT(ODF):
         ## @return TableCell
         def addTableCell(o, fontsize):
             tc = TableCell(stylename="Table.Cell")
-            
             #Parses orientation
             p = P(stylename="Table.ContentsRight.Font{}".format(fontsize))
             s=Span(text=o)
@@ -518,8 +516,17 @@ class ODT(ODF):
                 tr.addElement(addTableCell(o, fontsize))
         return self.insertInCursor(table, after)
 
-
-
+    ## Adds a paragraph with illustration style, with a list with image keys. All images will have the same width and height
+    def illustration(self, image_key_list, width, height, name, after=True):
+        p = P(stylename="Illustration")
+        for i, image_key in enumerate(image_key_list):
+            if name==None:
+                self.seqFrames=self.seqFrames+1
+                n="Frame.{}".format(self.seqFrames)
+            else:
+                n="{}.{}".format(name, i)
+            p.addElement(self.image(image_key, width, height, n))
+        self.insertInCursor(p, after=True)
 
 ## Class with starndard.odt template
 class ODT_Standard(ODT):
@@ -533,30 +540,6 @@ class ODT_Standard(ODT):
     def header(self, text, level, after=True):
         h=H(outlinelevel=level, stylename="Heading_20_{}".format(level), text=text)
         return self.insertInCursor(h, after)
-        
-#    ## Text body has no space between paragraph
-#    def list(self, arr, style='Standard', after=True):
-#        def item(o, style):
-#            it=ListItem()
-#            for obj in o:
-#                if obj==str:
-#                    p=P(stylename=style, text=item)
-#                    it.addElement(p)
-#                elif obj==List:
-#                    ls=List(stylename="List_20_1")
-#                    ls.addElement(item(obj, style))
-#                    it.addElement(ls)
-#            return it
-#        # #########################
-#        
-#        print("LIST MAL IN STANDARD")
-#        l=List(stylename="List_20_1", )
-#        for o in arr:
-#            l.addElement(item(o, style))
-#        self.insertInCursor(l, after)
-#        return l
-
-
 
     ## PH and PV styles are deffined in standard.odtg
     def pageBreak(self,  horizontal=False, after=True):    
@@ -565,6 +548,7 @@ class ODT_Standard(ODT):
         else:
             p=P(stylename="PV")
         return self.insertInCursor(p, after)
+
 ## Class with starndard.odt template
 class ODT_Manual_Styles(ODT):
     def __init__(self, filename, language="es", country="es"):

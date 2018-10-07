@@ -237,11 +237,14 @@ def demo_odt_commands(doc):
     p.addText(". Ahora sigo escribiendo sin problemas.")
     doc.insertInCursor(p, after=True)
 
-    doc.simpleParagraph("Como ves puedo repetirla mil veces sin que me aumente el tamaño del fichero, porque uso referencias")
-    p=P(stylename="Illustration")
+    doc.simpleParagraph(_("As you can see, I can reuse it one hundred times. File size will not be increased because I used reference names."))
+    p=P(stylename="Standard")
     for i in range(100):
-        p.addElement(doc.image("images/crown.png", "4cm", "4cm", name="Crown.{}".format(i)))
+        p.addElement(doc.image("images/crown.png", 0.2, 0.2, name="Crown.{}".format(i)))
     doc.insertInCursor(p, after=True)
+
+    doc.simpleParagraph(_("The next paragraph is generated with the illustration method"))
+    doc.illustration(["images/crown.png"]*5, 2.5,2.5, "IllustrationCrowns")
 
     doc.pageBreak(horizontal=True)
     doc.header(_("Horizontal page"), 2)
