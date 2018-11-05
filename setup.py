@@ -21,6 +21,34 @@ class Doc(Command):
         os.system("msgmerge -N --no-wrap -U locale/es.po locale/officegenerator.pot")
         os.system("msgfmt -cv -o officegenerator/locale/es/LC_MESSAGES/officegenerator.mo locale/es.po")
 
+class Procedure(Command):
+    description = "Show release procedure"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        print("""
+Nueva release
+=============
+01) Cambiar la versión y la fecha en commons.py
+02) Modificar el Changelog en el fichero README
+03) Python3 setup.py test
+04) python3 setup.py doc and edit es.po 
+  ) python3 setup.py doc again
+05) python3 setup.py doxygen
+06) python setup.py sdist upload -r pypi        Para subirlo a python
+07) Subir versión a Sourceforge
+08) Subir versión al subversion
+09) Crear un nuevo ebuild con la nueva versión
+10) Subirlo ebuild al subversion del portage
+""")
+
+
 ## Class to define doxygen command
 class Doxygen(Command):
     description = "Create/update doxygen documentation in doc/html"
@@ -97,6 +125,7 @@ setup(name='officegenerator',
      cmdclass={'doxygen': Doxygen,
                'uninstall':Uninstall, 
                'doc': Doc,
+               'procedure': Procedure,
               },
      zip_safe=False,
      test_suite = 'officegenerator.tests',
