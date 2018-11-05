@@ -11,7 +11,7 @@ import warnings
 from decimal import Decimal
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.5.0'
+__version__ = '1.6.0'
 __versiondate__=datetime.date(2018,11,5)
 
 try:

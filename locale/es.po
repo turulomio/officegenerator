@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-07 10:19+0200\n"
+"POT-Creation-Date: 2018-11-05 18:59+0100\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -218,6 +218,9 @@ msgstr "Esta celda va a ser unida desde con B13 y C13"
 
 msgid "This cell is going to be merged and aligned"
 msgstr "Esta celda va a ser unida y alineada"
+
+msgid "This sheet max rows are {} and max columns {}"
+msgstr "El número máximo de filas de esta celda es {} y el de columnas {}"
 
 msgid "Orange"
 msgstr "Naranja"
