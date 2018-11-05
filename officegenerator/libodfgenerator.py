@@ -378,7 +378,7 @@ class ODT(ODF):
 
     ## Converts saved odt to pdf. It will have the same file name but with .pdf extension
     def convert_to_pdf(self):
-        os.system("lowriter --headless --convert-to pdf {}".format(self.filename))
+        os.system("lowriter --headless --convert-to pdf '{}'".format(self.filename))
 
     def __setCursor(self, e):
         self.cursor=e
