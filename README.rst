@@ -26,6 +26,8 @@ You can view officegenerator/demo.py to see an example of code: https://sourcefo
 
 Changelog
 =========
+1.5.0
+  * Solved bug converting to pdf files with white spaces
 1.4.0
   * [#28] Removed deprecation warning when removing OpenPyXL Sheets. Added test to check it.
   * [#19] Added illustration method to add a paragraph with a list of images with the same size.
