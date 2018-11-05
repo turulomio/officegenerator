@@ -103,6 +103,17 @@ class OpenPyXL:
                 return id
         return None
 
+    ## Returns the number of columns with data of the current sheet. Returns the number not the index
+    ## @return int
+    def max_columns(self):
+        return self.ws_current.max_column
+        
+    ## Returns the number of rows with data of the current sheet. Returns the number not the index
+    ## @return int
+    def max_rows(self):
+        return self.ws_current.max_row
+        
+        
     ## After removing it sets current sheet to 0 index
     def remove_sheet_by_id(self, id):
         ws=self.get_sheet_by_id(id)

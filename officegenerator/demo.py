@@ -306,11 +306,14 @@ def demo_xlsx():
     #Merge cells
     xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
     xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
+        
     xlsx.setSelectedCell("B11")
     xlsx.freezePanels("A9")
     
     
     xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
+    xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.max_rows(), xlsx.max_columns()), style=xlsx.stYellow,  alignment="center")
+
 
 
     xlsx.save()
