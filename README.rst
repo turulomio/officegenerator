@@ -1,13 +1,17 @@
-Source code & Development:
-    https://officegenerator.sourceforge.io
-OfficeGenerator doxygen documentation:
-    http://turulomio.users.sourceforge.net/doxygen/officegenerator/
-Web page main developer
-    http://turulomio.users.sourceforge.net/
+
 
 Description
 ===========
 Python module to quickly generate office documents with predefined styles
+
+Links
+=====
+OfficeGenerator doxygen documentation:
+  * http://turulomio.users.sourceforge.net/doxygen/officegenerator/
+Web page main developer
+  * http://turulomio.users.sourceforge.net/
+Pypi project page
+  * https://pypi.org/project/officegenerator/
 
 License
 =======
@@ -22,7 +26,7 @@ Dependencies
 
 Usage
 =====
-You can view officegenerator/demo.py to see an example of code: https://sourceforge.net/p/officegenerator/code/HEAD/tree/officegenerator/demo.py
+You can view officegenerator/demo.py to see an example of code: https://raw.githubusercontent.com/Turulomio/officegenerator/master/officegenerator/demo.py
 
 Changelog
 =========
