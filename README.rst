@@ -1,9 +1,3 @@
-
-
-Description
-===========
-Python module to quickly generate office documents with predefined styles
-
 Links
 =====
 OfficeGenerator doxygen documentation:
@@ -12,10 +6,6 @@ Web page main developer
   * http://turulomio.users.sourceforge.net/
 Pypi project page
   * https://pypi.org/project/officegenerator/
-
-License
-=======
-GPL-3
 
 Dependencies
 ============
