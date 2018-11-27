@@ -20,6 +20,8 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.6.1
+  * Project moved from Sourceforge to Github
 1.6.0
   * [#29] Added function max_rows max_columns
 1.5.0

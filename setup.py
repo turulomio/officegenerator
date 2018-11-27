@@ -32,22 +32,21 @@ class Procedure(Command):
         pass
 
     def run(self):
-        print("""
-Nueva release
-=============
-01) Cambiar la versión y la fecha en commons.py
-02) Modificar el Changelog en el fichero README
-03) Python3 setup.py test
-04) python3 setup.py doc and edit es.po 
-  ) python3 setup.py doc again
-05) python3 setup.py doxygen
-06) python setup.py sdist upload -r pypi        Para subirlo a python
-07) Subir versión a Sourceforge
-08) Subir versión al subversion
-09) Crear un nuevo ebuild con la nueva versión
-10) Subirlo ebuild al subversion del portage
-""")
-
+        print("""Nueva versión:
+  * Cambiar la versión y la fecha en version.py
+  * Modificar el Changelog en README
+  * python setup.py doc
+  * linguist
+  * python setup.py doc
+  * python setup.py install
+  * python setup.py doxygen
+  * git commit -a -m 'officegenerator-{}'
+  * git push
+  * Hacer un nuevo tag en GitHub
+  * python setup.py sdist upload -r pypi
+  * Crea un nuevo ebuild de Gentoo con la nueva versión
+  * Subelo al repositorio del portage
+""".format(__version__))
 
 ## Class to define doxygen command
 class Doxygen(Command):
