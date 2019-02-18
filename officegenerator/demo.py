@@ -325,6 +325,17 @@ def demo_xlsx():
     xlsx.overwrite("A25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
     xlsx.overwrite("B25", "=Amount*Price")
 
+
+
+    #To text split and cur position
+    xlsx.createSheet("Splitting")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.setSelectedCell("Z200")
+    xlsx.freezePanels("C3")
+
+
     xlsx.save()
 
 def demo_xlsx_readed():
