@@ -56,6 +56,7 @@ class OpenPyXL:
     ## @param coord_string String For example "A2"
     def setSelectedCell(self, coord_string):
         self.ws_current.views.sheetView[0].selection[0].activeCell=coord_string
+
     ## Changes name of the current sheet
     def setSheetName(self, name):
         self.ws_current.title=name
@@ -236,7 +237,9 @@ class OpenPyXL:
             bottom=openpyxl.styles.Side(border_style='thin') 
         )
 
-    ## Sets cell name to use in formulas
+    ## Sets cell name to use in formulas. Fails if range_string is not fixed. For example: $A$4
+    ## @param range_string 
+    ## @param name
     def setCellName(self, range_string, name):
         self.wb.create_named_range(name, self.ws_current, range_string)
 

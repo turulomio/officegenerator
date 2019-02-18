@@ -55,6 +55,7 @@ def main(arguments=None):
 
         demo_xlsx()
         print("  * " + _("XLSX Generated"))
+
         demo_xlsx_readed()
         print("  * " + _("XLSX Readed and regenerated"))
 
@@ -312,7 +313,17 @@ def demo_xlsx():
     xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
     xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.max_rows(), xlsx.max_columns()), style=xlsx.stYellow,  alignment="center")
 
+    #Named cells
+    xlsx.overwrite("A23", _("Cell B23 has a name 'Amount"), style=xlsx.stWhite)
+    xlsx.overwrite("B23", 5)
+    xlsx.setCellName("$B$23", "Amount")
 
+    xlsx.overwrite("A24", _("Cell B24 has a name 'Price"), style=xlsx.stWhite)
+    xlsx.overwrite("B24", Currency(10,'EUR'))
+    xlsx.setCellName("$B$24", "Price")
+
+    xlsx.overwrite("A25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
+    xlsx.overwrite("B25", "=Amount*Price")
 
     xlsx.save()
 
@@ -327,8 +338,6 @@ def demo_xlsx_readed():
     #Merge cells
     xlsx.overwrite_and_merge("A20:C21", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
     xlsx.overwrite_and_merge("A23:G23", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
-
-
 
     xlsx.save()
 
