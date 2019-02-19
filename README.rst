@@ -2,8 +2,6 @@ Links
 =====
 OfficeGenerator doxygen documentation:
   * http://turulomio.users.sourceforge.net/doxygen/officegenerator/
-Web page main developer
-  * http://turulomio.users.sourceforge.net/
 Pypi project page
   * https://pypi.org/project/officegenerator/
 
