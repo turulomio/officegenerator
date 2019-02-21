@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-05 18:59+0100\n"
+"POT-Creation-Date: 2019-02-21 06:31+0100\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -221,6 +221,15 @@ msgstr "Esta celda va a ser unida y alineada"
 
 msgid "This sheet max rows are {} and max columns {}"
 msgstr "El número máximo de filas de esta celda es {} y el de columnas {}"
+
+msgid "Cell B23 has a name 'Amount"
+msgstr "La celda B23 tiene el nombre 'Amount'"
+
+msgid "Cell B24 has a name 'Price"
+msgstr "La celda B24 tiene el nombre 'Price'"
+
+msgid "Cell B25 has a product with names"
+msgstr "La celda B25 hace un producto con nombres"
 
 msgid "Orange"
 msgstr "Naranja"
