@@ -288,7 +288,6 @@ def demo_xlsx():
     xlsx.overwrite("G1", _("Number with 2 decimals"), style=xlsx.stOrange,  alignment="center")
     xlsx.overwrite("H1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
     for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, xlsx.stWhite, None]):
-        name= [ k for k,v in locals().items() if v is style][0]
         xlsx.overwrite(Coord("A2").addRow(row), xlsx.styleName(style), style=style)
         xlsx.overwrite(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
         xlsx.overwrite(Coord("C2").addRow(row), datetime.date.today(), style=style)
@@ -314,16 +313,16 @@ def demo_xlsx():
     xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.max_rows(), xlsx.max_columns()), style=xlsx.stYellow,  alignment="center")
 
     #Named cells
-    xlsx.overwrite("A23", _("Cell B23 has a name 'Amount"), style=xlsx.stWhite)
-    xlsx.overwrite("B23", 5)
-    xlsx.setCellName("$B$23", "Amount")
+    xlsx.overwrite_and_merge("A23:B23", _("Cell B23 has a name 'Amount"), style=xlsx.stWhite)
+    xlsx.overwrite("C23", 5, style=xlsx.stWhite)
+    xlsx.setCellName("$C$23", "Amount")
 
-    xlsx.overwrite("A24", _("Cell B24 has a name 'Price"), style=xlsx.stWhite)
-    xlsx.overwrite("B24", Currency(10,'EUR'))
-    xlsx.setCellName("$B$24", "Price")
+    xlsx.overwrite_and_merge("A24:B24", _("Cell B24 has a name 'Price"), style=xlsx.stWhite)
+    xlsx.overwrite("C24", Currency(10,'EUR'), style=xlsx.stWhite)
+    xlsx.setCellName("$C$24", "Price")
 
-    xlsx.overwrite("A25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
-    xlsx.overwrite("B25", "=Amount*Price")
+    xlsx.overwrite_and_merge("A25:B25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
+    xlsx.overwrite("C25", "=Amount*Price", style=xlsx.stWhite, alignment='right')
 
 
 
