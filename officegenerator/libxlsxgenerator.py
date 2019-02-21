@@ -46,6 +46,25 @@ class OpenPyXL:
         self.stGrayLight=openpyxl.styles.Color('FFDCDCDC')
         self.stGrayDark=openpyxl.styles.Color('FFC3C3C3')
         self.stWhite=openpyxl.styles.Color('FFFFFFFF')
+    
+    ## Returns the style name of a givenven color
+    ## @param openpyxl.styles.Color
+    ## @return string
+    def styleName(self, color):
+        if color==self.stOrange:
+            return "Orange"
+        elif color==self.stYellow:
+            return "Yellow"
+        elif color==self.stGreen:
+            return "Green"
+        elif color==self.stGrayDark:
+            return "Dark gray"
+        elif color==self.stGrayLight:
+            return "Light gray"
+        elif color==self.stWhite:
+            return "White"
+        elif color==None:
+            return "Normal"
 
     ## Freezes panels
     ## @param strcell String For example "A2"
@@ -158,7 +177,6 @@ class OpenPyXL:
         elif value.__class__ in (datetime.date, ):
             cell.number_format="YYYY-MM-DD"
         elif value.__class__ in (Currency, ):
-            #zeros=decimals*"0"
             cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(value.symbol())
         elif value.__class__ in (Percentage, ):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"

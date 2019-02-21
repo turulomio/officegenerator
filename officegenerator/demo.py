@@ -289,7 +289,7 @@ def demo_xlsx():
     xlsx.overwrite("H1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
     for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, xlsx.stWhite, None]):
         name= [ k for k,v in locals().items() if v is style][0]
-        xlsx.overwrite(Coord("A2").addRow(row), name, style=style)
+        xlsx.overwrite(Coord("A2").addRow(row), xlsx.styleName(style), style=style)
         xlsx.overwrite(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
         xlsx.overwrite(Coord("C2").addRow(row), datetime.date.today(), style=style)
         xlsx.overwrite(Coord("D2").addRow(row), pow(-1, row)*-10000000, style=style)
