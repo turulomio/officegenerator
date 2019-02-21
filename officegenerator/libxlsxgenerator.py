@@ -147,7 +147,7 @@ class OpenPyXL:
         if style==None:
             return
         if value.__class__ in (int, ):#Un solo valor
-            cell.number_format="#.###;[RED]-#.###"
+            cell.number_format='#,##0;[RED]-#,##0'
         elif value.__class__ in (float, Decimal):#Un solo valor
             cell.number_format="#.###,00;[RED]-#.###,00"
         elif value.__class__ in (datetime.datetime, ):
