@@ -293,7 +293,7 @@ def demo_xlsx():
         xlsx.overwrite(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
         xlsx.overwrite(Coord("C2").addRow(row), datetime.date.today(), style=style)
         xlsx.overwrite(Coord("D2").addRow(row), pow(-1, row)*-10000000, style=style)
-        xlsx.overwrite(Coord("E2").addRow(row), Currency(12.56, "EUR"), style=style, decimals=row+1)
+        xlsx.overwrite(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), style=style)
         xlsx.overwrite(Coord("F2").addRow(row), Percentage(1, 3), style=style,  decimals=row+1)
         xlsx.overwrite(Coord("G2").addRow(row), pow(-1, row)*12.121212, style=style, decimals=2)
         xlsx.overwrite(Coord("H2").addRow(row), pow(-1, row)*-12.121212, style=style, decimals=6)

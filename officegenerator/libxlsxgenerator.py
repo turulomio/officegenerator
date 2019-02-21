@@ -139,6 +139,8 @@ class OpenPyXL:
         return self.ws_current[coord.string()]
 
     ## Internal function to set the number format
+    ##
+    ## This strings are openpyxl string not libreoffice cell string
     ## @param cell is a cell object
     ## @param value Value to add to the cell
     ## @param style Color or None. If None this function it's ignored
@@ -149,14 +151,15 @@ class OpenPyXL:
         if value.__class__ in (int, ):#Un solo valor
             cell.number_format='#,##0;[RED]-#,##0'
         elif value.__class__ in (float, Decimal):#Un solo valor
-            cell.number_format="#.###,00;[RED]-#.###,00"
+            zeros=decimals*"0"
+            cell.number_format="#,##0.{0};[RED]-#,##0.{0}".format(zeros)
         elif value.__class__ in (datetime.datetime, ):
             cell.number_format="YYYY-MM-DD HH:mm"
         elif value.__class__ in (datetime.date, ):
             cell.number_format="YYYY-MM-DD"
         elif value.__class__ in (Currency, ):
             #zeros=decimals*"0"
-            cell.number_format="#.##0,00 {0};[RED]-#.##0,00 {0}".format(value.currency)
+            cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(value.symbol())
         elif value.__class__ in (Percentage, ):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
 
