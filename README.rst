@@ -18,6 +18,9 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.8.0
+  * Solved bug saving with template
+  * Unified method to freeze and set position
 1.7.0
   * Now integers in xlsx show thousands separator.
   * Cell number format shows currency and decimals in float numbers, correctly
