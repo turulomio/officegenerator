@@ -35,7 +35,7 @@ class OpenPyXL:
         if template==None:
             self.wb=openpyxl.Workbook()
         else:
-            self.wb=openpyxl.load_workbook(self.template)
+            self.wb=openpyxl.load_workbook(self.template, keep_vba=True)
 
         self.ws_current=self.wb.active
         self.setCurrentSheet(self.ws_current.title)

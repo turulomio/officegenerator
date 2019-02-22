@@ -346,8 +346,8 @@ def demo_xlsx_readed():
     xlsx.overwrite("A7", _("White"), style=xlsx.stWhite, alignment="center")
     xlsx.overwrite("D4", 1223)
     #Merge cells
-    xlsx.overwrite_and_merge("A20:C21", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
-    xlsx.overwrite_and_merge("A23:G23", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
+    xlsx.overwrite_and_merge("A15:C16", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
+    xlsx.overwrite_and_merge("A17:G17", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
 
     xlsx.save()
 
