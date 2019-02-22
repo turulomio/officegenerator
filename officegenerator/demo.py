@@ -321,21 +321,33 @@ def demo_xlsx():
 
     xlsx.overwrite_and_merge("A25:B25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
     xlsx.overwrite("C25", "=Amount*Price", style=xlsx.stWhite, alignment='right')
-    
-    xlsx.setSelectedCell("B11", "A1")
-    xlsx.freezePanels("A9")
 
-
+    xlsx.freezeAndSelect("A9","B11", "A9")
 
     #To text split and cur position
-    xlsx.createSheet("Splitting")
+    xlsx.createSheet("Freeze A1")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         for number in range(1, 200):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-
-    xlsx.setSelectedCell("Z200", "Z190", "bottomRight")
-    xlsx.freezePanels("C3")
-
+    xlsx.freezeAndSelect("A1","Z199", "I168")
+    #To text split and cur position
+    xlsx.createSheet("Freeze A2")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("A2","Z199", "I168")
+    #To text split and cur position
+    xlsx.createSheet("Freeze B1")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("B1","Z199", "I168")
+    #To text split and cur position
+    xlsx.createSheet("Freeze C3")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("C3","Z199", "I168")
 
     xlsx.save()
 
