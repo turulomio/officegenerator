@@ -71,10 +71,21 @@ class OpenPyXL:
     def freezePanels(self, coord_string):
         self.ws_current.freeze_panes=self.ws_current[coord_string]
 
-    ## Selects a cell
-    ## @param coord_string String For example "A2"
-    def setSelectedCell(self, coord_string):
-        self.ws_current.views.sheetView[0].selection[0].activeCell=coord_string
+    ## Selects a cell https://openpyxl.readthedocs.io/en/latest/_modules/openpyxl/worksheet/views.html#Selection
+    ##
+    ## Seems to work when setting before freezePanels
+    ## @param coord_string String with Selected cell coord For example "A2"
+    ## @param topleftcell top left cell to set the view of the selected cell
+    def setSelectedCell(self, coord_string, topleftcell=None, pane='topLeft'):
+        ##print(len(self.ws_current.views.sheetView))
+        #pane=openpyxl.worksheet.views.Pane(activePane=pane, topLeftCell=topleftcell)
+        sheet=self.ws_current.views.sheetView[0]
+#        sheet.pane=pane
+#        print(sheet.pane.__class__)
+        sheet.selection[0].activeCell=coord_string
+        sheet.selection[0].pane=pane
+#        if topleftcell!=None:
+#            sheet.topLeftCell=topleftcell
 
     ## Changes name of the current sheet
     def setSheetName(self, name):
