@@ -5,37 +5,14 @@ Introduction
 
 OfficeGenerator is a python module to read and write LibreOffice and MS Office files.
 
-The main web page is located <a src="https://officegenerator.sourceforge.io/">here</a>
+The main web page is located in <a src="https://github.com/turulomio/officegenerator/">GitHub</a>
 
 Development
 ===========
 - Turulomio (Idea y development)
 
-Sourceforge
-===========
-This project is hosted in <a href="https://officegenerator.sourceforge.io">SourceForge</a>, so you can use the next services:
-
-- <a href="https://sourceforge.net/p/officegenerator/tickets/" target="_blank">Tickets</a>
-
-You can also visit the <a href="http://turulomio.users.sourceforge.net">main developer web page</a>
-
 Pypi
 ====
 The project uses setuptools distribution system and it's also hosted in <a href="https://pypi.org/project/officegenerator/">https://pypi.org/project/officegenerator/</a>
-
-
-Software used to develop OfficeGenerator
-========================================
-
-<a target="_blank" href="https://eric-ide.python-projects.org/index.html">Eric</a> is used as the main IDE
-
-OfficeGenerator depends on the following software:
-- <a target="_blank" href="https://www.python.org/">Python3</a>, as the main programming language.
-- <a target="_blank" href="https://pypi.org/project/odfpy/">odfpy</a>, to generate LibreOffice documents.
-- <a target="_blank" href="https://pypi.org/project/openpyxl/">openpyxl</a>, to generate MS Office XLSX/XLSM  documents.
-
-
-
-
 
 */
