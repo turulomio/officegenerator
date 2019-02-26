@@ -320,7 +320,7 @@ def demo_xlsx():
     xlsx.setCellName("$C$24", "Price")
 
     xlsx.overwrite_and_merge("A25:B25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
-    xlsx.overwrite("C25", "=Amount*Price", style=xlsx.stWhite, alignment='right')
+    xlsx.overwrite_formula("C25", "=Amount*Price", "€", style=xlsx.stWhite, alignment='right')
 
     xlsx.freezeAndSelect("A9","B11", "A9")
 

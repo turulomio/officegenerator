@@ -220,6 +220,43 @@ class OpenPyXL:
         elif value.__class__ in (Percentage, ):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
 
+    ## Internal function to set the number format of a formula
+    ##
+    ## This strings are openpyxl string not libreoffice cell string
+    ## @param cell is a cell object
+    ## @param resultclass int, float, Decimal, datetime.datetime, datetime.date,"€","$" (Currency.symbol), Percentage
+    ## @param style Color or None. If None this function it's ignored
+    ## @param decimals Number of decimals
+    def __setFormulaNumberFormat(self, cell, resultclass, style, decimals):     
+        if style==None:
+            return
+        if resultclass in (int, ):#Un solo valor
+            cell.number_format='#,##0;[RED]-#,##0'
+        elif resultclass in (float, Decimal):#Un solo valor
+            zeros=decimals*"0"
+            cell.number_format="#,##0.{0};[RED]-#,##0.{0}".format(zeros)
+        elif resultclass in (datetime.datetime, ):
+            cell.number_format="YYYY-MM-DD HH:mm"
+        elif resultclass in (datetime.date, ):
+            cell.number_format="YYYY-MM-DD"
+        elif resultclass.__class__ in (str, ):
+            cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(resultclass)
+        elif resultclass in (Percentage, ):
+            cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
+
+
+
+    ## Returns true if value is a string beginning with = or +
+    ## @param value must be a string
+    ## @return boolean
+    def isFormula(self, value):
+        if len(value)>0 and value[0] in ["=", "+"]:
+            return True
+        return False
+        
+
+
+
     ## Internat function to set a cell. All properties except border that it's setted in overwrite functions (merged and no merged)
     ## @param cell is a cell object
     def __setValue(self, cell, value, style, decimals, alignment):     
@@ -282,6 +319,33 @@ class OpenPyXL:
                     self.__setCell(Coord(coord.string()).addRow(i), result[i], style, decimals, alignment )
         else:#Un solo valor
             self.__setCell(coord, result, style, decimals, alignment )
+            
+
+    ## Writes a formula in a cell 
+    ## @param coord Can be a Coord or a string with text coord
+    ## @param result Can be a value
+    ## @param resultclass int, float, Decimal, datetime.datetime, datetime.date,"€","$" (Currency.symbol), Percentage
+    ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGrayDark, stGrayLight, stOrange, stYellow, stWhite or None. None is used to preserve template cell and the value is the only thing will be changed
+    ## @param decimals Integer with the number of decimals. 2 by default
+    ## @param alignment String None by default. Can be "right","left","center"
+    def overwrite_formula(self, coord, value, resultclass=None, style=None, decimals=2, alignment=None):
+        if self.isFormula(value)==False:
+            print(_("This is not a formula. You can't use overwrite_formula"))
+            return
+        if value.__class__==list:
+            print("Adding formula list is not allowed")
+            return
+        coord=Coord.assertCoord(coord)
+        cell=self.cell(coord.string())
+        self.__setValue(cell, value, style, decimals, alignment)
+        self.__setBorder(cell, style)
+        self.__setAlignment(cell, value, style, alignment)
+        self.__setFormulaNumberFormat(cell, resultclass, style, decimals)      
+
+        if style!=None:
+            cell.fill=openpyxl.styles.PatternFill("solid", fgColor=style)
+            bold=False if style==self.stWhite else True
+            cell.font=openpyxl.styles.Font(name='Arial', size=10, bold=bold)
 
 
     ##Sets border to a cell not merged
