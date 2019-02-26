@@ -296,7 +296,7 @@ class OpenPyXL:
         if style==None:
             return
         if alignment==None:
-            if value.__class__ in (str, datetime.datetime, datetime.date):#Un solo valor
+            if value.__class__ in (str):#Un solo valor
                 alignment='left'
             else:
                 alignment='right'
