@@ -18,6 +18,8 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.9.0
+  * Added overwrite_formula method. Now we can define formula number_format
 1.8.0
   * Solved bug saving with template
   * Unified method to freeze and set position
