@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-26 05:32+0100\n"
+"POT-Creation-Date: 2019-03-29 06:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,6 +50,15 @@ msgstr ""
 msgid "Created cell"
 msgstr ""
 
+msgid "OfficeGenerator ODS example"
+msgstr ""
+
+msgid "Demo with ODS_Write class"
+msgstr ""
+
+msgid "This file have been generated with OfficeGenerator-{}. You can see OfficeGenerator main page in http://github.com/turulomio/officegenerator"
+msgstr ""
+
 msgid "This is a comment"
 msgstr ""
 
@@ -84,6 +93,12 @@ msgid "This cell is going to be merged with B13 a F14"
 msgstr ""
 
 msgid "This cell is going to be merged and aligned desde B18 a G18"
+msgstr ""
+
+msgid "OfficeGenerator ODT example"
+msgstr ""
+
+msgid "Demo with ODT documents"
 msgstr ""
 
 msgid "Manual of officegenerator"
@@ -240,9 +255,6 @@ msgid "White"
 msgstr ""
 
 msgid "You can't overwrite a readed ods"
-msgstr ""
-
-msgid "This document has been generated with OfficeGenerator v{}"
 msgstr ""
 
 msgid "Tag {} hasn't been found"

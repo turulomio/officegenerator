@@ -18,6 +18,9 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.10.0
+  * Datetime and date cells are now aligned right by default
+  * Added creationdate, description, and keywords to metadata in ODF class
 1.9.0
   * Added overwrite_formula method. Now we can define formula number_format
 1.8.0

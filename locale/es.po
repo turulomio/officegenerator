@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-26 05:31+0100\n"
+"POT-Creation-Date: 2019-03-29 06:13+0100\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -51,6 +51,15 @@ msgstr "Esta celda ha sido leída y modificada"
 msgid "Created cell"
 msgstr "Celda creada"
 
+msgid "OfficeGenerator ODS example"
+msgstr "Ejemplo ODS de OfficeGenerator"
+
+msgid "Demo with ODS_Write class"
+msgstr "Demostración de la clase ODS_Write"
+
+msgid "This file have been generated with OfficeGenerator-{}. You can see OfficeGenerator main page in http://github.com/turulomio/officegenerator"
+msgstr "Este fichero ha sido generado con OfficeGenerator-{}. Puedes ver la página principal del proyecto OfficeGenerator en http://github.com/turulomio/officegenerator"
+
 msgid "This is a comment"
 msgstr "Esto es un comentario"
 
@@ -86,6 +95,12 @@ msgstr "Esta celda va a unir el rango B13 y F14"
 
 msgid "This cell is going to be merged and aligned desde B18 a G18"
 msgstr "Esta celda va a unir y alinear el rango B18 a G18"
+
+msgid "OfficeGenerator ODT example"
+msgstr "Ejemplo de ODT con OfficeGenerator"
+
+msgid "Demo with ODT documents"
+msgstr "Demostración con documentos ODT"
 
 msgid "Manual of officegenerator"
 msgstr "Manual de OfficeGenerator"
@@ -242,9 +257,6 @@ msgstr "Blanco"
 
 msgid "You can't overwrite a readed ods"
 msgstr "No puedes sobreescribir un ods leído"
-
-msgid "This document has been generated with OfficeGenerator v{}"
-msgstr "Este documento ha sido creado con OfficeGenerator v{}"
 
 msgid "Tag {} hasn't been found"
 msgstr "La etiqueta {} no ha sido encontrada"
