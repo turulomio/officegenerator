@@ -18,13 +18,13 @@ from odf.text import P,  H,  Span, ListStyle,  ListLevelStyleBullet,  List,  Lis
 from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
 from odf.draw import Frame, Image
 from odf.dc import Creator, Description, Title, Date, Subject
-from odf.meta import InitialCreator
+from odf.meta import InitialCreator, Keyword, CreationDate
 import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
 
-from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency,  __version__
+from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -164,15 +164,25 @@ class ODF:
         self.filename=filename
         self.images={}
         
-                
-    def setMetadata(self, title,  subject, creator):
+    ## Set metadata in odf document
+    ## @param title String with the title of the document
+    ## @param subject String with a brief of the document
+    ## @param creator String with the author of the document
+    ## @param description String with a larga description of the document
+    ## @param keywords String with keywords separated by space
+    ## @param creationdate Naive datetime with the creation date and time
+    def setMetadata(self, title="",  subject="", creator="", description="", keywords="", creationdate=datetime.datetime.now()):
         for e in self.doc.meta.childNodes:
             self.doc.meta.removeChild(e)
-        self.doc.meta.addElement(Description(text=_("This document has been generated with OfficeGenerator v{}".format(__version__))))
+        self.doc.meta.addElement(Description(text=description))
         self.doc.meta.addElement(Title(text=title))
         self.doc.meta.addElement(Subject(text=subject))
         self.doc.meta.addElement(Creator(text=creator))
         self.doc.meta.addElement(InitialCreator(text=creator))
+        self.doc.meta.addElement(Keyword(text=keywords))
+        d=Date()
+        d.addText(creationdate.strftime("%Y-%m-%dT%H:%M:%S"))
+        self.doc.meta.addElement(CreationDate(text=d))
 
     ## Adds an image to self.images dictionary. We add to a dictionary in order to reuse the same image in a directory
     ##

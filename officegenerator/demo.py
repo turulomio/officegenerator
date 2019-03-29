@@ -80,7 +80,7 @@ def demo_ods_readed():
 
 def demo_ods():
     doc=ODS_Write("officegenerator.ods")
-    doc.setMetadata("OfficeGenerator example",  "This class documentation", "Mariano Muñoz")
+    doc.setMetadata(_("OfficeGenerator ODS example"),  _("Demo with ODS_Write class"), "Turulomio", _("This file have been generated with OfficeGenerator-{}. You can see OfficeGenerator main page in http://github.com/turulomio/officegenerator").format(__version__), "officegenerator demo files")
     s1=doc.createSheet("Example")
     s1.add("A1", [["Title", "Value"]], "OrangeCenter")
     s1.add("A2", "Percentage", "YellowLeft")
@@ -152,6 +152,8 @@ def demo_ods():
    
 def demo_odt_commands(doc):
     doc.setMetadata("OfficeGenerator title",  "OfficeGenerator subject", "Turulomio")
+    doc.setMetadata(_("OfficeGenerator ODT example"),  _("Demo with ODT documents"), "Turulomio", _("This file have been generated with OfficeGenerator-{}. You can see OfficeGenerator main page in http://github.com/turulomio/officegenerator").format(__version__), "officegenerator demo files")
+
     doc.title(_("Manual of officegenerator"))
     doc.subtitle(_("Version {}".format(__version__)))
 
