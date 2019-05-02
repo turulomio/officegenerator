@@ -92,12 +92,13 @@ class OpenPyXL:
         sheet=self.ws_current.views.sheetView[0]
         freeze=Coord(freeze_coord_string)
         # USEFUL TO DEBUG
-        #print(sheet.selection, sheet.selection.__class__)
-        if freeze.letterIndex()>0 and freeze.numberIndex()>0:#Freeze C3 WORKS
+        #print("andtes", sheet.selection, sheet.selection.__class__)
+        if freeze.letterIndex()>0 and freeze.numberIndex()>0:#Freeze C3 WORKS 20190502
             sheet.selection[2].activeCell=selected_coord_string
+            sheet.selection[2].sqref=selected_coord_string
             sheet.pane.activePane = 'bottomRight'
             sheet.pane.topLeftCell=topleftcell_coord_string
-        elif freeze.letterIndex()==0 and freeze.numberIndex()>0:#Freeze A2 NEAR
+        elif freeze.letterIndex()==0 and freeze.numberIndex()>0:#Freeze A2 WORKS 20190502
             sheet.selection[0].activeCell=selected_coord_string
             sheet.selection[0].sqref=selected_coord_string
             sheet.pane.activePane = 'bottomLeft'
@@ -107,12 +108,14 @@ class OpenPyXL:
             sheet.selection[0].sqref=selected_coord_string
             sheet.pane.activePane = 'topRight'
             sheet.pane.topLeftCell=topleftcell_coord_string
-            #sheet.pane.state='frozenSplit'
-#            print(sheet.selection, sheet.selection.__class__)
-#            print (sheet.pane, sheet.pane.__class__)
-        elif freeze.letterIndex()==0 and freeze.numberIndex()==0:#Freeze A1 WORKS
+            #print("B1", sheet.selection, sheet.selection.__class__)
+            #print("B1", sheet.pane, sheet.pane.__class__)
+        elif freeze.letterIndex()==0 and freeze.numberIndex()==0:#Freeze A1 WORKS 20190502
             sheet.selection[0].activeCell=selected_coord_string
+            sheet.selection[0].sqref=selected_coord_string
+            sheet.selection[0].pane=None
             sheet.topLeftCell=topleftcell_coord_string
+            #print("A1",  sheet.selection, sheet.selection.__class__)
         
 
     ## Changes name of the current sheet
