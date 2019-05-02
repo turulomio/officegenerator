@@ -18,6 +18,8 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.11.0
+  * Fixing problems with freeze and select
 1.10.0
   * Datetime and date cells are now aligned right by default
   * Added creationdate, description, and keywords to metadata in ODF class
