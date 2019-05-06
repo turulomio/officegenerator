@@ -13,16 +13,14 @@ import openpyxl.formatting.rule
 import os
 import pkg_resources
 
-from officegenerator.commons import columnAdd, makedirs,  Currency,  Percentage,  Coord, Range, deprecated
+from officegenerator.commons import columnAdd, makedirs,  Currency,  Percentage,  Coord, Range
 from decimal import Decimal
-
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
     _=t.gettext
 except:
     _=str
-
 
 class ColumnWidthXLSX:
     Date=40
@@ -66,57 +64,42 @@ class OpenPyXL:
         elif color==None:
             return "Normal"
 
-    ## Freezes panels
-    ## @param strcell String For example "A2"
-    @deprecated
-    def freezePanels(self, coord_string):
-        self.ws_current.freeze_panes=self.ws_current[coord_string]
-
-    ## Selects a cell https://openpyxl.readthedocs.io/en/latest/_modules/openpyxl/worksheet/views.html#Selection
-    ##
-    ## Seems to work when setting before freezePanels
-    ## @param coord_string String with Selected cell coord For example "A2"
-    ## @param topleftcell top left cell to set the view of the selected cell
-    @deprecated
-    def setSelectedCell(self, coord_string, topleftcell=None, pane='topLeft'):
-        sheet=self.ws_current.views.sheetView[0]
-        sheet.selection[0].activeCell=coord_string
-
-
     ## Freeze panels in a sheet and sets the selected cell
-    ## @param freeze_coord_string, Cell where panels are frrozen
-    ## @param selected_coord_string. Cell selected opening sheet
-    ## @param topLeftCell, topleftcell to show in sheet after opening    
-    def freezeAndSelect(self, freeze_coord_string, selected_coord_string, topleftcell_coord_string):
-        self.ws_current.freeze_panes=self.ws_current[freeze_coord_string]
+    ## Selects a cell https://openpyxl.readthedocs.io/en/latest/_modules/openpyxl/worksheet/views.html#Selection
+    ## @param freeze_coord, Cell where panels are frrozen. Can be a string or a Coord object.
+    ## @param selected_coord. Cell selected opening sheet. Can be a string or a Coord object.
+    ## @param topLeftCell, topleftcell to show in sheet after opening. Can be a string or a Coord object.
+    def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord):
+        freeze_coord=Coord.assertCoord(freeze_coord)
+        selected_coord=Coord.assertCoord(selected_coord)
+        topleftcell_coord=Coord.assertCoord(topleftcell_coord)
+        self.ws_current.freeze_panes=self.ws_current[freeze_coord.string()]
         sheet=self.ws_current.views.sheetView[0]
-        freeze=Coord(freeze_coord_string)
         # USEFUL TO DEBUG
         #print("andtes", sheet.selection, sheet.selection.__class__)
-        if freeze.letterIndex()>0 and freeze.numberIndex()>0:#Freeze C3 WORKS 20190502
-            sheet.selection[2].activeCell=selected_coord_string
-            sheet.selection[2].sqref=selected_coord_string
+        if freeze_coord.letterIndex()>0 and freeze_coord.numberIndex()>0:#Freeze C3 WORKS 20190502
+            sheet.selection[2].activeCell=selected_coord.string()
+            sheet.selection[2].sqref=selected_coord.string()
             sheet.pane.activePane = 'bottomRight'
-            sheet.pane.topLeftCell=topleftcell_coord_string
-        elif freeze.letterIndex()==0 and freeze.numberIndex()>0:#Freeze A2 WORKS 20190502
-            sheet.selection[0].activeCell=selected_coord_string
-            sheet.selection[0].sqref=selected_coord_string
+            sheet.pane.topLeftCell=topleftcell_coord.string()
+        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()>0:#Freeze A2 WORKS 20190502
+            sheet.selection[0].activeCell=selected_coord.string()
+            sheet.selection[0].sqref=selected_coord.string()
             sheet.pane.activePane = 'bottomLeft'
-            sheet.pane.topLeftCell=topleftcell_coord_string
-        elif freeze.letterIndex()>0 and freeze.numberIndex()==0:#Freeze B1 NEAR
-            sheet.selection[0].activeCell=selected_coord_string
-            sheet.selection[0].sqref=selected_coord_string
+            sheet.pane.topLeftCell=topleftcell_coord.string()
+        elif freeze_coord.letterIndex()>0 and freeze_coord.numberIndex()==0:#Freeze B1 NEAR
+            sheet.selection[0].activeCell=selected_coord.string()
+            sheet.selection[0].sqref=selected_coord.string()
             sheet.pane.activePane = 'topRight'
-            sheet.pane.topLeftCell=topleftcell_coord_string
+            sheet.pane.topLeftCell=topleftcell_coord.string()
             #print("B1", sheet.selection, sheet.selection.__class__)
             #print("B1", sheet.pane, sheet.pane.__class__)
-        elif freeze.letterIndex()==0 and freeze.numberIndex()==0:#Freeze A1 WORKS 20190502
-            sheet.selection[0].activeCell=selected_coord_string
-            sheet.selection[0].sqref=selected_coord_string
+        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()==0:#Freeze A1 WORKS 20190502
+            sheet.selection[0].activeCell=selected_coord.string()
+            sheet.selection[0].sqref=selected_coord.string()
             sheet.selection[0].pane=None
-            sheet.topLeftCell=topleftcell_coord_string
+            sheet.topLeftCell=topleftcell_coord.string()
             #print("A1",  sheet.selection, sheet.selection.__class__)
-        
 
     ## Changes name of the current sheet
     def setSheetName(self, name):
