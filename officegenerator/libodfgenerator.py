@@ -876,63 +876,68 @@ B1:
         self.cursorPositionY=coord.numberIndex()
 
     ## Freeze panels in a sheet and sets the selected cell
+    ##        split/freeze vertical (0|1|2) - 1 = split ; 2 = freeze
+    ##          ##split/freeze horizontal (0|1|2) - 1 = split ; 2 = freeze
+    ##      vertical position = in cell if fixed, in screen unit if frozen
+    ##      horizontal position = in cell if fixed, in screen unit if frozen
+    ##      active zone in the splitted|frozen sheet (0..3 from let to right, top
+    ##  to bottom)
+    ##  #   COMPROBADO CON ODF2XML
+    ##  B1: 
+    ##                <config:config-item config:name="HorizontalSplitMode" config:type="short">2</config:config-item>
+    ##                <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
+    ##                <config:config-item config:name="HorizontalSplitPosition" config:type="int">1</config:config-item>
+    ##                <config:config-item config:name="VerticalSplitPosition" config:type="int">0</config:config-item>
+    ##                <config:config-item config:name="ActiveSplitRange" config:type="short">3</config:config-item>
+    ##                <config:config-item config:name="PositionLeft" config:type="int">0</config:config-item>
+    ##                <config:config-item config:name="PositionRight" config:type="int">1</config:config-item>
+    ##                <config:config-item config:name="PositionTop" config:type="int">0</config:config-item>
+    ##                <config:config-item config:name="PositionBottom" config:type="int">0</config:config-item>
     ## @param freeze_coord, Cell where panels are frrozen. Can be a string or a Coord object.
     ## @param selected_coord. Cell selected opening sheet. Can be a string or a Coord object.
     ## @param topLeftCell, topleftcell to show in sheet after opening. Can be a string or a Coord object.
     def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord):
-        def setActiveSplitRange():
-            """
-                Creo que es la posición tras los ejes.
-            """
-            if (self.horizontalSplitPosition!="0" and self.verticalSplitPosition=="0"):
-                return "3"
-            if (self.horizontalSplitPosition=="0" and self.verticalSplitPosition!="0"):
-                return "2"
-            if self.horizontalSplitPosition!="0" and self.verticalSplitPosition!="0":
-                return "3"
-            return "2"
-        #________________________________________________
+        # Creates Coord objects
         freeze_coord=Coord.assertCoord(freeze_coord)
         selected_coord=Coord.assertCoord(selected_coord)
         topleftcell_coord=Coord.assertCoord(topleftcell_coord)
 
+        #Sets cursor position
         self.cursorPositionX=selected_coord.letterIndex()
         self.cursorPositionY=selected_coord.numberIndex()
-
-
-
-        """
-                split/freeze vertical (0|1|2) - 1 = split ; 2 = freeze
-    split/freeze horizontal (0|1|2) - 1 = split ; 2 = freeze
-    vertical position = in cell if fixed, in screen unit if frozen
-    horizontal position = in cell if fixed, in screen unit if frozen
-    active zone in the splitted|frozen sheet (0..3 from let to right, top
-to bottom)
-
-
-#   COMPROBADO CON ODF2XML
-B1: 
-              <config:config-item config:name="HorizontalSplitMode" config:type="short">2</config:config-item>
-              <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
-              <config:config-item config:name="HorizontalSplitPosition" config:type="int">1</config:config-item>
-              <config:config-item config:name="VerticalSplitPosition" config:type="int">0</config:config-item>
-              <config:config-item config:name="ActiveSplitRange" config:type="short">3</config:config-item>
-              <config:config-item config:name="PositionLeft" config:type="int">0</config:config-item>
-              <config:config-item config:name="PositionRight" config:type="int">1</config:config-item>
-              <config:config-item config:name="PositionTop" config:type="int">0</config:config-item>
-              <config:config-item config:name="PositionBottom" config:type="int">0</config:config-item>
-
-"""
+    
+        #Sets freeze position and modes
         self.horizontalSplitPosition=str(freeze_coord.letterIndex())
         self.verticalSplitPosition=str(freeze_coord.numberIndex())
         self.horizontalSplitMode="0" if self.horizontalSplitPosition=="0" else "2"
         self.verticalSplitMode="0" if self.verticalSplitPosition=="0" else "2"
-        self.activeSplitRange=setActiveSplitRange()
-        self.positionTop="0"
-        self.positionBottom="0" if self.verticalSplitPosition=="0" else str(self.verticalSplitPosition)
-        self.positionLeft="0"
-        self.positionRight="0" if self.horizontalSplitPosition=="0" else str(self.horizontalSplitPosition)
-
+        
+        #Sets active split range and top left cell position
+        if self.horizontalSplitPosition!="0" and self.verticalSplitPosition=="0":#C1 WORKS
+            self.activeSplitRange="3"
+            self.positionTop="0"
+            self.positionBottom=str(topleftcell_coord.numberIndex())
+            self.positionLeft="0"
+            self.positionRight=str(topleftcell_coord.letterIndex())
+        if self.horizontalSplitPosition=="0" and self.verticalSplitPosition!="0":#A3
+            print("A3")
+            self.activeSplitRange="2"
+            self.positionTop=str(selected_coord.numberIndex())
+            self.positionBottom="0"
+            self.positionLeft=str(selected_coord.letterIndex())
+            self.positionRight="0"
+        if self.horizontalSplitPosition!="0" and self.verticalSplitPosition!="0": # C3 WORKS
+            self.activeSplitRange="3"
+            self.positionTop="0"
+            self.positionBottom=str(topleftcell_coord.numberIndex())
+            self.positionLeft="0"
+            self.positionRight=str(topleftcell_coord.letterIndex())
+        else:#A1
+            self.activeSplitRange="2"
+            self.positionTop="0"
+            self.positionBottom=str(topleftcell_coord.numberIndex())
+            self.positionLeft="0"
+            self.positionRight=str(topleftcell_coord.letterIndex())
 
     ## Sets a comment in the givven cell
     ## @param coord can be Coord o Coord.string()

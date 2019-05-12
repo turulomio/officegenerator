@@ -108,12 +108,30 @@ def demo_ods():
     s1.add("A15", [[12.3]*3, [12.3]*3])
 
 
-    s4=doc.createSheet("Splitting")
+    sf1=doc.createSheet("Freeze A1")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         for number in range(1, 200):
-            s4.add(letter + str(number), letter+str(number), "YellowLeft")
-    s4.freezeAndSelect("C3", "Z199","U180") 
+            sf1.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf1.freezeAndSelect("A1", "Z199","U180") 
 
+    sf2=doc.createSheet("Freeze A2")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            sf2.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf2.freezeAndSelect("A2", "Z199","M171") 
+
+    sf3=doc.createSheet("Freeze C1")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            sf3.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf3.freezeAndSelect("C1", "Z199","Q168") 
+
+
+    sf4=doc.createSheet("Freeze C3")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            sf4.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf4.freezeAndSelect("C3", "Z199","Q168") 
 
     s6=doc.createSheet("Format number")
     s6.setColumnsWidth([ColumnWidthODS.L, ColumnWidthODS.Datetime, ColumnWidthODS.Date, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.XL, ColumnWidthODS.XXL])
