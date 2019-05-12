@@ -146,6 +146,13 @@ def demo_ods():
     s6.addMerged("B18:G18", _("This cell is going to be merged and aligned desde B18 a G18"), "YellowRight")
     s6.setCursorPosition("B11")
     s6.setSplitPosition("A11")
+    
+    #Cells with formula with diferent styles and number formats
+    s6.addMerged("A20:D20",  _("These cells show formulas with diferent styles and number formats"), "Green")
+    s6.add("E20",  "=2+3.3", "NormalDecimal6")
+    s6.add("F20",  "=2+3.3", "YellowEUR")
+    s6.add("G20",  "=2+3.3", "GreenDatetime")
+    s6.add("H20",  "=0.9/23", "WhitePercentage")
 
     doc.setActiveSheet(s6)
     doc.save()
