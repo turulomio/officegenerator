@@ -109,11 +109,10 @@ def demo_ods():
 
 
     s4=doc.createSheet("Splitting")
-    for letter in "ABCDEFGHIJ":
-        for number in range(1, 11):
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
             s4.add(letter + str(number), letter+str(number), "YellowLeft")
-    s4.setCursorPosition("C3")
-    s4.setSplitPosition("C3")
+    s4.freezeAndSelect("C3", "Z199","U180") 
 
 
     s6=doc.createSheet("Format number")
