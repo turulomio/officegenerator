@@ -306,79 +306,79 @@ def demo_odt_manual_styles():
 def demo_xlsx():
     xlsx=OpenPyXL("officegenerator.xlsx")
     xlsx.setCurrentSheet(0)
-#
-#    xlsx.setSheetName(_("Styles"))
-#    xlsx.setColumnsWidth([20, 20, 20, 20, 20, 20, 20, 20])
-#    
-#    xlsx.overwrite("A1", _("Style name"), style=xlsx.stOrange,  alignment="center")
-#    xlsx.overwrite("B1", _("Date and time"), style=xlsx.stOrange,  alignment="center")
-#    xlsx.overwrite("C1", _("Date"), style=xlsx.stOrange,  alignment="center")
-#    xlsx.overwrite("D1", _("Integer"), style=xlsx.stOrange,  alignment="center")
-#    xlsx.overwrite("E1", _("Euros"), style=xlsx.stOrange,  alignment="center")
-#    xlsx.overwrite("F1", _("Percentage"), style=xlsx.stOrange,  alignment="center")
-#    xlsx.overwrite("G1", _("Number with 2 decimals"), style=xlsx.stOrange,  alignment="center")
-#    xlsx.overwrite("H1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
-#    for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, xlsx.stWhite, None]):
-#        xlsx.overwrite(Coord("A2").addRow(row), xlsx.styleName(style), style=style)
-#        xlsx.overwrite(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
-#        xlsx.overwrite(Coord("C2").addRow(row), datetime.date.today(), style=style)
-#        xlsx.overwrite(Coord("D2").addRow(row), pow(-1, row)*-10000000, style=style)
-#        xlsx.overwrite(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), style=style)
-#        xlsx.overwrite(Coord("F2").addRow(row), Percentage(1, 3), style=style,  decimals=row+1)
-#        xlsx.overwrite(Coord("G2").addRow(row), pow(-1, row)*12.121212, style=style, decimals=2)
-#        xlsx.overwrite(Coord("H2").addRow(row), pow(-1, row)*-12.121212, style=style, decimals=6)
-#    xlsx.setComment("B2", _("This is a comment"))
-#    
-#    ##To write a custom cell
-#    cell=xlsx.wb.active['B12']
-#    cell.font=openpyxl.styles.Font(name='Arial', size=16, bold=True, color=openpyxl.styles.colors.RED)
-#    cell.value=_("This is a custom cell")
-#    #Merge cells
-#    xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
-#    xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
-#
-#
-#    xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
-#    xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.max_rows(), xlsx.max_columns()), style=xlsx.stYellow,  alignment="center")
-#
-#    #Named cells
-#    xlsx.overwrite_and_merge("A23:B23", _("Cell B23 has a name 'Amount"), style=xlsx.stWhite)
-#    xlsx.overwrite("C23", 5, style=xlsx.stWhite)
-#    xlsx.setCellName("$C$23", "Amount")
-#
-#    xlsx.overwrite_and_merge("A24:B24", _("Cell B24 has a name 'Price"), style=xlsx.stWhite)
-#    xlsx.overwrite("C24", Currency(10,'EUR'), style=xlsx.stWhite)
-#    xlsx.setCellName("$C$24", "Price")
-#
-#    xlsx.overwrite_and_merge("A25:B25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
-#    xlsx.overwrite_formula("C25", "=Amount*Price", "€", style=xlsx.stWhite, alignment='right')
-#
-#    xlsx.freezeAndSelect("A9","B11", "A9")
-#
-#    #To text split and cur position
+
+    xlsx.setSheetName(_("Styles"))
+    xlsx.setColumnsWidth([20, 20, 20, 20, 20, 20, 20, 20])
+    
+    xlsx.overwrite("A1", _("Style name"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("B1", _("Date and time"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("C1", _("Date"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("D1", _("Integer"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("E1", _("Euros"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("F1", _("Percentage"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("G1", _("Number with 2 decimals"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("H1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
+    for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, xlsx.stWhite, None]):
+        xlsx.overwrite(Coord("A2").addRow(row), xlsx.styleName(style), style=style)
+        xlsx.overwrite(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
+        xlsx.overwrite(Coord("C2").addRow(row), datetime.date.today(), style=style)
+        xlsx.overwrite(Coord("D2").addRow(row), pow(-1, row)*-10000000, style=style)
+        xlsx.overwrite(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), style=style)
+        xlsx.overwrite(Coord("F2").addRow(row), Percentage(1, 3), style=style,  decimals=row+1)
+        xlsx.overwrite(Coord("G2").addRow(row), pow(-1, row)*12.121212, style=style, decimals=2)
+        xlsx.overwrite(Coord("H2").addRow(row), pow(-1, row)*-12.121212, style=style, decimals=6)
+    xlsx.setComment("B2", _("This is a comment"))
+    
+    ##To write a custom cell
+    cell=xlsx.wb.active['B12']
+    cell.font=openpyxl.styles.Font(name='Arial', size=16, bold=True, color=openpyxl.styles.colors.RED)
+    cell.value=_("This is a custom cell")
+    #Merge cells
+    xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
+    xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
+
+
+    xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
+    xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.max_rows(), xlsx.max_columns()), style=xlsx.stYellow,  alignment="center")
+
+    #Named cells
+    xlsx.overwrite_and_merge("A23:B23", _("Cell B23 has a name 'Amount"), style=xlsx.stWhite)
+    xlsx.overwrite("C23", 5, style=xlsx.stWhite)
+    xlsx.setCellName("$C$23", "Amount")
+
+    xlsx.overwrite_and_merge("A24:B24", _("Cell B24 has a name 'Price"), style=xlsx.stWhite)
+    xlsx.overwrite("C24", Currency(10,'EUR'), style=xlsx.stWhite)
+    xlsx.setCellName("$C$24", "Price")
+
+    xlsx.overwrite_and_merge("A25:B25", _("Cell B25 has a product with names"), style=xlsx.stWhite)
+    xlsx.overwrite_formula("C25", "=Amount*Price", "€", style=xlsx.stWhite, alignment='right')
+
+    xlsx.freezeAndSelect("A9","B11", "A9")
+
+    #To text split and cur position
     xlsx.createSheet("Freeze A1")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         for number in range(1, 200):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("A1","Z199", "I168")
-#    #To text split and cur position
-#    xlsx.createSheet("Freeze A3")
-#    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-#        for number in range(1, 200):
-#            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-#    xlsx.freezeAndSelect("A3","Z199", "I168")
-#    #To text split and cur position
-#    xlsx.createSheet("Freeze B1")
-#    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-#        for number in range(1, 200):
-#            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-#    xlsx.freezeAndSelect("B1","Z199", "I168")
-#    #To text split and cur position
-#    xlsx.createSheet("Freeze C3")
-#    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-#        for number in range(1, 200):
-#            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-#    xlsx.freezeAndSelect("C3","Z199", "I168")
+    #To text split and cur position
+    xlsx.createSheet("Freeze A3")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("A3","Z199", "I168")
+    #To text split and cur position
+    xlsx.createSheet("Freeze C1")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("C1","Z199", "I168")
+    #To text split and cur position
+    xlsx.createSheet("Freeze C3")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("C3","Z199", "I168")
 
     xlsx.save()
 
