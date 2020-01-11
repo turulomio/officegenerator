@@ -8,7 +8,7 @@
 import datetime
 import gettext
 from decimal import Decimal
-from logging import debug, info
+from logging import info
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
 from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds
@@ -860,14 +860,13 @@ class OdfSheet:
             self.positionBottom=str(topleftcell_coord.numberIndex())
             self.positionLeft="0"
             self.positionRight=str(topleftcell_coord.letterIndex())
-        if self.horizontalSplitPosition=="0" and self.verticalSplitPosition!="0":#A3
-            debug("OdfSheet.freezeAndSelect:A3 may not work")
+        elif self.horizontalSplitPosition=="0" and self.verticalSplitPosition!="0":#A3 WORKS
             self.activeSplitRange="2"
-            self.positionTop=str(selected_coord.numberIndex())
-            self.positionBottom="0"
-            self.positionLeft=str(selected_coord.letterIndex())
+            self.positionTop="0"
+            self.positionBottom=str(topleftcell_coord.numberIndex())
+            self.positionLeft=str(topleftcell_coord.letterIndex())
             self.positionRight="0"
-        if self.horizontalSplitPosition!="0" and self.verticalSplitPosition!="0": # C3 WORKS
+        elif self.horizontalSplitPosition!="0" and self.verticalSplitPosition!="0": # C3  WORKS
             self.activeSplitRange="3"
             self.positionTop="0"
             self.positionBottom=str(topleftcell_coord.numberIndex())

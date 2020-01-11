@@ -116,18 +116,17 @@ def demo_ods():
             sf1.add(letter + str(number), letter+str(number), "YellowLeft")
     sf1.freezeAndSelect("A1", "Z199","U180") 
 
-    sf2=doc.createSheet("Freeze A2")
+    sf2=doc.createSheet("Freeze A3")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         for number in range(1, 200):
             sf2.add(letter + str(number), letter+str(number), "YellowLeft")
-    sf2.freezeAndSelect("A2", "Z199","M171") 
+    sf2.freezeAndSelect("A3", "Z199","M171") 
 
     sf3=doc.createSheet("Freeze C1")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         for number in range(1, 200):
             sf3.add(letter + str(number), letter+str(number), "YellowLeft")
     sf3.freezeAndSelect("C1", "Z199","Q168") 
-
 
     sf4=doc.createSheet("Freeze C3")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
@@ -176,9 +175,9 @@ def demo_ods():
     doc.save()
     
     # Create A1 small example to debug.. You must set the wanted position and saved another one with a1.bueno.ods, and compare it with odf2xml
-    doc=ODS_Write("a1.ods")
-    doc.sheets.append(sf1)
-    doc.save()
+    #doc=ODS_Write("a3.ods")
+    #doc.sheets.append(sf2)
+    #doc.save()#Remove to debug
    
 def demo_odt_commands(doc):
     doc.setMetadata("OfficeGenerator title",  "OfficeGenerator subject", "Turulomio")
