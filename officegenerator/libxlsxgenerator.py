@@ -66,6 +66,7 @@ class OpenPyXL:
 
     ## Freeze panels in a sheet and sets the selected cell
     ## Selects a cell https://openpyxl.readthedocs.io/en/latest/_modules/openpyxl/worksheet/views.html#Selection
+    ## To DEBUG THIS function rename xlsx to zip and enter in xl/worksheet to see code and props
     ## @param freeze_coord, Cell where panels are frrozen. Can be a string or a Coord object.
     ## @param selected_coord. Cell selected opening sheet. Can be a string or a Coord object.
     ## @param topLeftCell, topleftcell to show in sheet after opening. Can be a string or a Coord object.
@@ -75,14 +76,12 @@ class OpenPyXL:
         topleftcell_coord=Coord.assertCoord(topleftcell_coord)
         self.ws_current.freeze_panes=self.ws_current[freeze_coord.string()]
         sheet=self.ws_current.views.sheetView[0]
-        # USEFUL TO DEBUG
-        #print("andtes", sheet.selection, sheet.selection.__class__)
         if freeze_coord.letterIndex()>0 and freeze_coord.numberIndex()>0:#Freeze C3 WORKS 20190502
             sheet.selection[2].activeCell=selected_coord.string()
             sheet.selection[2].sqref=selected_coord.string()
             sheet.pane.activePane = 'bottomRight'
             sheet.pane.topLeftCell=topleftcell_coord.string()
-        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()>0:#Freeze A2 WORKS 20190502
+        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()>0:#Freeze A3 WORKS 20190502
             sheet.selection[0].activeCell=selected_coord.string()
             sheet.selection[0].sqref=selected_coord.string()
             sheet.pane.activePane = 'bottomLeft'

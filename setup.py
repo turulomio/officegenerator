@@ -89,9 +89,6 @@ class Uninstall(Command):
 
 ########################################################################
 
-with open('README.md', encoding='utf-8') as f:
-    long_description = f.read()
-
 ## Version of officegenerator captured from commons to avoid problems with package dependencies
 __version__= None
 with open('officegenerator/commons.py', encoding='utf-8') as f:
@@ -103,7 +100,7 @@ with open('officegenerator/commons.py', encoding='utf-8') as f:
 setup(name='officegenerator',
      version=__version__,
      description='Python module to read and write LibreOffice and MS Office files',
-     long_description=long_description,
+     long_description='Project web page is in https://github.com/turulomio/officegenerator',
      long_description_content_type='text/markdown',
      classifiers=['Development Status :: 4 - Beta',
                   'Intended Audience :: Developers',
@@ -120,6 +117,7 @@ setup(name='officegenerator',
      install_requires=['odfpy','openpyxl'],
      entry_points = {'console_scripts': ['officegenerator_demo=officegenerator.demo:main',
                                          'officegenerator_odf2xml=officegenerator.odf2xml:main',
+                                         'officegenerator_xlsx2xml=officegenerator.xlsx2xml:main',
                                         ],
                     },
      cmdclass={'doxygen': Doxygen,
