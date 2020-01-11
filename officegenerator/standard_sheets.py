@@ -71,9 +71,6 @@ class Model:
                 s.add(Coord("A2").addRow(number).addColumn(letter), field)
         s.setSplitPosition("A1")
         s.setCursorPosition(Coord("B2").addRow(len(self.data)))
-        return s
-        
-        
 
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write

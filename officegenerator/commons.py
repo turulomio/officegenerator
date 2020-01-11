@@ -1,14 +1,13 @@
 ## @namespace officegenerator.commons
 ## @brief Common code to odfpy and openpyxl wrappers
 import datetime
-import functools
 import gettext
-import logging
+
 import os
 import pkg_resources
 import sys
-import warnings
 from decimal import Decimal
+from logging import info, error, warning, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
 __version__ = '1.11.9999'
@@ -20,16 +19,6 @@ try:
 except:
     _=str
 
-
-## This is a decorator which can be used to mark functions as deprecated. It will result in a warning being emitted when the function is used
-def deprecated(func):
-     @functools.wraps(func)
-     def new_func(*args, **kwargs):
-         warnings.simplefilter('always', DeprecationWarning)  # turn off filter
-         warnings.warn("Call to deprecated function {}.".format(func.__name__), category=DeprecationWarning, stacklevel=2)
-         warnings.simplefilter('default', DeprecationWarning)  # reset filter
-         return func(*args, **kwargs)
-     return new_func
 
 ## Class to manage currencies in officegenerator
 ##
@@ -51,7 +40,7 @@ class Currency:
         if self.currency==money.currency:
             return Currency(self.amount+money.amount, self.currency)
         else:
-            logging.error("Before adding, please convert to the same currency")
+            error("Before adding, please convert to the same currency")
             raise "OdfMoneyOperationException"
 
     def __sub__(self, money):
@@ -59,7 +48,7 @@ class Currency:
         if self.currency==money.currency:
             return Currency(self.amount-money.amount, self.currency)
         else:
-            logging.error("Before substracting, please convert to the same currency")
+            error("Before substracting, please convert to the same currency")
             raise "CurrencyOperationException"
 
     def __lt__(self, money):
@@ -68,7 +57,7 @@ class Currency:
                 return True
             return False
         else:
-            logging.error("Before lt ordering, please convert to the same currency")
+            error("Before lt ordering, please convert to the same currency")
             sys.exit(1)
 
     ## Si las divisas son distintas, queda el resultado con la divisa del primero
@@ -80,7 +69,7 @@ class Currency:
         if self.currency==money.currency:
             return Currency(self.amount*money.amount, self.currency)
         else:
-            logging.error("Before multiplying, please convert to the same currency")
+            error("Before multiplying, please convert to the same currency")
             sys.exit(1)
 
     def __truediv__(self, money):
@@ -88,7 +77,7 @@ class Currency:
         if self.currency==money.currency:
             return Currency(self.amount/money.amount, self.currency)
         else:
-            logging.error("Before true dividing, please convert to the same currency")
+            error("Before true dividing, please convert to the same currency")
             sys.exit(1)
 
     def __repr__(self):
@@ -162,7 +151,7 @@ class Percentage:
         elif o.__class__==Percentage:
             return o.value
         else:
-            logging.warning (o.__class__)
+            warning (o.__class__)
             return None
 
     def __repr__(self):
@@ -435,3 +424,21 @@ class Range:
     def addColumnBefore(self, num=1):
         self.start=self.start.addColumn(-num)
         return self
+
+## Sets debug sustem, needs
+## @param args It's the result of a argparse     args=parser.parse_args()        
+def addDebugSystem(level):
+    logFormat = "%(asctime)s.%(msecs)03d %(levelname)s %(message)s [%(module)s:%(lineno)d]"
+    dateFormat='%F %I:%M:%S'
+
+    if level=="DEBUG":#Show detailed information that can help with program diagnosis and troubleshooting. CODE MARKS
+        basicConfig(level=DEBUG, format=logFormat, datefmt=dateFormat)
+    elif level=="INFO":#Everything is running as expected without any problem. TIME BENCHMARCKS
+        basicConfig(level=INFO, format=logFormat, datefmt=dateFormat)
+    elif level=="WARNING":#The program continues running, but something unexpected happened, which may lead to some problem down the road. THINGS TO DO
+        basicConfig(level=WARNING, format=logFormat, datefmt=dateFormat)
+    elif level=="ERROR":#The program fails to perform a certain function due to a bug.  SOMETHING BAD LOGIC
+        basicConfig(level=ERROR, format=logFormat, datefmt=dateFormat)
+    elif level=="CRITICAL":#The program encounters a serious error and may stop running. ERRORS
+        basicConfig(level=CRITICAL, format=logFormat, datefmt=dateFormat)
+    info("Debug level set to {}".format(level))

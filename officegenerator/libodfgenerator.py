@@ -7,10 +7,8 @@
 
 import datetime
 import gettext
-import logging
-import os
-import pkg_resources
 from decimal import Decimal
+from logging import debug, info
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
 from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds
@@ -23,11 +21,12 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-
-from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency, deprecated
+from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency
+from os import system, path
+from pkg_resources import resource_filename
 
 try:
-    t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
+    t=gettext.translation('officegenerator', resource_filename("officegenerator","locale"))
     _=t.gettext
 except:
     _=str
@@ -44,7 +43,6 @@ class ColumnWidthODS:
     XXL=200
     XXXL=250
     XXXXL=300
-
 
 class ODS_Read:
     def __init__(self, filename):
@@ -388,7 +386,7 @@ class ODT(ODF):
 
     ## Converts saved odt to pdf. It will have the same file name but with .pdf extension
     def convert_to_pdf(self):
-        os.system("lowriter --headless --convert-to pdf '{}'".format(self.filename))
+        system("lowriter --headless --convert-to pdf '{}'".format(self.filename))
 
     def __setCursor(self, e):
         self.cursor=e
@@ -401,7 +399,7 @@ class ODT(ODF):
         if  self.filename==self.template:
             print(_("You can't overwrite a readed odt"))
             return
-        makedirs(os.path.dirname(self.filename))
+        makedirs(path.dirname(self.filename))
         self.doc.save( self.filename)
 
     ## Adds an empty paragraph
@@ -549,7 +547,7 @@ class ODT(ODF):
 ## Class with starndard.odt template
 class ODT_Standard(ODT):
     def __init__(self, filename, language="es", country="es"):
-        template=pkg_resources.resource_filename("officegenerator","templates/odt/standard.odt")
+        template=resource_filename("officegenerator","templates/odt/standard.odt")
         ODT.__init__(self, filename, template, language, country)
 
     ## Creates a text header
@@ -816,64 +814,7 @@ class OdfSheet:
         self.title=title
         self.widths=None
         self.arr=[]
-        self.setCursorPosition("A1")#Default values
-        self.setSplitPosition("A1")
-
-    @deprecated
-    def setSplitPosition(self, coord):
-        """
-                split/freeze vertical (0|1|2) - 1 = split ; 2 = freeze
-    split/freeze horizontal (0|1|2) - 1 = split ; 2 = freeze
-    vertical position = in cell if fixed, in screen unit if frozen
-    horizontal position = in cell if fixed, in screen unit if frozen
-    active zone in the splitted|frozen sheet (0..3 from let to right, top
-to bottom)
-
-
-#   COMPROBADO CON ODF2XML
-B1: 
-              <config:config-item config:name="HorizontalSplitMode" config:type="short">2</config:config-item>
-              <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
-              <config:config-item config:name="HorizontalSplitPosition" config:type="int">1</config:config-item>
-              <config:config-item config:name="VerticalSplitPosition" config:type="int">0</config:config-item>
-              <config:config-item config:name="ActiveSplitRange" config:type="short">3</config:config-item>
-              <config:config-item config:name="PositionLeft" config:type="int">0</config:config-item>
-              <config:config-item config:name="PositionRight" config:type="int">1</config:config-item>
-              <config:config-item config:name="PositionTop" config:type="int">0</config:config-item>
-              <config:config-item config:name="PositionBottom" config:type="int">0</config:config-item>
-
-"""
-        def setActiveSplitRange():
-            """
-                Creo que es la posición tras los ejes.
-            """
-            if (self.horizontalSplitPosition!="0" and self.verticalSplitPosition=="0"):
-                return "3"
-            if (self.horizontalSplitPosition=="0" and self.verticalSplitPosition!="0"):
-                return "2"
-            if self.horizontalSplitPosition!="0" and self.verticalSplitPosition!="0":
-                return "3"
-            return "2"
-
-        coord=Coord.assertCoord(coord)
-        self.horizontalSplitPosition=str(coord.letterIndex())
-        self.verticalSplitPosition=str(coord.numberIndex())
-        self.horizontalSplitMode="0" if self.horizontalSplitPosition=="0" else "2"
-        self.verticalSplitMode="0" if self.verticalSplitPosition=="0" else "2"
-        self.activeSplitRange=setActiveSplitRange()
-        self.positionTop="0"
-        self.positionBottom="0" if self.verticalSplitPosition=="0" else str(self.verticalSplitPosition)
-        self.positionLeft="0"
-        self.positionRight="0" if self.horizontalSplitPosition=="0" else str(self.horizontalSplitPosition)
-
-    @deprecated
-    def setCursorPosition(self, coord):
-        """
-            Sets the cursor in a Sheet
-        """
-        coord=Coord.assertCoord(coord)
-        self.cursorPositionX=coord.letterIndex()
-        self.cursorPositionY=coord.numberIndex()
+        self.freezeAndSelect("A1", "A1", "A1")#Default values
 
     ## Freeze panels in a sheet and sets the selected cell
     ##        split/freeze vertical (0|1|2) - 1 = split ; 2 = freeze
@@ -920,7 +861,7 @@ B1:
             self.positionLeft="0"
             self.positionRight=str(topleftcell_coord.letterIndex())
         if self.horizontalSplitPosition=="0" and self.verticalSplitPosition!="0":#A3
-            print("A3")
+            debug("OdfSheet.freezeAndSelect:A3 may not work")
             self.activeSplitRange="2"
             self.positionTop=str(selected_coord.numberIndex())
             self.positionBottom="0"
@@ -933,6 +874,7 @@ B1:
             self.positionLeft="0"
             self.positionRight=str(topleftcell_coord.letterIndex())
         else:#A1
+            debug("OdfSheet.freezeAndSelect:A1 may not work")
             self.activeSplitRange="2"
             self.positionTop="0"
             self.positionBottom=str(topleftcell_coord.numberIndex())
@@ -1143,7 +1085,7 @@ class ODS(ODF):
         if  filename==None:
             filename=self.filename
 
-        makedirs(os.path.dirname(filename))
+        makedirs(path.dirname(filename))
         self.doc.save(filename)
 
     def setActiveSheet(self, value):
@@ -1376,7 +1318,7 @@ def guess_ods_style(color_or_style, object):
         elif object.__class__==datetime.date:
             return color_or_style + "Date"
         else:
-            logging.info("guess_ods_style not guessed",  object.__class__)
+            info("guess_ods_style not guessed",  object.__class__)
             return "NormalLeft"
     else:
         return color_or_style

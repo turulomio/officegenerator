@@ -7,7 +7,7 @@ import gettext
 import os
 import pkg_resources
 from decimal import Decimal
-from officegenerator.commons import __version__
+from officegenerator.commons import __version__, addDebugSystem
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS
 from officegenerator.libxlsxgenerator import OpenPyXL
 from officegenerator.commons import argparse_epilog, Coord, Percentage,  Currency
@@ -26,10 +26,13 @@ except:
 def main(arguments=None):
     parser=argparse.ArgumentParser(prog='officegenerator', description=_('Create example files using officegenerator module'), epilog=argparse_epilog(), formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--debug', help="Debug program information", choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"], default="ERROR")
     group= parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--create', help="Create demo files", action="store_true",default=False)
     group.add_argument('--remove', help="Remove demo files", action="store_true", default=False)
     args=parser.parse_args(arguments)
+    
+    addDebugSystem(args.debug)
 
     if args.remove==True:
         os.remove("officegenerator.ods")
@@ -90,8 +93,7 @@ def demo_ods():
     s1.add("B4",  "=sum(B2:B3)","WhitePercentage" )
     s1.add("B6",  100.26, "WhiteDecimal6")
     s1.add("B7",  101, "WhiteInteger")
-    s1.setCursorPosition("A3")
-    s1.setSplitPosition("A2")
+    s1.freezeAndSelect("A2", "A3", "A3")#Default values
 
     #Manual cell
     cell=OdfCell("B10", "Celda con OdfCell", "YellowCenter")
@@ -161,8 +163,7 @@ def demo_ods():
     #Merge cells
     s6.addMerged("B13:F14", _("This cell is going to be merged with B13 a F14"), "GreenCenter")
     s6.addMerged("B18:G18", _("This cell is going to be merged and aligned desde B18 a G18"), "YellowRight")
-    s6.setCursorPosition("B11")
-    s6.setSplitPosition("A11")
+    s6.freezeAndSelect("A11", "B11", "A11")#Default values
     
     #Cells with formula with diferent styles and number formats
     s6.addMerged("A20:D20",  _("These cells show formulas with diferent styles and number formats"), "Green")
