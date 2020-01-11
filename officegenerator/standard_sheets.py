@@ -1,5 +1,6 @@
 ## DEBE INCLUIRSE IN OFFICEGENERATOR
-from officegenerator import Coord, rowAdd, OpenPyXL
+from officegenerator.commons import Coord, rowAdd
+from officegenerator.libxlsxgenerator import OpenPyXL
 
 class Model:
     def __init__(self):
@@ -75,7 +76,7 @@ class Model:
         
 
 if __name__ == "__main__":
-    from officegenerator import  ODS_Write
+    from officegenerator.libodfgenerator import  ODS_Write
     filename="standard_sheets.ods"
     ods=ODS_Write("standard_sheets.ods")
     xlsx=OpenPyXL("standard_sheets.xlsx")
