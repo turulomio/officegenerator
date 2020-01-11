@@ -356,17 +356,17 @@ def demo_xlsx():
 #    xlsx.freezeAndSelect("A9","B11", "A9")
 #
 #    #To text split and cur position
-#    xlsx.createSheet("Freeze A1")
-#    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-#        for number in range(1, 200):
-#            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-#    xlsx.freezeAndSelect("A1","Z199", "I168")
-    #To text split and cur position
-    xlsx.createSheet("Freeze A3")
+    xlsx.createSheet("Freeze A1")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         for number in range(1, 200):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-    xlsx.freezeAndSelect("A3","Z199", "I168")
+    xlsx.freezeAndSelect("A1","Z199", "I168")
+#    #To text split and cur position
+#    xlsx.createSheet("Freeze A3")
+#    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+#        for number in range(1, 200):
+#            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+#    xlsx.freezeAndSelect("A3","Z199", "I168")
 #    #To text split and cur position
 #    xlsx.createSheet("Freeze B1")
 #    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":

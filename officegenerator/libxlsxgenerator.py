@@ -76,27 +76,36 @@ class OpenPyXL:
         topleftcell_coord=Coord.assertCoord(topleftcell_coord)
         self.ws_current.freeze_panes=self.ws_current[freeze_coord.string()]
         sheet=self.ws_current.views.sheetView[0]
-        if freeze_coord.letterIndex()>0 and freeze_coord.numberIndex()>0:#Freeze C3 WORKS 20190502
+        if freeze_coord.letterIndex()>0 and freeze_coord.numberIndex()>0:#Freeze C3 
             sheet.selection[2].activeCell=selected_coord.string()
             sheet.selection[2].sqref=selected_coord.string()
             sheet.pane.activePane = 'bottomRight'
             sheet.pane.topLeftCell=topleftcell_coord.string()
-        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()>0:#Freeze A3 WORKS 20190502
-            sheet.selection[0].activeCell=selected_coord.string()
-            sheet.selection[0].sqref=selected_coord.string()
+        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()>0:#Freeze A3
+            topLeftCellFirst=topleftcell_coord.letter+"1"
+            sheet.topLeftCell=topLeftCellFirst
+            sheet.view="normal"
+            sheet.pane.xSplit="0"
+            sheet.selection[0].activeCell=selected_coord.letter+"1"
+            sheet.selection[0].sqref=selected_coord.letter+"1"
+            sheet.selection[0].state="frozen"
+#            sheet.selection[1].activeCell=selected_coord.string()
+#            sheet.selection[1].sqref=selected_coord.string()
+            sheet.pane.activePane = 'topLeft'
+            sheet.pane.topLeftCell=topleftcell_coord.string()
             sheet.pane.activePane = 'bottomLeft'
             sheet.pane.topLeftCell=topleftcell_coord.string()
-        elif freeze_coord.letterIndex()>0 and freeze_coord.numberIndex()==0:#Freeze B1 NEAR
+        elif freeze_coord.letterIndex()>0 and freeze_coord.numberIndex()==0:#Freeze B1 
             sheet.selection[0].activeCell=selected_coord.string()
             sheet.selection[0].sqref=selected_coord.string()
             sheet.pane.activePane = 'topRight'
             sheet.pane.topLeftCell=topleftcell_coord.string()
             #print("B1", sheet.selection, sheet.selection.__class__)
             #print("B1", sheet.pane, sheet.pane.__class__)
-        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()==0:#Freeze A1 WORKS 20190502
+        elif freeze_coord.letterIndex()==0 and freeze_coord.numberIndex()==0:#Freeze A1 
             sheet.selection[0].activeCell=selected_coord.string()
             sheet.selection[0].sqref=selected_coord.string()
-            sheet.selection[0].pane=None
+            sheet.selection[0].pane='topLeft'
             sheet.topLeftCell=topleftcell_coord.string()
             #print("A1",  sheet.selection, sheet.selection.__class__)
 
