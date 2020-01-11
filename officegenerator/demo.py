@@ -93,7 +93,7 @@ def demo_ods():
     s1.add("B4",  "=sum(B2:B3)","WhitePercentage" )
     s1.add("B6",  100.26, "WhiteDecimal6")
     s1.add("B7",  101, "WhiteInteger")
-    s1.freezeAndSelect("A2", "A3", "A3")#Default values
+    s1.freezeAndSelect("A2", "A30", "A5")
 
     #Manual cell
     cell=OdfCell("B10", "Celda con OdfCell", "YellowCenter")
@@ -173,6 +173,11 @@ def demo_ods():
     s6.add("H20",  "=0.9/23", "WhitePercentage")
 
     doc.setActiveSheet(s6)
+    doc.save()
+    
+    # Create A1 small example to debug.. You must set the wanted position and saved another one with a1.bueno.ods, and compare it with odf2xml
+    doc=ODS_Write("a1.ods")
+    doc.sheets.append(sf1)
     doc.save()
    
 def demo_odt_commands(doc):

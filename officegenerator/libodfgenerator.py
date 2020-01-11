@@ -873,12 +873,11 @@ class OdfSheet:
             self.positionBottom=str(topleftcell_coord.numberIndex())
             self.positionLeft="0"
             self.positionRight=str(topleftcell_coord.letterIndex())
-        else:#A1
-            debug("OdfSheet.freezeAndSelect:A1 may not work")
+        else:#A1 WORKS
             self.activeSplitRange="2"
             self.positionTop="0"
             self.positionBottom=str(topleftcell_coord.numberIndex())
-            self.positionLeft="0"
+            self.positionLeft=str(topleftcell_coord.letterIndex())
             self.positionRight=str(topleftcell_coord.letterIndex())
 
     ## Sets a comment in the givven cell
