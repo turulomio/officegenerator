@@ -344,6 +344,26 @@ class Coord:
             self.letter=columnAdd(self.letter, num)
         return self
 
+    ## Add a number of rows to the Coord and return a copy of the object
+    ## @param num Integer Can be positive and negative. When num is negative, if Coord.number is less than 1, returns 1
+    def addRowCopy(self, num=1):
+        r=Coord(self.string())
+        if r.numberIndex()+num<0:
+            r.number="1"
+        else:
+            r.number=rowAdd(r.number, num)
+        return r
+
+    ## Add a number of columns/letters to the Coord and return a copy of the objject
+    ## @param num Integer. Can be positive and negative. When num is negative, if Coord.letter is less than A, returns A.
+    def addColumnCopy(self, num=1):
+        r=Coord(self.string())
+        if r.letterIndex()+num<0:
+            r.letter="A"
+        else:
+            r.letter=columnAdd(r.letter, num)
+        return r
+
     ## Reterns the letter/column index (letterPosition()-1)
     ## @return int
     def letterIndex(self):
