@@ -9,7 +9,7 @@ from decimal import Decimal
 from logging import info, error, warning, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.12.0'
+__version__ = '1.13.0'
 __versiondate__=datetime.date(2020, 1, 12)
 
 try:

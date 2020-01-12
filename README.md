@@ -23,6 +23,10 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.13.0
+------
+  * [#18] Added default topleftcell in freezeAndSelect methods.
+  * [#19] Added addRowCopy and addColumnCopy functions.
 
 1.12.0
 ------
