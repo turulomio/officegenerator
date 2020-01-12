@@ -30,17 +30,16 @@ def generate_xml(filename):
     system("cp '{}' '{}'".format(filename, zipfilename))
     zf = ZipFile(zipfilename)
     for fi in zf.namelist():
-        if fi.find("sheet")!=-1:
-            print("### {} ###".format(fi))
-            xml=open("tmp.xml", "w")
-            print(fi)
-            xml.write(zf.read(fi).decode('UTF-8'))
-            xml.close()
-            q=subprocess.run(['xmllint', '--format', 'tmp.xml'])
-            if q.stdout!=None:
-                print(q.stdout.decode('UTF-8'))
-            subprocess.run(['rm', 'tmp.xml'])
-            
+        print("### {} ###".format(fi))
+        xml=open("tmp.xml", "w")
+        print(fi)
+        xml.write(zf.read(fi).decode('UTF-8'))
+        xml.close()
+        q=subprocess.run(['xmllint', '--format', 'tmp.xml'])
+        if q.stdout!=None:
+            print(q.stdout.decode('UTF-8'))
+        subprocess.run(['rm', 'tmp.xml'])
+        print("")
     subprocess.run(['rm', zipfilename])
 
 def main():

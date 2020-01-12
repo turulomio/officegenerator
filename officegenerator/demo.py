@@ -379,7 +379,6 @@ def demo_xlsx():
         for number in range(1, 200):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("C3","Z199", "I168")
-
     xlsx.save()
 
 def demo_xlsx_readed():
