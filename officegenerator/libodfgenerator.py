@@ -21,7 +21,7 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency
+from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency, topLeftCellNone
 from os import system, path
 from pkg_resources import resource_filename
 
@@ -837,7 +837,9 @@ class OdfSheet:
     ## @param freeze_coord, Cell where panels are frrozen. Can be a string or a Coord object.
     ## @param selected_coord. Cell selected opening sheet. Can be a string or a Coord object.
     ## @param topLeftCell, topleftcell to show in sheet after opening. Can be a string or a Coord object.
-    def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord):
+    def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord=None):
+        if topleftcell_coord==None:
+            topleftcell_coord=topLeftCellNone(freeze_coord, selected_coord)
         # Creates Coord objects
         freeze_coord=Coord.assertCoord(freeze_coord)
         selected_coord=Coord.assertCoord(selected_coord)

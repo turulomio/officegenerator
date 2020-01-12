@@ -461,3 +461,19 @@ def addDebugSystem(level):
     elif level=="CRITICAL":#The program encounters a serious error and may stop running. ERRORS
         basicConfig(level=CRITICAL, format=logFormat, datefmt=dateFormat)
     info("Debug level set to {}".format(level))
+
+## When top left cell is None in freezeAndSelect, both ods and xlsx returns a default topLeftCell
+def topLeftCellNone(freeze_coord, selected_coord):
+        freeze_coord=Coord.assertCoord(freeze_coord)
+        selected_coord=Coord.assertCoord(selected_coord)
+        #Get the select coord - 20 rows and - 10 columns
+        minus_coord=selected_coord.addRowCopy(-20).addColumnCopy(-10)
+        if minus_coord.letterIndex()<=freeze_coord.letterIndex():#letter
+            letter=freeze_coord.letter
+        else:
+            letter=minus_coord.letter
+        if minus_coord.numberIndex()<=freeze_coord.numberIndex():#number
+            number=freeze_coord.number
+        else:
+            number=minus_coord.number
+        return Coord(letter+number)

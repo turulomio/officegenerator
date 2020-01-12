@@ -129,11 +129,35 @@ def demo_ods():
     sf3.freezeAndSelect("C1", "Z199","Q168") 
 
     sf4=doc.createSheet("Freeze C3")
+    for letter in "ABCDEFG":
+        for number in range(1, 200):
+            sf4.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf4.freezeAndSelect("C3", "G199","Q168") 
+
+
+    sf1=doc.createSheet("Freeze A1 None")
+    for letter in "ABCDEFG":
+        for number in range(1, 200):
+            sf1.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf1.freezeAndSelect("A1", "G199") 
+
+    sf2=doc.createSheet("Freeze A3 None")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 15):
+            sf2.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf2.freezeAndSelect("A3", "Z14") 
+
+    sf3=doc.createSheet("Freeze C1 None")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 15):
+            sf3.add(letter + str(number), letter+str(number), "YellowLeft")
+    sf3.freezeAndSelect("C1", "Z14") 
+
+    sf4=doc.createSheet("Freeze C3 None")
     for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
         for number in range(1, 200):
             sf4.add(letter + str(number), letter+str(number), "YellowLeft")
-    sf4.freezeAndSelect("C3", "Z199","Q168") 
-
+    sf4.freezeAndSelect("C3", "Z199") 
     s6=doc.createSheet("Format number")
     s6.setColumnsWidth([ColumnWidthODS.L, ColumnWidthODS.Datetime, ColumnWidthODS.Date, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.XL, ColumnWidthODS.XXL])
 
@@ -379,6 +403,34 @@ def demo_xlsx():
         for number in range(1, 200):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("C3","Z199", "I168")
+    xlsx.save()
+    
+    
+    
+    #To text split and cur position
+    xlsx.createSheet("Freeze A1 None")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("A1","Z199")
+    #To text split and cur position
+    xlsx.createSheet("Freeze A3 None")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("A3","Z199")
+    #To text split and cur position
+    xlsx.createSheet("Freeze C1 None")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("C1","Z199")
+    #To text split and cur position
+    xlsx.createSheet("Freeze C3 None")
+    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        for number in range(1, 200):
+            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
+    xlsx.freezeAndSelect("C3","Z199")
     xlsx.save()
 
 def demo_xlsx_readed():

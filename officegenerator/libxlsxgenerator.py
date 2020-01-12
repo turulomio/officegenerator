@@ -14,7 +14,7 @@ import openpyxl.formatting.rule
 import os
 import pkg_resources
 
-from officegenerator.commons import columnAdd, makedirs,  Currency,  Percentage,  Coord, Range
+from officegenerator.commons import columnAdd, makedirs,  Currency,  Percentage,  Coord, Range, topLeftCellNone
 from decimal import Decimal
 
 try:
@@ -71,7 +71,9 @@ class OpenPyXL:
     ## @param freeze_coord, Cell where panels are frrozen. Can be a string or a Coord object.
     ## @param selected_coord. Cell selected opening sheet. Can be a string or a Coord object.
     ## @param topLeftCell, topleftcell to show in sheet after opening. Can be a string or a Coord object.
-    def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord):
+    def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord=None):
+        if topleftcell_coord==None:
+            topleftcell_coord=topLeftCellNone(freeze_coord, selected_coord)
         freeze_coord=Coord.assertCoord(freeze_coord)
         selected_coord=Coord.assertCoord(selected_coord)
         topleftcell_coord=Coord.assertCoord(topleftcell_coord)
