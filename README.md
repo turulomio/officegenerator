@@ -2,13 +2,16 @@ Links
 =====
 
 OfficeGenerator doxygen documentation:
+
   * http://turulomio.users.sourceforge.net/doxygen/officegenerator/
  
 Pypi project page
+
   * https://pypi.org/project/officegenerator/
 
 Dependencies
 ============
+
 * https://www.python.org/, as the main programming language.
 * https://pypi.org/project/odfpy/, to generate LibreOffice documents.
 * https://pypi.org/project/openpyxl/, to generate MS Office XLSX/XLSM  documents.
@@ -21,10 +24,18 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 Changelog
 =========
 
+1.12.0
+------
+  * Fixing problems with freeze and select
+  * Added formulas with different styles
+  * Added fist version of Model class and standard sheets
+  * Replaced setCursorPosition and setSplitPosition by freezeAndSelect
+  * Added officegenerartor_xlsx2xml to help debuging
+
 1.11.0
 ------
   * Fixing problems with freeze and select
-  
+ 
 1.10.0
 ------
   * Datetime and date cells are now aligned right by default

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-29 06:13+0100\n"
+"POT-Creation-Date: 2020-01-12 07:45+0100\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -95,6 +95,9 @@ msgstr "Esta celda va a unir el rango B13 y F14"
 
 msgid "This cell is going to be merged and aligned desde B18 a G18"
 msgstr "Esta celda va a unir y alinear el rango B18 a G18"
+
+msgid "These cells show formulas with diferent styles and number formats"
+msgstr "Estas celdas muestran fórmulas with diferentes estilos y formatos numéricos"
 
 msgid "OfficeGenerator ODT example"
 msgstr "Ejemplo de ODT con OfficeGenerator"
@@ -279,3 +282,11 @@ msgstr "Fichero ODF a convertir"
 msgid "officegenerator_odf2xml only works on Linux"
 msgstr "officegenerator_odf2xml solo funciona en Linux"
 
+msgid "Convert a XLSX file into an indented xml"
+msgstr "Convierte un fichero XLSX en un xml con sangría"
+
+msgid "XLSX file to convert"
+msgstr "Fichero XLSX a convertir"
+
+msgid "officegenerator_xlsx2xml only works on Linux"
+msgstr "officegenerator_xlsx2xml sólo funciona en Linux"

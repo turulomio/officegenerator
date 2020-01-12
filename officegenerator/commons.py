@@ -2,7 +2,6 @@
 ## @brief Common code to odfpy and openpyxl wrappers
 import datetime
 import gettext
-
 import os
 import pkg_resources
 import sys
@@ -10,8 +9,8 @@ from decimal import Decimal
 from logging import info, error, warning, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.11.9999'
-__versiondate__=datetime.date(2019, 5, 2)
+__version__ = '1.12.0'
+__versiondate__=datetime.date(2020, 1, 12)
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))

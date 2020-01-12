@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-02 08:02+0200\n"
+"POT-Creation-Date: 2020-01-12 07:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,6 +93,9 @@ msgid "This cell is going to be merged with B13 a F14"
 msgstr ""
 
 msgid "This cell is going to be merged and aligned desde B18 a G18"
+msgstr ""
+
+msgid "These cells show formulas with diferent styles and number formats"
 msgstr ""
 
 msgid "OfficeGenerator ODT example"
@@ -276,4 +279,13 @@ msgid "Odf file to convert"
 msgstr ""
 
 msgid "officegenerator_odf2xml only works on Linux"
+msgstr ""
+
+msgid "Convert a XLSX file into an indented xml"
+msgstr ""
+
+msgid "XLSX file to convert"
+msgstr ""
+
+msgid "officegenerator_xlsx2xml only works on Linux"
 msgstr ""
