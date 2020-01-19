@@ -9,8 +9,8 @@ from decimal import Decimal
 from logging import info, error, warning, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.13.0'
-__versiondate__=datetime.date(2020, 1, 12)
+__version__ = '1.14.0'
+__versiondate__=datetime.date(2020, 1, 19)
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))

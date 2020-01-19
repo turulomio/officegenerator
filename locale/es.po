@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-12 07:45+0100\n"
+"POT-Creation-Date: 2020-01-19 17:09+0100\n"
 "PO-Revision-Date: 2015-03-22 18:51+0100\n"
 "Last-Translator: root <turulomio@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -261,9 +261,6 @@ msgstr "Blanco"
 msgid "You can't overwrite a readed ods"
 msgstr "No puedes sobreescribir un ods leído"
 
-msgid "Tag {} hasn't been found"
-msgstr "La etiqueta {} no ha sido encontrada"
-
 msgid "You can't overwrite a readed odt"
 msgstr "No puedes sobreescribir un odt leído"
 
@@ -290,3 +287,6 @@ msgstr "Fichero XLSX a convertir"
 
 msgid "officegenerator_xlsx2xml only works on Linux"
 msgstr "officegenerator_xlsx2xml sólo funciona en Linux"
+
+#~ msgid "Tag {} hasn't been found"
+#~ msgstr "La etiqueta {} no ha sido encontrada"
