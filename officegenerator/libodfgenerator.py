@@ -22,7 +22,7 @@ import odf.element
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
 from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency, topLeftCellNone
-from os import system, path
+from os import system, path, remove
 from pkg_resources import resource_filename
 
 try:
@@ -227,8 +227,27 @@ class ODT(ODF):
             self.doc=OpenDocumentText()
         else:
             self.doc= load(self.template)
+            self.save()#After loading a template it's needed to save file to work with search functions
+            remove(self.filename)#Delete temporal save
         self.cursor=None
         self.cursorParent=self.doc.text
+
+    ## Creates a text header
+    ## @param text String with the header string
+    ## @Level Integer Level of the header
+    def header(self, text, level, after=True):
+        h=H(outlinelevel=level, stylename="Heading_20_{}".format(level), text=text)
+        return self.insertInCursor(h, after)
+
+    def pageBreak(self,  horizontal=False, after=True):    
+        p=P(stylename="PageBreak")#Is an automatic style
+        self.doc.text.addElement(p)
+        if horizontal==True:
+            p=P(stylename="PH")
+        else:
+            p=P(stylename="PV")
+        return self.insertInCursor(p, after)
+
 
     ## @param href must bu added before with addImage
     ## @param width Int or float value
@@ -323,17 +342,16 @@ class ODT(ODF):
         self.__setCursor(o)
         return o
 
-    ## Search for a tag type elementes  an returns element and its index. With it, inserts new with replaced text and removes old
+    ## Search for a tag type_ elementes  an returns element and its index. With it, inserts new with replaced text and removes old
     ##
     ## Cursor doesn't change because we replace Text objects in Element Text
     ## @param tag String to search
     ## @param replace String to replace. Can't be None
-    def search_and_replace(self, tag, replace, type=P):
-        e,  textindex=self.search(tag, type) #Places cursor to element
+    ## @param Search in elements with tag P or H. To encapsulate type_ will be a string "P" or "H"
+    def search_and_replace(self, tag, replace, type_="P"):
+        e,  textindex=self.search(tag, type_) #Places cursor to element
         if e==None:
-            print(_("Tag {} hasn't been found"))
             return
-
 
         if replace==None:#Remove paragraph
             print("Replace parameter can't be None. Use '' instead or use search_and_replace_element")
@@ -353,12 +371,10 @@ class ODT(ODF):
     ##
     ## @param tag String to search
     ## @param replace ELement. OdfPy element
-    def search_and_replace_element(self, tag, newelement, type=P):
-        e,  textindex=self.search(tag, type) #Places cursor to element
+    def search_and_replace_element(self, tag, newelement, type_="P"):
+        e,  textindex=self.search(tag, type_) #Places cursor to element
         if e==None:
-            print(_("Tag {} hasn't been found"))
             return
-
 
         if newelement==None:#Remove paragraph
             print("New element can't be None")
@@ -371,16 +387,24 @@ class ODT(ODF):
 
     ## Searchs for the item with a tag. Perhaps is its paren where I'll have to append. Only finds the first one
     ## Returns the element p and the position in its text children
-    def search(self, tag, type=P):
-        for e in self.doc.getElementsByType(type):
+    ## Using templates sometimes you cant search a tag. It's due to sometimes has <span> in the tag. Use odf2xml to detect them
+    ## 20200119 Search_and_replace has problem with tables, we must try to not abuse of them
+    def search(self, tag, type_="P"):
+        if type_=="P":
+             ty=P
+        elif type_=="H":
+             ty=H
+        for e in self.doc.getElementsByType(ty):
+            #print("Searching", tag, "found", str(e))
             if str(e).find(tag)!=-1:
                 self.__setCursor(e)
                 for index, child in enumerate(e.childNodes):
                     #print(index, child)
+                    #print("Searching in for", tag,"-", child , "found", str(e))
                     if str(child).find(tag)!=-1:
                         #print("SEARCH RETURN",  e, index)
                         return e, index
-        print ("tag {} not found".format(tag))
+        print ("Tag {} not found with type {}".format(tag,type_))
         return None, None
 
 
@@ -549,13 +573,6 @@ class ODT_Standard(ODT):
     def __init__(self, filename, language="es", country="es"):
         template=resource_filename("officegenerator","templates/odt/standard.odt")
         ODT.__init__(self, filename, template, language, country)
-
-    ## Creates a text header
-    ## @param text String with the header string
-    ## @Level Integer Level of the header
-    def header(self, text, level, after=True):
-        h=H(outlinelevel=level, stylename="Heading_20_{}".format(level), text=text)
-        return self.insertInCursor(h, after)
 
     ## PH and PV styles are deffined in standard.odtg
     def pageBreak(self,  horizontal=False, after=True):    
