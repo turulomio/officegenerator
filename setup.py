@@ -4,6 +4,27 @@ import os
 import platform
 
 
+
+class Reusing(Command):
+    description = "Download modules from https://github.com/turulomio/reusingcode/"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        from sys import path
+        path.append("officegenerator")
+        from github import download_from_github
+        download_from_github('turulomio','reusingcode','python/libmanagers.py', 'officegenerator')
+        download_from_github('turulomio','reusingcode','python/github.py', 'officegenerator')
+        download_from_github('turulomio','reusingcode','python/casts.py', 'officegenerator')
+        download_from_github('turulomio','reusingcode','python/objects/percentage.py', 'officegenerator/objects/')
+        download_from_github('turulomio','reusingcode','python/objects/currency.py', 'officegenerator/objects/')
+
 ## Class to define doc command
 class Doc(Command):
     description = "Update translations"
@@ -125,6 +146,7 @@ setup(name='officegenerator',
                'uninstall':Uninstall, 
                'doc': Doc,
                'procedure': Procedure,
+               'reusing': Reusing,
               },
      zip_safe=False,
      test_suite = 'officegenerator.tests',

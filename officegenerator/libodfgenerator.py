@@ -21,7 +21,9 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range,  Percentage, Currency, topLeftCellNone
+from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range, topLeftCellNone
+from officegenerator.objects.currency import Currency
+from officegenerator.objects.percentage import Percentage
 from os import system, path, remove
 from pkg_resources import resource_filename
 
@@ -510,14 +512,14 @@ class ODT(ODF):
             #Parses orientation
             p = P(stylename="Table.ContentsRight.Font{}".format(fontsize))
             s=Span(text=o)
-            if o.__class__ in (str, datetime.datetime, datetime.date ):
+            if o.__class__.__name__ in ("str", "datetime", "date" ):
                 p = P(stylename="Table.Contents.Font{}".format(fontsize))
                 s=Span(text=str(o))
-            elif o.__class__ in (Currency,  Percentage):
+            elif o.__class__.__name__ in ("Currency", "Percentage"):
                 if o.isLTZero():
                     p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
                 s=Span(text=o.string())
-            elif o.__class__ in (int, Decimal,  float):
+            elif o.__class__ in ("int", "Decimal",  "float"):
                 if o<0:
                     p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
             p.addElement(s)
@@ -780,15 +782,15 @@ class OdfCell:
     def generate(self):
         if self.object==None:
             self.object=" - "
-        if self.object.__class__==Currency:
+        if self.object.__class__.__name__=="Currency":
             odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
-        elif self.object.__class__==Percentage:
+        elif self.object.__class__.__name__=="Percentage":
             odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
-        elif self.object.__class__==datetime.datetime:
+        elif self.object.__class__.__name__=="datetime":
             odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
-        elif self.object.__class__==datetime.date:
+        elif self.object.__class__.__name__=="date":
             odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
-        elif self.object.__class__ in (Decimal, float,  int):
+        elif self.object.__class__.__name__ in ("Decimal", "float", "int"):
             odfcell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
         else:#strings
             if len(self.object)>0:
@@ -1320,19 +1322,19 @@ class ODS_Write(ODS):
 ## @return String with the style 
 def guess_ods_style(color_or_style, object):
     if color_or_style in ["Green", "GrayDark", "GrayLight", "Orange", "Yellow", "White", "Blue", "Red", "Normal"]:
-        if object.__class__==str:
+        if object.__class__.__name__=="str":
             return color_or_style + "Left"
-        elif object.__class__==int:
+        elif object.__class__.__name__=="int":
             return color_or_style + "Integer"
-        elif object.__class__==Currency:
+        elif object.__class__.__name__=="Currency":
             return color_or_style + object.currency
-        elif object.__class__==Percentage:
+        elif object.__class__.__name__=="Percentage":
             return color_or_style + "Percentage"
-        elif object.__class__ in (Decimal, float):
+        elif object.__class__.__name__ in ("Decimal", "float"):
             return color_or_style +  "Decimal2"
-        elif object.__class__==datetime.datetime:
+        elif object.__class__.__name__=="datetime":
             return color_or_style + "Datetime"
-        elif object.__class__==datetime.date:
+        elif object.__class__.__name__=="date":
             return color_or_style + "Date"
         else:
             info("guess_ods_style not guessed",  object.__class__)

@@ -10,7 +10,9 @@ from decimal import Decimal
 from officegenerator.commons import __version__, addDebugSystem
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS
 from officegenerator.libxlsxgenerator import OpenPyXL
-from officegenerator.commons import argparse_epilog, Coord, Percentage,  Currency
+from officegenerator.commons import argparse_epilog, Coord
+from officegenerator.objects.currency import Currency
+from officegenerator.objects.percentage import Percentage
 from odf.text import P
 import openpyxl.styles
 

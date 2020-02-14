@@ -14,7 +14,9 @@ import openpyxl.formatting.rule
 import os
 import pkg_resources
 
-from officegenerator.commons import columnAdd, makedirs,  Currency,  Percentage,  Coord, Range, topLeftCellNone
+from officegenerator.commons import columnAdd, makedirs, Coord, Range, topLeftCellNone
+from officegenerator.objects.currency import Currency
+from officegenerator.objects.percentage import Percentage
 from decimal import Decimal
 
 try:
