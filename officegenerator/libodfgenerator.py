@@ -21,10 +21,10 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import makedirs,  number2column,  number2row,  Coord, Range, topLeftCellNone
+from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone
 from officegenerator.objects.currency import Currency
 from officegenerator.objects.percentage import Percentage
-from os import system, path, remove
+from os import system, path, remove, makedirs
 from pkg_resources import resource_filename
 
 try:
@@ -425,7 +425,7 @@ class ODT(ODF):
         if  self.filename==self.template:
             print(_("You can't overwrite a readed odt"))
             return
-        makedirs(path.dirname(self.filename))
+        makedirs(path.dirname(self.filename), exist_ok=True)
         self.doc.save( self.filename)
 
     ## Adds an empty paragraph
@@ -1104,7 +1104,7 @@ class ODS(ODF):
         if  filename==None:
             filename=self.filename
 
-        makedirs(path.dirname(filename))
+        makedirs(path.dirname(filename), exist_ok=True)
         self.doc.save(filename)
 
     def setActiveSheet(self, value):

@@ -11,10 +11,10 @@ import openpyxl.styles
 import openpyxl.worksheet
 import openpyxl.worksheet.worksheet
 import openpyxl.formatting.rule
-import os
+from os import path, makedirs
 import pkg_resources
 
-from officegenerator.commons import columnAdd, makedirs, Coord, Range, topLeftCellNone
+from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone
 from officegenerator.objects.currency import Currency
 from officegenerator.objects.percentage import Percentage
 from decimal import Decimal
@@ -183,10 +183,10 @@ class OpenPyXL:
     def save(self, filename=None):
         if filename==None:
             filename=self.filename
-        makedirs(os.path.dirname(filename))
+        makedirs(path.dirname(filename), exist_ok=True)
         self.wb.save(filename)
 
-        if os.path.exists(filename)==False:
+        if path.exists(filename)==False:
             print(_("*** ERROR: File wasn't generated ***"))
 
     ## Returns a cell object in the current sheet

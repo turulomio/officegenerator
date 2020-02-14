@@ -1,17 +1,16 @@
 ## @namespace officegenerator.commons
 ## @brief Common code to odfpy and openpyxl wrappers
-import datetime
-import gettext
-import os
-import pkg_resources
+from datetime import date
+from gettext import translation
+from pkg_resources import resource_filename
 from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
 __version__ = '1.14.9999'
-__versiondate__=datetime.date(2020, 2, 14)
+__versiondate__=date(2020, 2, 14)
 
 try:
-    t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
+    t=translation('officegenerator',resource_filename("officegenerator","locale"))
     _=t.gettext
 except:
     _=str
@@ -76,15 +75,6 @@ def index2row(index):
 ## Convierte el indice de la columna a la cadena de letras de la columna de la hoja de datos
 def index2column(index):
     return number2column(index+1)
-    
-## Crea un directorio con todos sus subdirectorios
-##
-## No produce error si ya está creado.
-def makedirs(dir):
-    try:
-        os.makedirs(dir)
-    except:
-        pass
 
 def ODFPYversion():
     return __odfpy_version__.split("/")[1]
