@@ -425,7 +425,8 @@ class ODT(ODF):
         if  self.filename==self.template:
             print(_("You can't overwrite a readed odt"))
             return
-        makedirs(path.dirname(self.filename), exist_ok=True)
+        if path.dirname(self.filename)!="":
+            makedirs(path.dirname(self.filename), exist_ok=True)
         self.doc.save( self.filename)
 
     ## Adds an empty paragraph
@@ -454,13 +455,13 @@ class ODT(ODF):
 
 
     ## Creates a table adding it to self.doc
-    ## @param header List with all header strings
+    ## @param hh List with all header strings
     ## @param data Multidimension List with all data objects. Can be str, Decimal, int, datetime, date, Currency, Percentage
     ## @param sizes Integer list with sizes in cm
     ## @param fontsize Integer in pt
     ## @param name str or None. Sets the object name. Appears in LibreOffice navigator. If none table will be named to "Table.Sequence"
     ## @param after True: insert after self.cursor element. False: insert before self.cursor element. None: Just return element
-    def table(self, header, data, sizes, fontsize, name=None, after=True):
+    def table(self, hh, data, sizes, fontsize, name=None, after=True):
         def generate_table_styles():
             s=Style(name="Table.Size{}".format(sum(sizes)), family='table')
             s.addElement(TableProperties(width="{}cm".format(sum(sizes)), align="center", margintop="0.6cm", marginbottom="0.6cm"))
@@ -538,7 +539,7 @@ class ODT(ODF):
         headerrow=TableHeaderRows()
         tablerow=TableRow()
         headerrow.addElement(tablerow)
-        for i, head in enumerate(header):
+        for i, head in enumerate(hh):
             p=P(stylename="Table.Heading.Font{}".format(fontsize), text=head)
             tablecell=TableCell(stylename="Table.HeaderCell")
             tablecell.addElement(p)

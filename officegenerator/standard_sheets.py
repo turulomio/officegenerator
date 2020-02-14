@@ -1,6 +1,4 @@
-## DEBE INCLUIRSE IN OFFICEGENERATOR
 from officegenerator.commons import Coord
-from officegenerator.libxlsxgenerator import OpenPyXL
 
 class Model:
     def __init__(self):
@@ -79,6 +77,9 @@ class Model:
             for letter,  field in enumerate(row):
                 s.add(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
         s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(number).addColumn(letter))
+
+    def odt_table(self, doc, sizes, fontsize, after=True):
+        return doc.table(self.hh, self.data, sizes, fontsize, self.title, after)        
         
     def __getFirstContentCoord(self):
         #firstcontentletter and firstcontentnumber
@@ -90,12 +91,14 @@ class Model:
             return Coord("B2")
         elif self.hh is None and self.vh is None:
             return Coord("A1")
-            
 
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write
+    from officegenerator.libodfgenerator import ODT_Standard
+    from officegenerator.libxlsxgenerator import OpenPyXL
     filename="standard_sheets.ods"
     ods=ODS_Write("standard_sheets.ods")
+    odt=ODT_Standard("standard_sheets.odt")
     xlsx=OpenPyXL("standard_sheets.xlsx")
     
     m=Model()
@@ -117,6 +120,9 @@ if __name__ == "__main__":
     m2.ods_sheet(ods)
     m2.xlsx_sheet(xlsx)
     
+    m.odt_table(odt, [3]*3, 8)
+    
     xlsx.remove_sheet_by_id(0)
     ods.save()
     xlsx.save()
+    odt.save()
