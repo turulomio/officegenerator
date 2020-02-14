@@ -1104,7 +1104,8 @@ class ODS(ODF):
         if  filename==None:
             filename=self.filename
 
-        makedirs(path.dirname(filename), exist_ok=True)
+        if path.dirname(filename)!="":
+            makedirs(path.dirname(filename), exist_ok=True)
         self.doc.save(filename)
 
     def setActiveSheet(self, value):

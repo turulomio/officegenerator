@@ -1,49 +1,49 @@
 ## DEBE INCLUIRSE IN OFFICEGENERATOR
-from officegenerator.commons import Coord, rowAdd
+from officegenerator.commons import Coord
 from officegenerator.libxlsxgenerator import OpenPyXL
 
 class Model:
     def __init__(self):
-        self.columns_sizes=None
-        self.title_style=None
+        self.hh_ods_style="OrangeCenter"
+        self.vh_ods_style="GreenLeft"
+        self.hh=None
+        self.vh=None
 
     def setTitle(self, title):
         self.title=title
         
-    def setColumns(self, columns_title):
-        self.columns=columns_title
-        
-    ## Number as cm
-    ## 
-    def setColumnSizes(self, *args):
-        self.columns_sizes=args
+    ## If you want only vertical headers you must add self.setHorizontalHeaders(None, sizes=10)
+    ## @param hh List or NOne
+    ## @param sizes int or List in cm, to generate document use, ods_columnSizes
+    def setHorizontalHeaders(self, hh, sizes=10):
+        self.hh=hh
+        if hh==None:#Only vertical headers
+            columns=100
+        else:
+            columns=len(self.hh)
+        if sizes.__class__.__name__=="int":
+            self.hh_sizes=[sizes]*columns
+        else:
+            self.hh_sizes=sizes
+    
+    def setVerticalHeaders(self, vh):
+        self.vh=vh
         
     def ods_columnSizes(self):
         r=[]
-        for arg in self.columns_sizes:
+        for arg in self.hh_sizes:
                 r.append(arg*30)
         return r
         
     def xlsx_columnSizes(self):
         r=[]
-        for arg in self.columns_sizes:
+        for arg in self.hh_sizes:
                 r.append(arg*6)
         return r
 
     def setData(self, data):
         self.data=data
-        
-    def setTitleStyle(self, s):
-        self.title_style=s
-
-    def odsTitleStyle(self):
-            if self.title_style==None:
-                return "OrangeCenter"
-
-    def xlsxTitleStyle(self, doc):
-            if self.title_style==None:
-                return doc.stOrange
-            
+           
             
     ## @param title String with the title of the sheet
     ## @param columns_title List of Strings
@@ -52,11 +52,15 @@ class Model:
     def xlsx_sheet(self, doc):
         doc.createSheet(self.title)
         doc.setColumnsWidth(self.xlsx_columnSizes())
-        doc.overwrite("A1", [self.columns], self.xlsxTitleStyle(doc))
+        if self.hh is not None:
+            doc.overwrite(self.__getFirstContentCoord().addRow(-1), [self.hh], doc.stOrange)
+        if self.vh is not None:
+            for i, header in enumerate(self.vh):
+                doc.overwrite(self.__getFirstContentCoord().addColumn(-1).addRow(i), header, doc.stGreen, alignment="left")
         for number, row in enumerate(self.data):
             for letter,  field in enumerate(row):
-                doc.overwrite(Coord("A2").addRow(number).addColumn(letter), field)
-        doc.freezeAndSelect("A2", "A{}".format(rowAdd("2", number)), "A{}".format(rowAdd("2", number-20)))
+                doc.overwrite(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
+        doc.freezeAndSelect(self.__getFirstContentCoord(), self.__getFirstContentCoord().addRow(number).addColumn(letter))
 
     ## @param title String with the title of the sheet
     ## @param columns_title List of Strings
@@ -65,27 +69,54 @@ class Model:
     def ods_sheet(self, doc):
         s=doc.createSheet(self.title)
         s.setColumnsWidth(self.ods_columnSizes())
-        s.add("A1", [self.columns], self.odsTitleStyle())
+        if self.hh is not None:
+            s.add(self.__getFirstContentCoord().addRow(-1), [self.hh], self.hh_ods_style)
+        if self.vh is not None:
+            for i, header in enumerate(self.vh):
+                s.add(self.__getFirstContentCoord().addColumn(-1).addRow(i), header, self.vh_ods_style)
+                
         for number, row in enumerate(self.data):
             for letter,  field in enumerate(row):
-                s.add(Coord("A2").addRow(number).addColumn(letter), field)
-        s.setSplitPosition("A1")
-        s.setCursorPosition(Coord("B2").addRow(len(self.data)))
+                s.add(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
+        s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(number).addColumn(letter))
+        
+    def __getFirstContentCoord(self):
+        #firstcontentletter and firstcontentnumber
+        if self.hh is None and self.vh is not None:
+            return Coord("B1")
+        elif self.hh is not None and self.vh is None:
+            return Coord("A2")
+        elif self.hh is not None and self.vh is not None:
+            return Coord("B2")
+        elif self.hh is None and self.vh is None:
+            return Coord("A1")
+            
 
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write
     filename="standard_sheets.ods"
     ods=ODS_Write("standard_sheets.ods")
     xlsx=OpenPyXL("standard_sheets.xlsx")
+    
     m=Model()
     m.setTitle("Probe")
-    m.setColumnSizes(1, 2, 3)
-    m.setColumns(["Number", "Data", "More data"])
+    m.setHorizontalHeaders(["Number", "Data", "More data"], 7)
+    m.setVerticalHeaders(["Number", "Data", "More data"]*10)
     data=[]        
     for row in range(30):
         data.append([row, "Data", "Data++"])
     m.setData(data)
     m.ods_sheet(ods)
     m.xlsx_sheet(xlsx)
+    
+    m2=Model()
+    m2.setTitle("Probe 2")
+    m2.setHorizontalHeaders(None, 7)
+    m2.setVerticalHeaders(["Number", "Data", "More data"]*10)
+    m2.setData(data)
+    m2.ods_sheet(ods)
+    m2.xlsx_sheet(xlsx)
+    
+    xlsx.remove_sheet_by_id(0)
     ods.save()
     xlsx.save()
