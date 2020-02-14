@@ -515,7 +515,7 @@ class ODT(ODF):
             if o.__class__.__name__ in ("str", "datetime", "date" ):
                 p = P(stylename="Table.Contents.Font{}".format(fontsize))
                 s=Span(text=str(o))
-            elif o.__class__.__name__ in ("Currency", "Percentage"):
+            elif o.__class__.__name__ in ("Currency", "Percentage", "Money"):
                 if o.isLTZero():
                     p = P(stylename="Table.ContentsRight.FontRed{}".format(fontsize))
                 s=Span(text=o.string())
@@ -782,7 +782,7 @@ class OdfCell:
     def generate(self):
         if self.object==None:
             self.object=" - "
-        if self.object.__class__.__name__=="Currency":
+        if self.object.__class__.__name__ in ["Currency", "Money"]:
             odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
         elif self.object.__class__.__name__=="Percentage":
             odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
@@ -1326,7 +1326,7 @@ def guess_ods_style(color_or_style, object):
             return color_or_style + "Left"
         elif object.__class__.__name__=="int":
             return color_or_style + "Integer"
-        elif object.__class__.__name__=="Currency":
+        elif object.__class__.__name__ in ["Currency", "Money"]:
             return color_or_style + object.currency
         elif object.__class__.__name__=="Percentage":
             return color_or_style + "Percentage"
