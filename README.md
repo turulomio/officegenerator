@@ -23,6 +23,10 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.15.1
+------
+  * Added forgotten object files.
+
 1.15.0
 ------
   * Percentage and Currency objects are now from reusingcode project.

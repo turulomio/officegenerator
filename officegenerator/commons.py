@@ -6,7 +6,7 @@ from pkg_resources import resource_filename
 from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.15.0'
+__version__ = '1.15.1'
 __versiondate__=date(2020, 2, 15)
 
 try:
