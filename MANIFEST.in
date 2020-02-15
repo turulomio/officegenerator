@@ -2,5 +2,6 @@ include LICENSE.txt  *.py
 recursive-include locale *.po 
 recursive-include officegenerator *.py *.mo *.odt
 recursive-include officegenerator/images *.png
+recursive-include officegenerator/objects *.py
 prune __pycache__
 global-exclude *.pyc
