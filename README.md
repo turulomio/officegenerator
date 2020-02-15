@@ -23,9 +23,15 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.15.0
+------
+  * Percentage and Currency objects are now from reusingcode project.
+  * Added Xulpymoney Money class support as a string.
+  * Model updated to work fine with basic ODS, ODT and XLSX data sheets.  
+
 1.14.0
 ------
-  * Improving search encapsulating types with Strings
+  * Improving search encapsulating types with Strings.
 
 1.13.0
 ------
