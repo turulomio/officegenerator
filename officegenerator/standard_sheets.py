@@ -2,8 +2,6 @@ from officegenerator.commons import Coord
 
 class Model:
     def __init__(self):
-        self.hh_ods_style="OrangeCenter"
-        self.vh_ods_style="GreenLeft"
         self.hh=None
         self.vh=None
 
@@ -12,7 +10,7 @@ class Model:
         
     ## If you want only vertical headers you must add self.setHorizontalHeaders(None, sizes=10)
     ## @param hh List or NOne
-    ## @param sizes int or List in cm, to generate document use, ods_columnSizes
+    ## @param sizes int or List in cm, to generate document use, columnSizes_for_ods
     def setHorizontalHeaders(self, hh, sizes=10):
         self.hh=hh
         if hh==None:#Only vertical headers
@@ -24,19 +22,40 @@ class Model:
         else:
             self.hh_sizes=sizes
     
-    def setVerticalHeaders(self, vh):
+    ## @param hh List or NOne
+    ## @param size int with the witdth in cm of the vertical header
+    def setVerticalHeaders(self, vh, size=5):
         self.vh=vh
+        self.vh_size=size
         
-    def ods_columnSizes(self):
+    ## Converts self.hh_sizes and self.hv_size in cm to ods sizes. It returns them together
+    def columnSizes_for_ods(self):
         r=[]
+        factor=30
+        if self.vh is not None:
+            r.append(self.vh_size*factor)
         for arg in self.hh_sizes:
-                r.append(arg*30)
+                r.append(arg*factor)
         return r
         
-    def xlsx_columnSizes(self):
+    ## Converts self.hh_sizes in cm to xlsx sizes
+    def columnSizes_for_xlsx(self):
         r=[]
+        factor=6
+        if self.vh is not None:
+            r.append(self.vh_size*factor)
         for arg in self.hh_sizes:
-                r.append(arg*6)
+                r.append(arg*factor)
+        return r
+        
+    ## Converts self.hh_sizes in cm to odt sizes
+    def columnSizes_for_odt(self):
+        r=[]
+        factor=30
+        if self.vh is not None:
+            r.append(self.vh_size*factor)
+        for arg in self.hh_sizes:
+                r.append(arg*factor)
         return r
 
     def setData(self, data):
@@ -49,12 +68,14 @@ class Model:
     ## @param sizes List of integers
     def xlsx_sheet(self, doc):
         doc.createSheet(self.title)
-        doc.setColumnsWidth(self.xlsx_columnSizes())
+        doc.setColumnsWidth(self.columnSizes_for_xlsx())
         if self.hh is not None:
             doc.overwrite(self.__getFirstContentCoord().addRow(-1), [self.hh], doc.stOrange)
         if self.vh is not None:
             for i, header in enumerate(self.vh):
                 doc.overwrite(self.__getFirstContentCoord().addColumn(-1).addRow(i), header, doc.stGreen, alignment="left")
+            doc.overwrite("A1", " ",  doc.stOrange)
+
         for number, row in enumerate(self.data):
             for letter,  field in enumerate(row):
                 doc.overwrite(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
@@ -66,13 +87,14 @@ class Model:
     ## @param sizes List of integers
     def ods_sheet(self, doc):
         s=doc.createSheet(self.title)
-        s.setColumnsWidth(self.ods_columnSizes())
+        s.setColumnsWidth(self.columnSizes_for_ods())
         if self.hh is not None:
-            s.add(self.__getFirstContentCoord().addRow(-1), [self.hh], self.hh_ods_style)
+            s.add(self.__getFirstContentCoord().addRow(-1), [self.hh],  "OrangeCenter")
         if self.vh is not None:
             for i, header in enumerate(self.vh):
-                s.add(self.__getFirstContentCoord().addColumn(-1).addRow(i), header, self.vh_ods_style)
-                
+                s.add(self.__getFirstContentCoord().addColumn(-1).addRow(i), header, "GreenLeft")
+            s.add("A1", "", "OrangeCenter")
+
         for number, row in enumerate(self.data):
             for letter,  field in enumerate(row):
                 s.add(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
@@ -103,8 +125,8 @@ if __name__ == "__main__":
     
     m=Model()
     m.setTitle("Probe")
-    m.setHorizontalHeaders(["Number", "Data", "More data"], 7)
-    m.setVerticalHeaders(["Number", "Data", "More data"]*10)
+    m.setHorizontalHeaders(["Number", "Data", "More data"], [1, 2, 3])
+    m.setVerticalHeaders(["Number", "Data", "More data"]*10, 4)
     data=[]        
     for row in range(30):
         data.append([row, "Data", "Data++"])
@@ -114,7 +136,7 @@ if __name__ == "__main__":
     
     m2=Model()
     m2.setTitle("Probe 2")
-    m2.setHorizontalHeaders(None, 7)
+    m2.setHorizontalHeaders(None, [1, 2, 3])
     m2.setVerticalHeaders(["Number", "Data", "More data"]*10)
     m2.setData(data)
     m2.ods_sheet(ods)
