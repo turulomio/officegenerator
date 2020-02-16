@@ -1,4 +1,6 @@
+from logging import warning
 from officegenerator.commons import Coord
+from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions
 
 class Model:
     def __init__(self):
@@ -60,8 +62,27 @@ class Model:
 
     def setData(self, data):
         self.data=data
-           
-            
+        
+    ## Used to remove Columns in the self.data
+    ## @param columnList List of integers with the column index to remove
+    def removeColumns(self, columnList):
+        if self.hh is not None:
+            self.hh=list_remove_positions(self.hh, columnList)
+        if self.data is not None:
+            self.data=lor_remove_columns(self.data, columnList)
+        else:
+            warning("I can't remove columns if self.data is None")
+
+    ## Used to remove Columns in the self.data
+    ## @param columnList List of integers with the column index to remove
+    def removeRows(self, rowList):
+        if self.vh is not None:
+            self.vh=list_remove_positions(self.vh, rowList)
+        if self.data is not None:
+            self.data=lor_remove_rows(self.data, rowList)
+        else:
+            warning("I can't remove rows if self.data is None")
+
     ## @param title String with the title of the sheet
     ## @param columns_title List of Strings
     ## @param data list of list
@@ -74,6 +95,7 @@ class Model:
         if self.vh is not None:
             for i, header in enumerate(self.vh):
                 doc.overwrite(self.__getFirstContentCoord().addColumn(-1).addRow(i), header, doc.stGreen, alignment="left")
+        if self.__mustFillA1()==True:
             doc.overwrite("A1", " ",  doc.stOrange)
 
         for number, row in enumerate(self.data):
@@ -90,9 +112,10 @@ class Model:
         s.setColumnsWidth(self.columnSizes_for_ods())
         if self.hh is not None:
             s.add(self.__getFirstContentCoord().addRow(-1), [self.hh],  "OrangeCenter")
-        if self.vh is not None:
+        if self.vh is not None :
             for i, header in enumerate(self.vh):
                 s.add(self.__getFirstContentCoord().addColumn(-1).addRow(i), header, "GreenLeft")
+        if self.__mustFillA1()==True:
             s.add("A1", "", "OrangeCenter")
 
         for number, row in enumerate(self.data):
@@ -113,6 +136,13 @@ class Model:
             return Coord("B2")
         elif self.hh is None and self.vh is None:
             return Coord("A1")
+        
+    ## Return if A1 must be filled for a better view
+    ## @param bool
+    def __mustFillA1(self):
+        if self.hh is not None and self.vh is not None:
+            return True
+        return False
 
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write
@@ -139,6 +169,8 @@ if __name__ == "__main__":
     m2.setHorizontalHeaders(None, [1, 2, 3])
     m2.setVerticalHeaders(["Number", "Data", "More data"]*10)
     m2.setData(data)
+    m2.removeColumns([1, 2, ])
+    m2.removeRows([1, 2, ])
     m2.ods_sheet(ods)
     m2.xlsx_sheet(xlsx)
     
