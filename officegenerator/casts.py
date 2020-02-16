@@ -144,6 +144,17 @@ def lor_remove_columns(rows, listindex):
 def lor_remove_rows(rows, listindex):
     return list_remove_positions(rows, listindex) #It's a list but of row
 
+## Return a lor transposed. Changed rows by columns
+def lor_transposed(lor):
+    r=[]
+    columns=len(lor[0])
+    for column in range(columns):
+        tran_row=[]
+        for row in lor:
+            tran_row.append(row[column])
+        r.append(tran_row)
+    return r
+
 ## String to linux shell
 #def string2shell(cadena):
 #    cadena=str(cadena)
@@ -210,4 +221,5 @@ if __name__ == "__main__":
     b=lor_remove_rows(a,[8,9])
     print_lor(b)
 
-    
+    c=lor_transposed(b)
+    print_lor(c)

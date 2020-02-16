@@ -1,3 +1,4 @@
+from datetime import datetime,  timedelta
 from logging import warning
 from officegenerator.commons import Coord
 from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column
@@ -50,14 +51,19 @@ class Model:
                 r.append(arg*factor)
         return r
         
-    ## Converts self.hh_sizes in cm to odt sizes
-    def columnSizes_for_odt(self):
-        r=[]
+    ## Converts self.hh_sizes in cm to odt sizes,proporcional to the parameter
+    def columnSizes_for_odt(self, tablesize):
+        cm=[]
         factor=1
         if self.vh is not None:
-            r.append(self.vh_size*factor)
+            cm.append(self.vh_size*factor)
         for arg in self.hh_sizes:
-                r.append(arg*factor)
+                cm.append(arg*factor)
+        #Until here are cm but can oversize the maximum
+        r=[]
+        sum_=sum(cm)
+        for size in cm:
+            r.append(tablesize*size/sum_)
         return r
 
     def setData(self, data):
@@ -68,6 +74,7 @@ class Model:
     def removeColumns(self, columnList):
         if self.hh is not None:
             self.hh=list_remove_positions(self.hh, columnList)
+        self.hh_sizes=list_remove_positions(self.hh_sizes, columnList)
         if self.data is not None:
             self.data=lor_remove_columns(self.data, columnList)
         else:
@@ -125,16 +132,19 @@ class Model:
 
     ## Generates a odt table object from model
     ## @param doc odt document
+    ## @param tablesize float in cm where the table is going to be placed in the paper(document)
     ## @param fontsize int withe the size of the font in the document
     ## @param after officegenerator after parameter
-    def odt_table(self, doc, fontsize, after=True):
+    def odt_table(self, doc, tablesize, fontsize, after=True):
         if self.vh is not None:
             data=lor_add_column(self.data, 0, self.vh)
+        else:
+            data=self.data
         if self.__mustFillA1()==True:
             hh=[" ", ] + self.hh
         else:
             hh=self.hh
-        return doc.table(hh, data, self.columnSizes_for_odt(), fontsize, self.title, after)
+        return doc.table(hh, data, self.columnSizes_for_odt(tablesize), fontsize, self.title, after)
 
     def __getFirstContentCoord(self):
         #firstcontentletter and firstcontentnumber
@@ -165,15 +175,15 @@ if __name__ == "__main__":
     
     m=Model()
     m.setTitle("Probe")
-    m.setHorizontalHeaders(["Number", "Data", "More data"], [1, 2, 3])
-    m.setVerticalHeaders(["Number", "Data", "More data"]*10, 4)
+    m.setHorizontalHeaders(["Number", "Data", "More data", "Dt"], [1, 2, 3, 4])
+    m.setVerticalHeaders(["V1", "V2", "V3"]*10, 4)
     data=[]        
     for row in range(30):
-        data.append([row, "Data", "Data++"])
+        data.append([row, "Data", "Data++", datetime.now()+timedelta(days=row)])
     m.setData(data)
     m.ods_sheet(ods)
     m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 8)
+    m.odt_table(odt, 15, 8)
     
     m2=Model()
     m2.setTitle("Probe 2")
@@ -184,6 +194,7 @@ if __name__ == "__main__":
     m2.removeRows([1, 2, ])
     m2.ods_sheet(ods)
     m2.xlsx_sheet(xlsx)
+    m2.odt_table(odt, 15, 10)
     
     
     xlsx.remove_sheet_by_id(0)

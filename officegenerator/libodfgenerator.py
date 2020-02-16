@@ -23,6 +23,7 @@ from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, Con
 from odf.office import Annotation
 from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone
 from officegenerator.objects.currency import Currency
+from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
 from os import system, path, remove, makedirs
 from pkg_resources import resource_filename
@@ -517,8 +518,11 @@ class ODT(ODF):
             tc = TableCell(stylename="Table.Cell")
             #Parses orientation
             p = P(stylename="Table.ContentsRight.Font{}".format(fontsize))
-            s=Span(text=o)
-            if o.__class__.__name__ in ("str", "datetime", "date" ):
+            s=Span(text=str(o))
+            if o.__class__.__name__  == "datetime":
+                p = P(stylename="Table.Contents.Font{}".format(fontsize))
+                s=Span(text=dtnaive2string(o, "%Y-%m-%d %H:%M:%S"))
+            if o.__class__.__name__ in ("str", "date" ):
                 p = P(stylename="Table.Contents.Font{}".format(fontsize))
                 s=Span(text=str(o))
             elif o.__class__.__name__ in ("Currency", "Percentage", "Money"):
@@ -544,11 +548,12 @@ class ODT(ODF):
         headerrow=TableHeaderRows()
         tablerow=TableRow()
         headerrow.addElement(tablerow)
-        for i, head in enumerate(hh):
-            p=P(stylename="Table.Heading.Font{}".format(fontsize), text=head)
-            tablecell=TableCell(stylename="Table.HeaderCell")
-            tablecell.addElement(p)
-            tablerow.addElement(tablecell)
+        if hh is not None:
+            for i, head in enumerate(hh):
+                p=P(stylename="Table.Heading.Font{}".format(fontsize), text=head)
+                tablecell=TableCell(stylename="Table.HeaderCell")
+                tablecell.addElement(p)
+                tablerow.addElement(tablecell)
         table.addElement(headerrow)
 
         #Data rows
