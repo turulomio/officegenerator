@@ -23,6 +23,12 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.16.0
+------
+  * Added boolean number and styles.
+  * Added output dir parameter to 'convert_to_pdf' method.
+  * Added vertical header width feature
+
 1.15.1
 ------
   * Added forgotten object files.
