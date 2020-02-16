@@ -1357,7 +1357,6 @@ def guess_ods_style(color_or_style, object):
         elif object.__class__.__name__=="date":
             return color_or_style + "Date"
         elif object.__class__.__name__=="bool":
-            print("BOOLEAN")
             return color_or_style + "Boolean"
         else:
             info("guess_ods_style not guessed",  object.__class__)
