@@ -118,6 +118,19 @@ def list_remove_positions(l, listindex):
             r.append(o)
     return r
 
+## LOR is a list of list. Naned List Of Rows, used in myqtablewidget for example
+## @param rows LOR
+## @param index int with the index of the position where we are going to insert row
+## @param column List with the values to add. Must be of the same size of rows
+def lor_add_column(rows, index, column):
+    if len(rows)!=len(column):
+        warning("I can't add a column with different size of LOR")
+        return
+    r_rows=[]
+    for i, row in enumerate(rows):
+        r_rows.append(row[0:index] + [column[i],] + row[index:len(row)])
+    return r_rows
+
 ## LOR is a list of list. Naned List Of Rows, used in myqtablewidget
 ## @param listindex is a list of column indexes to remove
 def lor_remove_columns(rows, listindex):
@@ -176,12 +189,20 @@ def object2value(o):
 
 if __name__ == "__main__":
     def print_lor(lor):
+        print("")
         for row in lor:
             print(row)
 
     lor=[]
+    column_to_add=[]
     for i in range(10):
-        lor.append([1*i,2*i,3*i,4*i])
+        lor.append([1*i,2*i,3*i])
+        column_to_add.append(-i)
+    print_lor(lor)
+
+    lor=lor_add_column(lor, 0, column_to_add)
+    lor=lor_add_column(lor, 2, column_to_add)
+    lor=lor_add_column(lor, 5, column_to_add)
     print_lor(lor)
 
     a=lor_remove_columns(lor,[2,3])

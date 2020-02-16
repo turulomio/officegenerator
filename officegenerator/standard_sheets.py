@@ -1,6 +1,6 @@
 from logging import warning
 from officegenerator.commons import Coord
-from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions
+from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column
 
 class Model:
     def __init__(self):
@@ -53,7 +53,7 @@ class Model:
     ## Converts self.hh_sizes in cm to odt sizes
     def columnSizes_for_odt(self):
         r=[]
-        factor=30
+        factor=1
         if self.vh is not None:
             r.append(self.vh_size*factor)
         for arg in self.hh_sizes:
@@ -123,9 +123,19 @@ class Model:
                 s.add(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
         s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(number).addColumn(letter))
 
-    def odt_table(self, doc, sizes, fontsize, after=True):
-        return doc.table(self.hh, self.data, sizes, fontsize, self.title, after)        
-        
+    ## Generates a odt table object from model
+    ## @param doc odt document
+    ## @param fontsize int withe the size of the font in the document
+    ## @param after officegenerator after parameter
+    def odt_table(self, doc, fontsize, after=True):
+        if self.vh is not None:
+            data=lor_add_column(self.data, 0, self.vh)
+        if self.__mustFillA1()==True:
+            hh=[" ", ] + self.hh
+        else:
+            hh=self.hh
+        return doc.table(hh, data, self.columnSizes_for_odt(), fontsize, self.title, after)
+
     def __getFirstContentCoord(self):
         #firstcontentletter and firstcontentnumber
         if self.hh is None and self.vh is not None:
@@ -163,6 +173,7 @@ if __name__ == "__main__":
     m.setData(data)
     m.ods_sheet(ods)
     m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 8)
     
     m2=Model()
     m2.setTitle("Probe 2")
@@ -174,7 +185,6 @@ if __name__ == "__main__":
     m2.ods_sheet(ods)
     m2.xlsx_sheet(xlsx)
     
-    m.odt_table(odt, [3]*3, 8)
     
     xlsx.remove_sheet_by_id(0)
     ods.save()
