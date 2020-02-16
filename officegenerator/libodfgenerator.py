@@ -1349,10 +1349,8 @@ def guess_ods_style(color_or_style, object):
             return color_or_style + "Left"
         elif object.__class__.__name__=="int":
             return color_or_style + "Integer"
-        elif object.__class__.__name__ in ["Currency", ]:
+        elif object.__class__.__name__ in ["Currency", "Money" ]:
             return color_or_style + object.currency
-        elif object.__class__.__name__ in ["Money", ]:
-            return color_or_style + object.currency.id
         elif object.__class__.__name__=="Percentage":
             return color_or_style + "Percentage"
         elif object.__class__.__name__ in ("Decimal", "float"):
