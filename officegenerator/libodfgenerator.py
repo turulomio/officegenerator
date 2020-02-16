@@ -11,7 +11,7 @@ from decimal import Decimal
 from logging import info
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
-from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds
+from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds, Boolean, BooleanStyle
 from odf.text import P,  H,  Span, ListStyle,  ListLevelStyleBullet,  List,  ListItem, ListLevelStyleNumber,  OutlineLevelStyle,  OutlineStyle,  PageNumber,  PageCount
 from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
 from odf.draw import Frame, Image
@@ -793,6 +793,8 @@ class OdfCell:
             odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
         elif self.object.__class__.__name__ in ("Decimal", "float", "int"):
             odfcell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
+        elif self.object.__class__.__name__ =="bool":
+            odfcell= TableCell(valuetype="boolean", booleanvalue=self.object, stylename=self.style)
         else:#strings
             if len(self.object)>0:
                 if self.object[:1]=="=":#Formula
@@ -956,10 +958,10 @@ class OdfSheet:
                     for j, column in enumerate(row):
                         style=guess_ods_style(color_or_style, result[i][j])
                         self.addCell(OdfCell(Coord(coord.string()).addColumn(j).addRow(i), result[i][j], style))
-                else: #Any value not list if row.__class__ in (int, str, float, datetime.datetime,  datetime.date, Currency, Percentage,  Decimal):#Una lista de una columna
+                else: #Any value not list if row.__class__ in (int, str, float, datetime.datetime,  datetime.date, Currency, Percentage,  Decimal, bool):#Una lista de una columna
                     style=guess_ods_style(color_or_style, result[i])
                     self.addCell(OdfCell(Coord(coord.string()).addRow(i), result[i], style))
-        else: #Any value not list#result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal):#Un solo valor
+        else: #Any value not list#result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal,bool):#Un solo valor
             style=guess_ods_style(color_or_style, result)  
             self.addCell(OdfCell(coord, result, style))
 
@@ -1180,6 +1182,9 @@ class ODSStyleColor:
 
         integer = Style(name=self.name+"Integer", family="table-cell",  datastylename="Integer",parentstylename=self.name+"Right")
         doc.styles.addElement(integer)
+        
+        boolean = Style(name=self.name+"Boolean", family="table-cell",  datastylename="Boolean",parentstylename=self.name+"Right")
+        doc.styles.addElement(boolean)
 
         decimal2= Style(name=self.name+"Decimal2", family="table-cell",  datastylename="Decimal2",parentstylename=self.name+"Right")
         doc.styles.addElement(decimal2)
@@ -1284,6 +1289,17 @@ class ODSStyleColorManager:
         ns2.addElement(Number(decimalplaces="6", minintegerdigits="1", grouping="true"))
         ns2.addElement(Map(condition="value()>=0", applystylename="Decimal6Black"))
         doc.styles.addElement(ns2)
+        
+        #Boolean
+        ns1 = BooleanStyle(name="BooleanBlack", volatile="true")
+        ns1.addElement(Boolean())
+        doc.styles.addElement(ns1)
+
+        ns2 = BooleanStyle(name="Boolean")
+        ns2.addElement(TextProperties(color="#ff0000"))
+        ns2.addElement(Boolean())
+        ns2.addElement(Map(condition="value()==1", applystylename="BooleanBlack"))
+        doc.styles.addElement(ns2)
             
 
     def generate_ods_styles(self, doc, currencymanager):
@@ -1340,6 +1356,9 @@ def guess_ods_style(color_or_style, object):
             return color_or_style + "Datetime"
         elif object.__class__.__name__=="date":
             return color_or_style + "Date"
+        elif object.__class__.__name__=="bool":
+            print("BOOLEAN")
+            return color_or_style + "Boolean"
         else:
             info("guess_ods_style not guessed",  object.__class__)
             return "NormalLeft"
