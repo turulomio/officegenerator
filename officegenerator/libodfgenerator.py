@@ -410,9 +410,14 @@ class ODT(ODF):
         return None, None
 
 
-    ## Converts saved odt to pdf. It will have the same file name but with .pdf extension
-    def convert_to_pdf(self):
-        system("lowriter --headless --convert-to pdf '{}'".format(self.filename))
+    ## Converts saved odt to pdf. It will have the same basename but with .pdf extension
+    ## @param output_dir None or dirname. If set, it writes pdf in that directory with the same basename of the filename class attribute
+    def convert_to_pdf(self, output_dir=None):
+        if output_dir is None:
+            s_outdir=""
+        else:
+            s_outdir="--outdir '{}'".format(output_dir)
+        system("lowriter --headless --convert-to pdf '{}' {}".format(self.filename, s_outdir))
 
     def __setCursor(self, e):
         self.cursor=e
