@@ -23,6 +23,11 @@ You can view officegenerator/demo.py to see an example of code: https://raw.gith
 
 Changelog
 =========
+1.17.0
+------
+  * Added methods to remove rows and columns in Model class.
+  * Improved odt_table for standard_sheets.
+
 1.16.0
 ------
   * Added boolean number and styles.
