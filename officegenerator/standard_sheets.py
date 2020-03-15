@@ -3,6 +3,13 @@ from logging import warning
 from officegenerator.commons import Coord
 from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column
 
+class ModelStyles:
+    hh=0# Only horizontal header
+    hv=1
+    hht=2 #Only horizontal header with last row of totals
+    hhv=3 # Only vertical header with last column of totals
+    hhthhv=4 # Horizontal and vertical headers with last row and column of totals
+
 class Model:
     def __init__(self):
         self.hh=None
