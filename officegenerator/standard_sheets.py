@@ -125,10 +125,11 @@ class Model:
         if self.__mustFillA1()==True:
             s.add("A1", "", "OrangeCenter")
 
-        for number, row in enumerate(self.data):
-            for letter,  field in enumerate(row):
-                s.add(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
-        s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(number).addColumn(letter))
+        if len(self.data)>0: #Only must be executed with data
+            for number, row in enumerate(self.data):
+                for letter,  field in enumerate(row):
+                    s.add(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
+            s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(number).addColumn(letter))
 
     ## Generates a odt table object from model
     ## @param doc odt document
