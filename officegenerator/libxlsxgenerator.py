@@ -218,7 +218,7 @@ class OpenPyXL:
         elif value.__class__ in (datetime.date, ):
             cell.number_format="YYYY-MM-DD"
         elif value.__class__ in (Currency, ):
-            cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(value.symbol())
+            cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(value.currency)
         elif value.__class__ in (Percentage, ):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
 
