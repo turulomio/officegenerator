@@ -8,7 +8,7 @@ import os
 import pkg_resources
 from decimal import Decimal
 from officegenerator.commons import __version__, addDebugSystem
-from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS
+from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT
 from officegenerator.libxlsxgenerator import OpenPyXL
 from officegenerator.commons import argparse_epilog, Coord
 from officegenerator.objects.currency import Currency
@@ -54,6 +54,9 @@ def main(arguments=None):
 
         demo_odt_standard()
         print("  * " + _("ODT Generated"))
+        
+        demo_odt_search_and_replace()
+        print("  * " + _("ODT (Search and replace) Generated"))
 
         demo_odt_manual_styles()
         print("  * " + _("ODT Generated from Manual Styles"))
@@ -312,11 +315,23 @@ def demo_odt_commands(doc):
     doc.header("ODS Writing", 1)
     doc.simpleParagraph("This library create several default styles for writing ODS files. You can see examples in officegenerator.ods.")
     doc.pageBreak()
-
+    
+    doc.header("Search and replace", 2)
+    doc.simpleParagraph("You can search strings in a document and replace them programatically.")
+    doc.simpleParagraph("__REPLACEME__")
+    doc.simpleParagraph("You can delete this strings if you aren't going to use it")
+    doc.simpleParagraph("__DELETEME__")
+    
     doc.header("ODS Reading", 1)
     doc.pageBreak()
 
     doc.header("XLSX", 1)
+    
+def demo_odt_search_and_replace():
+    doc=ODT("officegenerator_search_and_replace.odt", template="officegenerator.odt")
+    doc.search_and_replace("_DELETEME__", None)
+    doc.search_and_replace("__REPLACEME__",  "This text has been replaced programatically")
+    doc.save()
 
     
 def demo_odt_standard():
