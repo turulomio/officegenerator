@@ -55,10 +55,11 @@ def l10nDecimal(dec, digits=2):
 ## Converts strings True or False to boolean
 ## @param s String
 ## @return Boolean
-def str2bool(s):
-    if s=="True":
+def str2bool(value):
+    if value=="0" or value.lower()=="false":
+        return False
+    elif value=="1" or value.lower()=="true":
         return True
-    return False    
 
 ## Converts boolean to  True or False string
 ## @param s String
@@ -154,6 +155,28 @@ def lor_transposed(lor):
             tran_row.append(row[column])
         r.append(tran_row)
     return r
+
+## Return sum of values of a column from and index to and other index position. This method ignores None values
+## This method can sum several objects
+## @zerovalue 0 or Money(self.mem, 0, self.mem.localcurrency)....
+def lor_sum_row(row, from_index, to_index, zerovalue=0):
+    s=zerovalue
+    for i, column in enumerate(row):
+        if i>=from_index and i<=to_index:
+            if column is not None:
+                s=s + column
+    return s
+
+## Return sum of values of a column from and index to and other index position. This method ignores None values
+## This method can sum several objects
+## @zerovalue 0 or Money(self.mem, 0, self.mem.localcurrency)....
+def lor_sum_column(lor, column, from_index, to_index, zerovalue=0):
+    s=zerovalue
+    for i, row in enumerate(lor):
+        if i>=from_index and i<=to_index:
+            if row[column] is not None:
+                s=s + row[column]
+    return s
 
 ## String to linux shell
 #def string2shell(cadena):

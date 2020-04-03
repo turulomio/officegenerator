@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 19:08+0100\n"
+"POT-Creation-Date: 2020-04-03 08:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,6 +33,9 @@ msgid "ODS Readed and regenerated"
 msgstr ""
 
 msgid "ODT Generated"
+msgstr ""
+
+msgid "ODT (Search and replace) Generated"
 msgstr ""
 
 msgid "ODT Generated from Manual Styles"
@@ -87,6 +90,9 @@ msgid "Number with 2 decimals"
 msgstr ""
 
 msgid "Number with 6 decimals"
+msgstr ""
+
+msgid "Time"
 msgstr ""
 
 msgid "This cell is going to be merged with B13 a F14"

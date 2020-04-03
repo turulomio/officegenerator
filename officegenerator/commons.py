@@ -6,8 +6,8 @@ from pkg_resources import resource_filename
 from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.17.0'
-__versiondate__=date(2020, 2, 17)
+__version__ = '1.18.0'
+__versiondate__=date(2020, 4, 3)
 
 try:
     t=translation('officegenerator',resource_filename("officegenerator","locale"))

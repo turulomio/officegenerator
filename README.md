@@ -21,8 +21,18 @@ Usage
 =====
 You can view officegenerator/demo.py to see an example of code: https://raw.githubusercontent.com/Turulomio/officegenerator/master/officegenerator/demo.py
 
+Known issues
+============
+  * Search and replace in odf files doesn't work with odfpy-1.4.1, setup forces to use odf.py-1.3.6
+
 Changelog
 =========
+1.18.0
+------
+  * Added suport for time objects
+  * Added demo file to search and replace in ODT
+  * Demo works on windows again
+
 1.17.0
 ------
   * Added methods to remove rows and columns in Model class.

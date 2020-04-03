@@ -2,21 +2,22 @@
 # Traducciones al español para el paquete PACKAGE.
 # Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# root <turulomio@yahoo.es>, 2015.
 #
+# root <turulomio@yahoo.es>, 2015, 2020.
 msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-19 17:09+0100\n"
-"PO-Revision-Date: 2015-03-22 18:51+0100\n"
-"Last-Translator: root <turulomio@yahoo.es>\n"
-"Language-Team: Spanish\n"
+"POT-Creation-Date: 2020-04-03 08:51+0200\n"
+"PO-Revision-Date: 2020-04-03 08:54+0200\n"
+"Last-Translator: trabajo <turulomio@yahoo.es>\n"
+"Language-Team: Spanish <kde-i18n-doc@kde.org>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 19.12.3\n"
 
 msgid "Developed by Mariano Muñoz 2015-{}"
 msgstr "Desarrollado por Mariano Muñoz 2015-{}"
@@ -35,6 +36,9 @@ msgstr "ODS leído y regenerado"
 
 msgid "ODT Generated"
 msgstr "ODT generado"
+
+msgid "ODT (Search and replace) Generated"
+msgstr "ODT (Buscar y remplazar) Generado"
 
 msgid "ODT Generated from Manual Styles"
 msgstr "ODT Generado con estilos manuales"
@@ -57,8 +61,13 @@ msgstr "Ejemplo ODS de OfficeGenerator"
 msgid "Demo with ODS_Write class"
 msgstr "Demostración de la clase ODS_Write"
 
-msgid "This file have been generated with OfficeGenerator-{}. You can see OfficeGenerator main page in http://github.com/turulomio/officegenerator"
-msgstr "Este fichero ha sido generado con OfficeGenerator-{}. Puedes ver la página principal del proyecto OfficeGenerator en http://github.com/turulomio/officegenerator"
+msgid ""
+"This file have been generated with OfficeGenerator-{}. You can see"
+" OfficeGenerator main page in http://github.com/turulomio/officegenerator"
+msgstr ""
+"Este fichero ha sido generado con OfficeGenerator-{}. Puedes ver la página"
+" principal del proyecto OfficeGenerator en"
+" http://github.com/turulomio/officegenerator"
 
 msgid "This is a comment"
 msgstr "Esto es un comentario"
@@ -90,6 +99,9 @@ msgstr "Número con 2 decimales"
 msgid "Number with 6 decimals"
 msgstr "Número con 6 decimales"
 
+msgid "Time"
+msgstr ""
+
 msgid "This cell is going to be merged with B13 a F14"
 msgstr "Esta celda va a unir el rango B13 y F14"
 
@@ -97,7 +109,8 @@ msgid "This cell is going to be merged and aligned desde B18 a G18"
 msgstr "Esta celda va a unir y alinear el rango B18 a G18"
 
 msgid "These cells show formulas with diferent styles and number formats"
-msgstr "Estas celdas muestran fórmulas with diferentes estilos y formatos numéricos"
+msgstr ""
+"Estas celdas muestran fórmulas with diferentes estilos y formatos numéricos"
 
 msgid "OfficeGenerator ODT example"
 msgstr "Ejemplo de ODT con OfficeGenerator"
@@ -117,14 +130,22 @@ msgstr "ODT"
 msgid "ODT files can be quickly generated with OfficeGenerator."
 msgstr "Los ficheros ODT son creados rápidamente con OfficeGenerator."
 
-msgid "It create predefined styles that allows to create nice documents without worry about styles."
-msgstr "Crea estilos predefinidos que te permiten crear documentos vistosos sin preocuparte de los estilos."
+msgid ""
+"It create predefined styles that allows to create nice documents without"
+" worry about styles."
+msgstr ""
+"Crea estilos predefinidos que te permiten crear documentos vistosos sin"
+" preocuparte de los estilos."
 
 msgid "OfficeGenerator predefined paragraph styles"
 msgstr "Estilos predefenidos de párrafo en OfficeGenerator"
 
-msgid "OfficeGenerator has headers and titles as you can see in the document structure."
-msgstr "OfficeGenerator tiene encabezados y titulos como puedes ver en la estructura del documento."
+msgid ""
+"OfficeGenerator has headers and titles as you can see in the document"
+" structure."
+msgstr ""
+"OfficeGenerator tiene encabezados y titulos como puedes ver en la estructura"
+" del documento."
 
 msgid "Morever, it has the following predefined styles:"
 msgstr "Además, tiene los siguientes estilos predefinidos"
@@ -210,8 +231,12 @@ msgstr "Lista multinivel con números"
 msgid "Images"
 msgstr "Imágenes"
 
-msgid "As you can see, I can reuse it one hundred times. File size will not be increased because I used reference names."
-msgstr "Como puedes ver, puedo reutilizar la imagen cien veces. El tamaño del fichero no aumentará porque uso referencias."
+msgid ""
+"As you can see, I can reuse it one hundred times. File size will not be"
+" increased because I used reference names."
+msgstr ""
+"Como puedes ver, puedo reutilizar la imagen cien veces. El tamaño del fichero"
+" no aumentará porque uso referencias."
 
 msgid "The next paragraph is generated with the illustration method"
 msgstr "El siguiente párrafo es generado con el método illustration"
@@ -223,7 +248,8 @@ msgid "By default OfficeGenerator uses a predefined A4 page."
 msgstr "Por defecto OfficeGenerator usa una página predefinida A4"
 
 msgid "Morever, you can set a predefined A4 horizontal page, as you can see."
-msgstr "Ademas, puedes añadir páginas horizontales A4 predefinidas, como puedes ver."
+msgstr ""
+"Ademas, puedes añadir páginas horizontales A4 predefinidas, como puedes ver."
 
 msgid "Styles"
 msgstr "Estilos"
