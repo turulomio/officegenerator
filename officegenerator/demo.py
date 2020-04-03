@@ -175,6 +175,7 @@ def demo_ods():
     s6.add("G1", _("Percentage"), "OrangeCenter")
     s6.add("H1", _("Number with 2 decimals"), "OrangeCenter")
     s6.add("I1", _("Number with 6 decimals"), "OrangeCenter")
+    s6.add("J1", _("Time"), "OrangeCenter")
     for row, color in enumerate(doc.colors.arr):
         s6.add(Coord("A2").addRow(row), color.name, color.name + "Left")
         s6.add(Coord("B2").addRow(row), datetime.datetime.now(),  color.name +"Datetime")
@@ -185,6 +186,7 @@ def demo_ods():
         s6.add(Coord("G2").addRow(row), Percentage(pow(-1, row)*1, 3), color.name+"Percentage")
         s6.add(Coord("H2").addRow(row), pow(-1, row)*123456789.121212, color.name+"Decimal2")
         s6.add(Coord("I2").addRow(row), pow(-1, row)*-12.121212, color.name+"Decimal6")
+        s6.add(Coord("J2").addRow(row), datetime.datetime.now().time(), color.name+"Time")
 
     s6.setComment("B2", _("This is a comment"))
     

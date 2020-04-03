@@ -11,7 +11,7 @@ from decimal import Decimal
 from logging import info
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
-from odf.number import  CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds, Boolean, BooleanStyle
+from odf.number import  TimeStyle, CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds, Boolean, BooleanStyle
 from odf.text import P,  H,  Span, ListStyle,  ListLevelStyleBullet,  List,  ListItem, ListLevelStyleNumber,  OutlineLevelStyle,  OutlineStyle,  PageNumber,  PageCount
 from odf.table import Table, TableColumn, TableRow, TableCell,  TableHeaderRows
 from odf.draw import Frame, Image
@@ -106,6 +106,8 @@ class ODS_Read:
                 r=datetime.datetime.strptime(datevalue, "%Y-%m-%d").date()
             else:
                 r=datetime.datetime.strptime(datevalue, "%Y-%m-%dT%H:%M:%S")
+        if cell.getAttribute('valuetype')=='time':
+            r="NEED TO DO IT"
         return r
 
     ## Returns an odfcell object
@@ -799,6 +801,8 @@ class OdfCell:
             odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
         elif self.object.__class__.__name__=="datetime":
             odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
+        elif self.object.__class__.__name__=="time":
+            odfcell = TableCell(valuetype="time", timevalue=self.object.strftime("%H:%M:%S"), stylename=self.style)
         elif self.object.__class__.__name__=="date":
             odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
         elif self.object.__class__.__name__ in ("Decimal", "float", "int"):
@@ -1189,6 +1193,9 @@ class ODSStyleColor:
 
         date = Style(name=self.name+"Date", datastylename="Date",parentstylename=self.name+"Left", family="table-cell")
         doc.styles.addElement(date)
+        
+        time = Style(name=self.name+"Time", datastylename="Time",parentstylename=self.name+"Left", family="table-cell")
+        doc.styles.addElement(time)
 
         integer = Style(name=self.name+"Integer", family="table-cell",  datastylename="Integer",parentstylename=self.name+"Right")
         doc.styles.addElement(integer)
@@ -1253,7 +1260,16 @@ class ODSStyleColorManager:
         date_style.addElement(Minutes(style="long"))
         date_style.addElement(Text(text=":"))
         date_style.addElement(Seconds(style="long"))
-        doc.styles.addElement(date_style)#NO SERIA ESTE UN AUTOMATICO????
+        doc.styles.addElement(date_style)#NO SERIA ESTE UN AUTOMATICO????        
+        
+        # Time
+        time_style = TimeStyle(name="Time") #, language="lv", country="LV")
+        time_style.addElement(Hours(style="long"))
+        time_style.addElement(Text(text=":"))
+        time_style.addElement(Minutes(style="long"))
+        time_style.addElement(Text(text=":"))
+        time_style.addElement(Seconds(style="long"))
+        doc.styles.addElement(time_style)#NO SERIA ESTE UN AUTOMATICO????
 
         #Date
         date_style = DateStyle(name="Date") #, language="lv", country="LV")
@@ -1364,6 +1380,8 @@ def guess_ods_style(color_or_style, object):
             return color_or_style + "Datetime"
         elif object.__class__.__name__=="date":
             return color_or_style + "Date"
+        elif object.__class__.__name__=="time":
+            return color_or_style + "Time"
         elif object.__class__.__name__=="bool":
             return color_or_style + "Boolean"
         else:
