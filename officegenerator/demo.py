@@ -2,10 +2,10 @@
 ## @brief Generate ODF example files
 
 import argparse
-import datetime
 import gettext
 import os
 import pkg_resources
+from datetime import timedelta, datetime, date
 from decimal import Decimal
 from officegenerator.commons import __version__, addDebugSystem
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT
@@ -178,15 +178,15 @@ def demo_ods():
     s6.add("J1", _("Time"), "OrangeCenter")
     for row, color in enumerate(doc.colors.arr):
         s6.add(Coord("A2").addRow(row), color.name, color.name + "Left")
-        s6.add(Coord("B2").addRow(row), datetime.datetime.now(),  color.name +"Datetime")
-        s6.add(Coord("C2").addRow(row), datetime.date.today(), color.name + "Date")
+        s6.add(Coord("B2").addRow(row), datetime.now(),  color.name +"Datetime")
+        s6.add(Coord("C2").addRow(row), date.today(), color.name + "Date")
         s6.add(Coord("D2").addRow(row), pow(-1, row)*-10000000, color.name+ "Integer")
         s6.add(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), color.name + "EUR")
         s6.add(Coord("F2").addRow(row), Currency(pow(-1, row)*12345.56, "USD"), color.name + "USD")
         s6.add(Coord("G2").addRow(row), Percentage(pow(-1, row)*1, 3), color.name+"Percentage")
         s6.add(Coord("H2").addRow(row), pow(-1, row)*123456789.121212, color.name+"Decimal2")
         s6.add(Coord("I2").addRow(row), pow(-1, row)*-12.121212, color.name+"Decimal6")
-        s6.add(Coord("J2").addRow(row), datetime.datetime.now().time(), color.name+"Time")
+        s6.add(Coord("J2").addRow(row), (datetime.now()+timedelta(seconds=3600*12*row)).time(), color.name+"Time")
 
     s6.setComment("B2", _("This is a comment"))
     
@@ -240,8 +240,8 @@ def demo_odt_commands(doc):
     doc.table(  [_("Concept"), _("Value")], 
                         [
                             [_("Text"), _("This is a text")], 
-                            [_("Datetime"), datetime.datetime.now()], 
-                            [_("Date"), datetime.date.today()], 
+                            [_("Datetime"), datetime.now()], 
+                            [_("Date"), date.today()], 
                             [_("Decimal"), Decimal("12.121")], 
                             [_("Currency"), Currency(12.12, "EUR")], 
                             [_("Percentage"), Percentage(1, 3)], 
@@ -363,8 +363,8 @@ def demo_xlsx():
     xlsx.overwrite("H1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
     for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, xlsx.stWhite, None]):
         xlsx.overwrite(Coord("A2").addRow(row), xlsx.styleName(style), style=style)
-        xlsx.overwrite(Coord("B2").addRow(row), datetime.datetime.now(), style=style)
-        xlsx.overwrite(Coord("C2").addRow(row), datetime.date.today(), style=style)
+        xlsx.overwrite(Coord("B2").addRow(row), datetime.now(), style=style)
+        xlsx.overwrite(Coord("C2").addRow(row), date.today(), style=style)
         xlsx.overwrite(Coord("D2").addRow(row), pow(-1, row)*-10000000, style=style)
         xlsx.overwrite(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), style=style)
         xlsx.overwrite(Coord("F2").addRow(row), Percentage(1, 3), style=style,  decimals=row+1)

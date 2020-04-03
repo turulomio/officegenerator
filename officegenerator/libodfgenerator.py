@@ -805,7 +805,7 @@ class OdfCell:
         elif self.object.__class__.__name__=="datetime":
             odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
         elif self.object.__class__.__name__=="time":
-            odfcell = TableCell(valuetype="time", timevalue=self.object.strftime("%H:%M:%S"), stylename=self.style)
+            odfcell = TableCell(valuetype="time", timevalue=self.object.strftime("PT%HH%MM%SS"), stylename=self.style)
         elif self.object.__class__.__name__=="date":
             odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
         elif self.object.__class__.__name__ in ("Decimal", "float", "int"):
