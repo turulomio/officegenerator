@@ -8,7 +8,7 @@
 import datetime
 import gettext
 from decimal import Decimal
-from logging import info
+from logging import info, debug
 from odf.opendocument import OpenDocumentSpreadsheet,  OpenDocumentText,  load
 from odf.style import Footer, FooterStyle, HeaderFooterProperties, Style, TextProperties, TableColumnProperties, Map,  TableProperties,  TableCellProperties, PageLayout, PageLayoutProperties, ParagraphProperties,  ListLevelProperties,  MasterPage
 from odf.number import  TimeStyle, CurrencyStyle, CurrencySymbol,  Number, NumberStyle, Text,  PercentageStyle,  DateStyle, Year, Month, Day, Hours, Minutes, Seconds, Boolean, BooleanStyle
@@ -370,7 +370,10 @@ class ODT(ODF):
                 self.cursorParent.removeChild(e)
         else: #Replace
             e.insertBefore( odf.element.Text(str(to_remove).replace(tag, replace)), to_remove)
-            e.removeChild(to_remove)
+            #print(to_remove.__class__, e.__class__, e.childNodes)
+            debug("THIS CODE FAILS IN ODFPY-1.4.1 AND WORKS IN ODFPY-1.3.6")
+            e.removeChild(to_remove     )
+            
 
     ## Search for a tag in doc an replaces its elemente with the parameter element
     ##

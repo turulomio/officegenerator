@@ -331,7 +331,7 @@ def demo_odt_commands(doc):
     
 def demo_odt_search_and_replace():
     doc=ODT("officegenerator_search_and_replace.odt", template="officegenerator.odt")
-    doc.search_and_replace("_DELETEME__", None)
+    doc.search_and_replace("_DELETEME__", "")
     doc.search_and_replace("__REPLACEME__",  "This text has been replaced programatically")
     doc.save()
 
