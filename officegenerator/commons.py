@@ -172,6 +172,19 @@ class Coord:
 class Range:
     def __init__(self,strrange):
         self.start, self.end=self.__extract(strrange)
+        
+    def __repr__(self):
+        return "Range <{}>".format(self.string())
+        
+    ## Returns a list of rows of all Coord objects in the range
+    def coords(self):
+        r=[]
+        for row in range(self.numRows()):
+            tmprow=[]
+            for column in range(self.numColumns()):
+                tmprow.append(self.start.addRowCopy(row).addColumnCopy(column))
+            r.append(tmprow)
+        return r
 
     ## Converts a string to a Range. Returns None if conversion can't be done
     def __extract(self,range):

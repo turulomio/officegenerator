@@ -10,7 +10,7 @@ from decimal import Decimal
 from officegenerator.commons import __version__, addDebugSystem
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT
 from officegenerator.libxlsxgenerator import OpenPyXL
-from officegenerator.commons import argparse_epilog, Coord
+from officegenerator.commons import argparse_epilog, Coord, Range
 from officegenerator.objects.currency import Currency
 from officegenerator.objects.percentage import Percentage
 from odf.text import P
@@ -45,6 +45,8 @@ def main(arguments=None):
         os.remove("officegenerator_readed.xlsx")
 
     if args.create==True:
+        
+        
         print(_("Generating example files"))
         demo_ods()
         print("  * " + _("ODS Generated"))
@@ -70,19 +72,24 @@ def main(arguments=None):
 
 def demo_ods_readed():
     doc=ODS_Read("officegenerator.ods")
-    s1=doc.getSheetElementByIndex(0)
+    
+    range=Range("A2:K2")
+    for coord in range.coords()[0]:
+        print(coord,  doc.getCellValue(9, coord))
+        
+    print(doc.cells(9, range))   
 
     #Sustituye celda
-    odfcell=doc.getCell(s1, "B6")
+    odfcell=doc.getCell(0, "B6")
     odfcell.object=1789.12
     odfcell.setComment(_("This cell has been readed and modified"))
-    doc.setCell(s1, "B6", odfcell)
+    doc.setCell(0, "B6", odfcell)
 
     #Added cell
-    odfcell=doc.getCell(s1, "B10")
+    odfcell=doc.getCell(0, "B10")
     odfcell.object=_("Created cell")
     odfcell.setComment(_("This cell has been readed and modified"))
-    doc.setCell(s1, "B10", odfcell )
+    doc.setCell(0, "B10", odfcell )
 
     doc.save("officegenerator_readed.ods")
 
@@ -176,6 +183,7 @@ def demo_ods():
     s6.add("H1", _("Number with 2 decimals"), "OrangeCenter")
     s6.add("I1", _("Number with 6 decimals"), "OrangeCenter")
     s6.add("J1", _("Time"), "OrangeCenter")
+    s6.add("K1", _("Integer with '"), "OrangeCenter")
     for row, color in enumerate(doc.colors.arr):
         s6.add(Coord("A2").addRow(row), color.name, color.name + "Left")
         s6.add(Coord("B2").addRow(row), datetime.now(),  color.name +"Datetime")
@@ -187,6 +195,7 @@ def demo_ods():
         s6.add(Coord("H2").addRow(row), pow(-1, row)*123456789.121212, color.name+"Decimal2")
         s6.add(Coord("I2").addRow(row), pow(-1, row)*-12.121212, color.name+"Decimal6")
         s6.add(Coord("J2").addRow(row), (datetime.now()+timedelta(seconds=3600*12*row)).time(), color.name+"Time")
+        s6.add(Coord("K2").addRow(row), 12121212,  color.name+"Left")
 
     s6.setComment("B2", _("This is a comment"))
     

@@ -5,7 +5,7 @@
 ## odf Element and Text inherits from Node and inherits from xml.Dom.Node https://docs.python.org/3.5/library/xml.dom.html
 ## Text can't have children
 
-import datetime
+from datetime import datetime, time
 import gettext
 from decimal import Decimal
 from logging import info, debug
@@ -70,52 +70,95 @@ class ODS_Read:
         except:
             return None
         
+    ## Returns a list of rows of OdfCell
+    def cells(self, sheet_index, range_=None):
+        if range_ is None:
+            range_=self.getSheetRange(sheet_index)
+        else:
+            range_=Range.assertRange(range_)
+        r=[]
+        for row in range(range_.numRows()):
+            tmprow=[]
+            for column in range(range_.numColumns()):
+                tmprow.append(self.getCell(sheet_index, range_.start.addRowCopy(row).addColumnCopy(column)))
+            r.append(tmprow)
+        return r
         
-    def rowNumber(self, sheet_element):
+    ## Returns a list of rows of object values
+    def values(self, sheet_index, range_=None):
+        if range_ is None:
+            range_=self.getSheetRange(sheet_index)
+        else:
+            range_=Range.assertRange(range_)
+        print(range_)
+        r=[]
+        for row in range(range_.numRows()):
+            tmprow=[]
+            for column in range(range_.numColumns()):
+                tmprow.append(self.getCellValue(sheet_index, range_.start.addRowCopy(row).addColumnCopy(column)))
+            r.append(tmprow)
+        return r
+        
+    ## Return a Range object with the limits of the index sheet
+    def getSheetRange(self, sheet_index):
+        endcoord=Coord("A1").addRow(self.rowNumber(sheet_index)-1).addColumn(self.columnNumber(sheet_index)-1)
+        return Range("A1:"+endcoord.string())
+        
+    def rowNumber(self, sheet_index):
         """
             Devuelve el numero de filas de un determinado sheet_element
         """
-        return len(sheet_element.getElementsByType(TableRow))-1
+        sheet_element=self.getSheetElementByIndex(sheet_index)
+        return len(sheet_element.getElementsByType(TableRow))
         
-    def columnNumber(self, sheet_element):
+    def columnNumber(self, sheet_index):
         """
             Devuelve el numero de filas de un determinado sheet_element
         """
+        sheet_element=self.getSheetElementByIndex(sheet_index)
         return len(sheet_element.getElementsByType(TableColumn))
         
     ## Returns the cell value
-    def getCellValue(self, sheet_element, coord):
+    def getCellValue(self, sheet_index, coord):
         coord=Coord.assertCoord(coord)
+        sheet_element=self.getSheetElementByIndex(sheet_index)
         row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
         cell=row.getElementsByType(TableCell)[coord.letterIndex()]
         r=None
         
         if cell.getAttribute('valuetype')=='string':
             r=cell.getAttribute('value')
-        if cell.getAttribute('valuetype')=='float':
+        elif cell.getAttribute('valuetype')=='float':
             r=Decimal(cell.getAttribute('value'))
-        if cell.getAttribute('valuetype')=='percentage':
+        elif cell.getAttribute('valuetype')=='percentage':
             r=Percentage(Decimal(cell.getAttribute('value')), Decimal(1))
-        if cell.getAttribute('formula')!=None:
+        elif cell.getAttribute('formula')!=None:
             r=str(cell.getAttribute('formula'))[3:]
-        if cell.getAttribute('valuetype')=='currency':
+        elif cell.getAttribute('valuetype')=='currency':
             r=Currency(Decimal(cell.getAttribute('value')), cell.getAttribute('currency'))
-        if cell.getAttribute('valuetype')=='date':
+        elif cell.getAttribute('valuetype')=='date':
             datevalue=cell.getAttribute('datevalue')
             if len(datevalue)<=10:
-                r=datetime.datetime.strptime(datevalue, "%Y-%m-%d").date()
+                r=datetime.strptime(datevalue, "%Y-%m-%d").date()
             else:
-                r=datetime.datetime.strptime(datevalue, "%Y-%m-%dT%H:%M:%S")
-        if cell.getAttribute('valuetype')=='time':
-            r="NEED TO DO IT"
+                r=datetime.strptime(datevalue, "%Y-%m-%dT%H:%M:%S")
+        elif cell.getAttribute('valuetype')=='time':
+            s=cell.getAttribute('timevalue')
+            h=int(s.split("PT")[1].split("H")[0])
+            m=int(s.split("H")[1].split("M")[0])
+            s=int(s.split("M")[1].split("S")[0])
+            r=time(h, m, s)
+        else:
+            return None
         return r
 
     ## Returns an odfcell object
-    def getCell(self, sheet_element,  coord):
+    def getCell(self, sheet_index,  coord):
         coord=Coord.assertCoord(coord)
+        sheet_element=self.getSheetElementByIndex(sheet_index)
         row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
         cell=row.getElementsByType(TableCell)[coord.letterIndex()]
-        object=self.getCellValue(sheet_element, coord)
+        object=self.getCellValue(sheet_index, coord)
         #Get spanning
         spanning_columns=cell.getAttribute('numbercolumnsspanned')
         if spanning_columns==None:
@@ -137,7 +180,7 @@ class ODS_Read:
         r.setSpanning(spanning_columns, spanning_rows)
         return r
         
-    def setCell(self, sheet_element,  coord, cell):
+    def setCell(self, sheet_index,  coord, cell):
         """
             Updates a cell
             insertBefore(newchild, refchild) – Inserts the node newchild before the existing child node refchild.
@@ -149,6 +192,7 @@ removeChild(oldchild) – Re
         PARA ESO USAR ODS_Write DE MOMENTO
         """
         coord=Coord.assertCoord(coord)
+        sheet_element=self.getSheetElementByIndex(sheet_index)
         row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
         oldcell=row.getElementsByType(TableCell)[coord.letterIndex()]
         row.insertBefore(cell.generate(), oldcell)
@@ -174,7 +218,7 @@ class ODF:
     ## @param description String with a larga description of the document
     ## @param keywords String with keywords separated by space
     ## @param creationdate Naive datetime with the creation date and time
-    def setMetadata(self, title="",  subject="", creator="", description="", keywords="", creationdate=datetime.datetime.now()):
+    def setMetadata(self, title="",  subject="", creator="", description="", keywords="", creationdate=datetime.now()):
         for e in self.doc.meta.childNodes:
             self.doc.meta.removeChild(e)
         self.doc.meta.addElement(Description(text=description))
@@ -828,7 +872,7 @@ class OdfCell:
         if self.comment!=None:
             a=Annotation(textstylename="Right")
             d=Date()
-            d.addText(datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+            d.addText(datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
             a.addElement(d)
             a.addElement(P(stylename="Right", text=self.comment))
             odfcell.addElement(a)
@@ -964,7 +1008,7 @@ class OdfSheet:
 
     ## Adds a cell to the sheet using its coord, an object and a color or a style
     ## @param coord Coord where the cell is going to be created
-    ## @param result Object to add to the Cell. Can be int, str, float, datetime.datetime, datetime.date, Currency, Percentage, Decimal, None (will be converted to " - ")
+    ## @param result Object to add to the Cell. Can be int, str, float, datetime, date, Currency, Percentage, Decimal, None (will be converted to " - ")
     ## @param color_or_style String with a color: Normal, White, Yellow, Orange, Blue, Red, GrayLight, GrayDark. Or a style WhiteInteger, YellowLeft, OrangeCenter, OrangeEUR, RedPercentage...
     def add(self, coord, result, color_or_style="Normal"):
         coord=Coord.assertCoord(coord)
@@ -975,10 +1019,10 @@ class OdfSheet:
                     for j, column in enumerate(row):
                         style=guess_ods_style(color_or_style, result[i][j])
                         self.addCell(OdfCell(Coord(coord.string()).addColumn(j).addRow(i), result[i][j], style))
-                else: #Any value not list if row.__class__ in (int, str, float, datetime.datetime,  datetime.date, Currency, Percentage,  Decimal, bool):#Una lista de una columna
+                else: #Any value not list if row.__class__ in (int, str, float, datetime,  date, Currency, Percentage,  Decimal, bool):#Una lista de una columna
                     style=guess_ods_style(color_or_style, result[i])
                     self.addCell(OdfCell(Coord(coord.string()).addRow(i), result[i], style))
-        else: #Any value not list#result.__class__ in (str, int, float, datetime.datetime, datetime.date,  Currency, Percentage, Decimal,bool):#Un solo valor
+        else: #Any value not list#result.__class__ in (str, int, float, datetime, date,  Currency, Percentage, Decimal,bool):#Un solo valor
             style=guess_ods_style(color_or_style, result)  
             self.addCell(OdfCell(coord, result, style))
 
@@ -1194,8 +1238,8 @@ class ODSStyleColor:
         dt = Style(name=self.name+"Datetime", datastylename="Datetime",parentstylename=self.name+"Left", family="table-cell")
         doc.styles.addElement(dt)
 
-        date = Style(name=self.name+"Date", datastylename="Date",parentstylename=self.name+"Left", family="table-cell")
-        doc.styles.addElement(date)
+        dat = Style(name=self.name+"Date", datastylename="Date",parentstylename=self.name+"Left", family="table-cell")
+        doc.styles.addElement(dat)
         
         time = Style(name=self.name+"Time", datastylename="Time",parentstylename=self.name+"Left", family="table-cell")
         doc.styles.addElement(time)
