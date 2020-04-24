@@ -70,7 +70,9 @@ class ODS_Read:
         except:
             return None
         
-    ## Returns a list of rows of OdfCell
+    ## @param sheet_index Integer index of the sheet
+    ## @param range_ Range object to get OdfCell. If None returns all OdfCell from sheet
+    ## @return Returns a list of rows of object values
     def cells(self, sheet_index, range_=None):
         if range_ is None:
             range_=self.getSheetRange(sheet_index)
@@ -84,7 +86,9 @@ class ODS_Read:
             r.append(tmprow)
         return r
         
-    ## Returns a list of rows of object values
+    ## @param sheet_index Integer index of the sheet
+    ## @param range_ Range object to get values. If None returns all values from sheet
+    ## @return Returns a list of rows of object values
     def values(self, sheet_index, range_=None):
         if range_ is None:
             range_=self.getSheetRange(sheet_index)

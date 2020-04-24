@@ -27,6 +27,10 @@ Known issues
 
 Changelog
 =========
+1.19.0
+------
+  * Added method to iterate ranges and ods sheets.
+
 1.18.0
 ------
   * Added suport for time objects
