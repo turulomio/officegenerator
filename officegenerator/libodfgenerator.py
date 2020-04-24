@@ -109,7 +109,7 @@ class ODS_Read:
     def getColumnValues(self, sheet_index, column_letter, skip=0):
         r=[]
         for row in range(skip, self.rowNumber(sheet_index)):
-            r.append(self.getCellValue(sheet_index, Coord("A1").addRow(row)))
+            r.append(self.getCellValue(sheet_index, Coord(column_letter+"1").addRow(row)))
         return r    
 
     ## @param sheet_index Integer index of the sheet

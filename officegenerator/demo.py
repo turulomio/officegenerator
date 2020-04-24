@@ -9,7 +9,7 @@ from datetime import timedelta, datetime, date
 from decimal import Decimal
 from officegenerator.commons import __version__, addDebugSystem
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT
-from officegenerator.libxlsxgenerator import OpenPyXL
+from officegenerator.libxlsxgenerator import XLSX_Write, XLSX_Read
 from officegenerator.commons import argparse_epilog, Coord, Range
 from officegenerator.objects.currency import Currency
 from officegenerator.objects.percentage import Percentage
@@ -40,19 +40,20 @@ def main(arguments=None):
         os.remove("officegenerator.ods")
         os.remove("officegenerator.odt")
         os.remove("officegenerator_manual_styles.odt")
-        os.remove("officegenerator_readed.ods")
+        os.remove("officegenerator_updated.ods")
         os.remove("officegenerator.xlsx")
-        os.remove("officegenerator_readed.xlsx")
+        os.remove("officegenerator_updated.xlsx")
 
     if args.create==True:
-        
+
         
         print(_("Generating example files"))
         demo_ods()
         print("  * " + _("ODS Generated"))
 
-        demo_ods_readed()
-        print("  * " + _("ODS Readed and regenerated"))
+
+        demo_ods_updated()
+        print("  * " + _("ODS updated"))
 
         demo_odt_standard()
         print("  * " + _("ODT Generated"))
@@ -63,14 +64,20 @@ def main(arguments=None):
         demo_odt_manual_styles()
         print("  * " + _("ODT Generated from Manual Styles"))
 
+        
         demo_xlsx()
         print("  * " + _("XLSX Generated"))
 
-        demo_xlsx_readed()
-        print("  * " + _("XLSX Readed and regenerated"))
+        demo_xlsx_updated()
+        print("  * " + _("XLSX updated"))
 
+        print("  * " + _("ODS Readonly extractions"))
+        demo_ods_readonly()
 
-def demo_ods_readed():
+        print("  * " + _("XLSX Readonly extractions"))
+        demo_xlsx_readonly()
+
+def demo_ods_readonly():
     doc=ODS_Read("officegenerator.ods")
     
     range=Range("A2:K2")
@@ -82,19 +89,22 @@ def demo_ods_readed():
         
     print(doc.values(9, range))   
 
+def demo_ods_updated():
+    doc=ODS_Read("officegenerator.ods")
+
     #Sustituye celda
     odfcell=doc.getCell(0, "B6")
     odfcell.object=1789.12
-    odfcell.setComment(_("This cell has been readed and modified"))
+    odfcell.setComment(_("This cell has been updated and modified"))
     doc.setCell(0, "B6", odfcell)
 
     #Added cell
     odfcell=doc.getCell(0, "B10")
     odfcell.object=_("Created cell")
-    odfcell.setComment(_("This cell has been readed and modified"))
+    odfcell.setComment(_("This cell has been updated and modified"))
     doc.setCell(0, "B10", odfcell )
 
-    doc.save("officegenerator_readed.ods")
+    doc.save("officegenerator_updated.ods")
 
 def demo_ods():
     doc=ODS_Write("officegenerator.ods")
@@ -359,7 +369,7 @@ def demo_odt_manual_styles():
     doc.save()
 
 def demo_xlsx():
-    xlsx=OpenPyXL("officegenerator.xlsx")
+    xlsx=XLSX_Write("officegenerator.xlsx")
     xlsx.setCurrentSheet(0)
 
     xlsx.setSheetName(_("Styles"))
@@ -373,6 +383,8 @@ def demo_xlsx():
     xlsx.overwrite("F1", _("Percentage"), style=xlsx.stOrange,  alignment="center")
     xlsx.overwrite("G1", _("Number with 2 decimals"), style=xlsx.stOrange,  alignment="center")
     xlsx.overwrite("H1", _("Number with 6 decimals"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("I1", _("Time"), style=xlsx.stOrange,  alignment="center")
+    xlsx.overwrite("J1", _("Boolean"), style=xlsx.stOrange,  alignment="center")
     for row, style in enumerate([xlsx.stOrange, xlsx.stGreen, xlsx.stGrayLight, xlsx.stYellow, xlsx.stGrayDark, xlsx.stWhite, None]):
         xlsx.overwrite(Coord("A2").addRow(row), xlsx.styleName(style), style=style)
         xlsx.overwrite(Coord("B2").addRow(row), datetime.now(), style=style)
@@ -382,6 +394,8 @@ def demo_xlsx():
         xlsx.overwrite(Coord("F2").addRow(row), Percentage(1, 3), style=style,  decimals=row+1)
         xlsx.overwrite(Coord("G2").addRow(row), pow(-1, row)*12.121212, style=style, decimals=2)
         xlsx.overwrite(Coord("H2").addRow(row), pow(-1, row)*-12.121212, style=style, decimals=6)
+        xlsx.overwrite(Coord("I2").addRow(row), datetime.now().time(), style=style, decimals=6)
+        xlsx.overwrite(Coord("J2").addRow(row), True, style=style, decimals=6)
     xlsx.setComment("B2", _("This is a comment"))
     
     ##To write a custom cell
@@ -464,8 +478,8 @@ def demo_xlsx():
     xlsx.freezeAndSelect("C3","Z199")
     xlsx.save()
 
-def demo_xlsx_readed():
-    xlsx=OpenPyXL("officegenerator_readed.xlsx", "officegenerator.xlsx")
+def demo_xlsx_updated():
+    xlsx=XLSX_Write("officegenerator_updated.xlsx", "officegenerator.xlsx")
     xlsx.setCurrentSheet(0)
     
     xlsx.overwrite("A2", _("Orange"))
@@ -477,6 +491,18 @@ def demo_xlsx_readed():
     xlsx.overwrite_and_merge("A17:G17", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
 
     xlsx.save()
+    
+def demo_xlsx_readonly(): 
+    doc=XLSX_Read("officegenerator.xlsx")
+    
+    range_=Range("A2:J2")
+    for coord in range_.coords()[0]:
+        print(coord,  doc.getCellValue(0, coord))
+        
+    print(doc.getColumnValues(0, "J", skip=0))
+    print(doc.getRowValues(1, "100", skip=3))
+        
+    print(doc.values(0, range_) )
 
 if __name__ == "__main__":
     main()

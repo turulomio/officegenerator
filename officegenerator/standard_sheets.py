@@ -175,11 +175,11 @@ class Model:
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write
     from officegenerator.libodfgenerator import ODT_Standard
-    from officegenerator.libxlsxgenerator import OpenPyXL
+    from officegenerator.libxlsxgenerator import XLSX_Write
     filename="standard_sheets.ods"
     ods=ODS_Write("standard_sheets.ods")
     odt=ODT_Standard("standard_sheets.odt")
-    xlsx=OpenPyXL("standard_sheets.xlsx")
+    xlsx=XLSX_Write("standard_sheets.xlsx")
     
     m=Model()
     m.setTitle("Probe")

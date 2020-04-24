@@ -29,8 +29,159 @@ class ColumnWidthXLSX:
     Date=40
     Detetime=60
 
-class OpenPyXL:
+class XLSX_Commons:
+    def __init__(self):
+        pass
+
+
+    ## It returns a sheet object with the index id
+    def get_sheet_by_id(self, id):
+        return self.wb[self.wb.sheetnames[id]]
+
+    ## It returns a index integer of the sheet with a given name
+    def get_sheet_id(self, name):
+        for id, s_name in enumerate(self.wb.sheetnames):
+            if s_name==name:
+                return id
+        return None
+
+    ## Returns the number of columns with data of the current sheet. Returns the number not the index
+    ## @return int
+    def max_columns(self):
+        return self.ws_current.max_column
+        
+    ## Returns the number of rows with data of the current sheet. Returns the number not the index
+    ## @return int
+    def max_rows(self):
+        return self.ws_current.max_row
+        
+
+    ## Function that establishes current worksheet. Updates self.ws_current and self.ws_current_id
+    ##
+    ## id Is a integer beginning with 0
+    ## name is the title of the sheet
+    ## @param id_or_name Index or Nmae
+    def setCurrentSheet(self, id_or_name):
+        if id_or_name.__class__==int:
+            self.ws_current_id=id_or_name
+        else:#name
+            self.ws_current_id=self.get_sheet_id(id_or_name)
+        self.ws_current=self.get_sheet_by_id(self.ws_current_id)
+
+    ## @param sheet_index Integer index of the sheet
+    ## @param range_ Range object to get OdfCell. If None returns all OdfCell from sheet
+    ## @return Returns a list of rows of object values
+    def cells(self, sheet_index, range_=None):
+        if range_ is None:
+            range_=self.getSheetRange(sheet_index)
+        else:
+            range_=Range.assertRange(range_)
+        r=[]
+        for row in range(range_.numRows()):
+            tmprow=[]
+            for column in range(range_.numColumns()):
+                tmprow.append(self.getCell(sheet_index, range_.start.addRowCopy(row).addColumnCopy(column)))
+            r.append(tmprow)
+        return r
+        
+    ## @param sheet_index Integer index of the sheet
+    ## @param range_ Range object to get values. If None returns all values from sheet
+    ## @return Returns a list of rows of object values
+    def values(self, sheet_index, range_=None):
+        if range_ is None:
+            range_=self.getSheetRange(sheet_index)
+        else:
+            range_=Range.assertRange(range_)
+        r=[]
+        for row in range(range_.numRows()):
+            tmprow=[]
+            for column in range(range_.numColumns()):
+                tmprow.append(self.getCellValue(sheet_index, range_.start.addRowCopy(row).addColumnCopy(column)))
+            r.append(tmprow)
+        return r
+    
+    ## @param sheet_index Integer index of the sheet
+    ## @param column_letter Letter of the column to get values
+    ## @param skip Integer Number of top rows to skip in the result
+    ## @return List of values
+    def getColumnValues(self, sheet_index, column_letter, skip=0):
+        r=[]
+        for row in range(skip, self.rowNumber(sheet_index)):
+            r.append(self.getCellValue(sheet_index, Coord(column_letter+"1").addRow(row)))
+        return r    
+
+    ## @param sheet_index Integer index of the sheet
+    ## @param row_number String Number of the row to get values
+    ## @param skip Integer Number of top rows to skip in the result
+    ## @return List of values
+    def getRowValues(self, sheet_index, row_number, skip=0):
+        r=[]
+        for column in range(skip, self.columnNumber(sheet_index)):
+            r.append(self.getCellValue(sheet_index, Coord("A"+row_number).addColumn(column)))
+        return r
+
+    ## Return a Range object with the limits of the index sheet
+    def getSheetRange(self, sheet_index):
+        self.setCurrentSheet(sheet_index)
+        return Range(self.ws_current.calculate_dimension())
+        
+    def rowNumber(self, sheet_index):
+        self.setCurrentSheet(sheet_index)
+        return self.ws_current.max_row
+        
+    def columnNumber(self, sheet_index):
+        self.setCurrentSheet(sheet_index)
+        return self.ws_current.max_column
+        
+    ## Returns the cell value
+    def getCellValue(self, sheet_index, coord):
+        def hasCurrency(cell):
+            for currency in ["EUR", "USD","GBP"]:
+                if currency in cell.number_format and cell.data_type=="n":
+                    return Currency(cell.value, currency)
+            return None
+        #----------------------
+        self.setCurrentSheet(sheet_index)
+        cell=self.getCell(sheet_index, coord)
+#        print(cell.number_format, cell.value, cell.data_type)
+        #print(dir(cell))
+        has_currency=hasCurrency(cell)
+        if has_currency is not None:
+            return has_currency
+        elif "%" in cell.number_format:
+            return Percentage(cell.value, 1)
+        elif cell.data_type=="d" and "H" not in cell.number_format.upper():#Date
+            return cell.value.date()
+        elif cell.data_type=="d" and "Y" not in cell.number_format.upper():#Tiime
+            return cell.value
+        elif cell.data_type=="d":#Datetime
+            return cell.value
+        elif cell.data_type == "b": #Boolean
+            return cell.value
+        elif cell.number_format=='"BOOL"e"AN"':
+            if cell.value==1:
+                return True
+            elif cell.value==0:
+                return False
+        elif cell.data_type == "s":
+            return str(cell.value)
+        elif cell.value is None:
+            return None
+        elif cell.data_type=="n":
+            try:
+                return Decimal(str(cell.value))
+            except:
+                return str(cell.value)
+
+    ## Returns an odfcell object
+    def getCell(self, sheet_index,  coord):
+        self.setCurrentSheet(sheet_index)
+        coord=Coord.assertCoord(coord)
+        return self.ws_current[coord.string()]
+
+class XLSX_Write(XLSX_Commons):
     def __init__(self,filename,template=None):
+        XLSX_Commons.__init__(self)
         self.filename=filename
         self.template=template
         if template==None:
@@ -125,17 +276,6 @@ class OpenPyXL:
         self.wb.create_sheet(title=name)
         self.setCurrentSheet(name)
 
-    ## Function that establishes current worksheet. Updates self.ws_current and self.ws_current_id
-    ##
-    ## id Is a integer beginning with 0
-    ## name is the title of the sheet
-    ## @param id_or_name Index or Nmae
-    def setCurrentSheet(self, id_or_name):
-        if id_or_name.__class__==int:
-            self.ws_current_id=id_or_name
-        else:#name
-            self.ws_current_id=self.get_sheet_id(id_or_name)
-        self.ws_current=self.get_sheet_by_id(self.ws_current_id)
 
     def setColorScale(self, range):
         self.ws_current.conditional_formatting.add(range, 
@@ -152,27 +292,6 @@ class OpenPyXL:
         return self.wb.sheetnames[id]
 
 
-    ## It returns a sheet object with the index id
-    def get_sheet_by_id(self, id):
-        return self.wb[self.wb.sheetnames[id]]
-
-    ## It returns a index integer of the sheet with a given name
-    def get_sheet_id(self, name):
-        for id, s_name in enumerate(self.wb.sheetnames):
-            if s_name==name:
-                return id
-        return None
-
-    ## Returns the number of columns with data of the current sheet. Returns the number not the index
-    ## @return int
-    def max_columns(self):
-        return self.ws_current.max_column
-        
-    ## Returns the number of rows with data of the current sheet. Returns the number not the index
-    ## @return int
-    def max_rows(self):
-        return self.ws_current.max_row
-        
         
     ## After removing it sets current sheet to 0 index
     def remove_sheet_by_id(self, id):
@@ -190,13 +309,6 @@ class OpenPyXL:
         if path.exists(filename)==False:
             print(_("*** ERROR: File wasn't generated ***"))
 
-    ## Returns a cell object in the current sheet
-    ## @param letter
-    ## @param number
-    ## @return sheet
-    def cell(self, coord):
-        coord=Coord.assertCoord(coord)
-        return self.ws_current[coord.string()]
 
     ## Internal function to set the number format
     ##
@@ -280,7 +392,7 @@ class OpenPyXL:
     ## @param alignment Cell alignment
     def __setCell(self, coord, value, style=None, decimals=2, alignment=None):
         coord=Coord.assertCoord(coord)
-        cell=self.cell(coord.string())
+        cell=self.getCell(self.ws_current_id, coord.string())
         self.__setValue(cell, value, style, decimals, alignment)
         self.__setBorder(cell, style)
         self.__setAlignment(cell, value, style, alignment)
@@ -338,7 +450,7 @@ class OpenPyXL:
             print("Adding formula list is not allowed")
             return
         coord=Coord.assertCoord(coord)
-        cell=self.cell(coord.string())
+        cell=self.getCell(self.ws_current_id, coord)
         self.__setValue(cell, value, style, decimals, alignment)
         self.__setBorder(cell, style)
         self.__setAlignment(cell, value, style, alignment)
@@ -409,3 +521,11 @@ class OpenPyXL:
     def setComment(self, coord_string, comment):
         self.ws_current[coord_string].comment=openpyxl.comments.Comment(comment, "PySGAE")
 
+
+class XLSX_Read(XLSX_Commons):
+    def __init__(self, filename):
+        XLSX_Commons.__init__(self)
+        self.filename=filename
+        self.wb=openpyxl.load_workbook(self.filename, keep_vba=True)
+        self.ws_current=self.wb.active
+        self.setCurrentSheet(self.ws_current.title)
