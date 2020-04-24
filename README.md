@@ -27,6 +27,12 @@ Known issues
 
 Changelog
 =========
+1.21.0
+------
+  * Refactorized OpenPyXL to XLSX_Write.
+  * Added XLSX_Read class.
+  * Improved demo readonly methods.
+
 1.20.0
 ------
   * Method created to get column and row values

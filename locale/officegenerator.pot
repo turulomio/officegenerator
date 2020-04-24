@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-24 20:28+0200\n"
+"POT-Creation-Date: 2020-04-25 01:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "ODS Generated"
 msgstr ""
 
-msgid "ODS Readed and regenerated"
+msgid "ODS updated"
 msgstr ""
 
 msgid "ODT Generated"
@@ -44,10 +44,16 @@ msgstr ""
 msgid "XLSX Generated"
 msgstr ""
 
-msgid "XLSX Readed and regenerated"
+msgid "XLSX updated"
 msgstr ""
 
-msgid "This cell has been readed and modified"
+msgid "ODS Readonly extractions"
+msgstr ""
+
+msgid "XLSX Readonly extractions"
+msgstr ""
+
+msgid "This cell has been updated and modified"
 msgstr ""
 
 msgid "Created cell"
@@ -234,6 +240,9 @@ msgid "Morever, you can set a predefined A4 horizontal page, as you can see."
 msgstr ""
 
 msgid "Styles"
+msgstr ""
+
+msgid "Boolean"
 msgstr ""
 
 msgid "This is a custom cell"

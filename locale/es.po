@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-24 19:50+0200\n"
+"POT-Creation-Date: 2020-04-25 01:21+0200\n"
 "PO-Revision-Date: 2020-04-03 08:54+0200\n"
 "Last-Translator: trabajo <turulomio@yahoo.es>\n"
 "Language-Team: Spanish <kde-i18n-doc@kde.org>\n"
@@ -31,8 +31,8 @@ msgstr "Generando ficheros de ejemplo"
 msgid "ODS Generated"
 msgstr "ODS generado"
 
-msgid "ODS Readed and regenerated"
-msgstr "ODS leído y regenerado"
+msgid "ODS updated"
+msgstr ""
 
 msgid "ODT Generated"
 msgstr "ODT generado"
@@ -46,11 +46,17 @@ msgstr "ODT Generado con estilos manuales"
 msgid "XLSX Generated"
 msgstr "XLSX generado"
 
-msgid "XLSX Readed and regenerated"
-msgstr "XLSX leído y regenerado"
+msgid "XLSX updated"
+msgstr ""
 
-msgid "This cell has been readed and modified"
-msgstr "Esta celda ha sido leída y modificada"
+msgid "ODS Readonly extractions"
+msgstr ""
+
+msgid "XLSX Readonly extractions"
+msgstr ""
+
+msgid "This cell has been updated and modified"
+msgstr ""
 
 msgid "Created cell"
 msgstr "Celda creada"
@@ -238,6 +244,9 @@ msgstr "Ademas, puedes añadir páginas horizontales A4 predefinidas, como puede
 msgid "Styles"
 msgstr "Estilos"
 
+msgid "Boolean"
+msgstr ""
+
 msgid "This is a custom cell"
 msgstr "Esto es una celda modificada"
 
@@ -297,6 +306,15 @@ msgstr "Fichero XLSX a convertir"
 
 msgid "officegenerator_xlsx2xml only works on Linux"
 msgstr "officegenerator_xlsx2xml sólo funciona en Linux"
+
+#~ msgid "ODS Readed and regenerated"
+#~ msgstr "ODS leído y regenerado"
+
+#~ msgid "XLSX Readed and regenerated"
+#~ msgstr "XLSX leído y regenerado"
+
+#~ msgid "This cell has been readed and modified"
+#~ msgstr "Esta celda ha sido leída y modificada"
 
 #~ msgid "Tag {} hasn't been found"
 #~ msgstr "La etiqueta {} no ha sido encontrada"
