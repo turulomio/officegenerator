@@ -1,13 +1,14 @@
 ## @namespace officegenerator.commons
 ## @brief Common code to odfpy and openpyxl wrappers
-from datetime import date
+from datetime import datetime
 from gettext import translation
 from pkg_resources import resource_filename
 from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
 from odf.opendocument import  __version__ as __odfpy_version__
 
-__version__ = '1.19.0'
-__versiondate__=date(2020, 4, 24)
+__version__ = '1.20.0'
+__versiondatetime__=datetime(2020, 4, 24, 20, 25)
+__versiondate__=__versiondatetime__.date()
 
 try:
     t=translation('officegenerator',resource_filename("officegenerator","locale"))

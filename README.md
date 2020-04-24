@@ -27,6 +27,10 @@ Known issues
 
 Changelog
 =========
+1.20.0
+------
+  * Method created to get column and row values
+
 1.19.0
 ------
   * Added method to iterate ranges and ods sheets.
