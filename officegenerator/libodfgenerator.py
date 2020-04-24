@@ -94,7 +94,6 @@ class ODS_Read:
             range_=self.getSheetRange(sheet_index)
         else:
             range_=Range.assertRange(range_)
-        print(range_)
         r=[]
         for row in range(range_.numRows()):
             tmprow=[]
@@ -102,7 +101,27 @@ class ODS_Read:
                 tmprow.append(self.getCellValue(sheet_index, range_.start.addRowCopy(row).addColumnCopy(column)))
             r.append(tmprow)
         return r
-        
+    
+    ## @param sheet_index Integer index of the sheet
+    ## @param column_letter Letter of the column to get values
+    ## @param skip Integer Number of top rows to skip in the result
+    ## @return List of values
+    def getColumnValues(self, sheet_index, column_letter, skip=0):
+        r=[]
+        for row in range(skip, self.rowNumber(sheet_index)):
+            r.append(self.getCellValue(sheet_index, Coord("A1").addRow(row)))
+        return r    
+
+    ## @param sheet_index Integer index of the sheet
+    ## @param row_number String Number of the row to get values
+    ## @param skip Integer Number of top rows to skip in the result
+    ## @return List of values
+    def getRowValues(self, sheet_index, row_number, skip=0):
+        r=[]
+        for column in range(skip, self.columnNumber(sheet_index)):
+            r.append(self.getCellValue(sheet_index, Coord("A"+row_number).addColumn(column)))
+        return r
+
     ## Return a Range object with the limits of the index sheet
     def getSheetRange(self, sheet_index):
         endcoord=Coord("A1").addRow(self.rowNumber(sheet_index)-1).addColumn(self.columnNumber(sheet_index)-1)

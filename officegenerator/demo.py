@@ -77,7 +77,10 @@ def demo_ods_readed():
     for coord in range.coords()[0]:
         print(coord,  doc.getCellValue(9, coord))
         
-    print(doc.cells(9, range))   
+    print(doc.getColumnValues(1, "J", skip=3))
+    print(doc.getRowValues(1, "100", skip=3))
+        
+    print(doc.values(9, range))   
 
     #Sustituye celda
     odfcell=doc.getCell(0, "B6")
