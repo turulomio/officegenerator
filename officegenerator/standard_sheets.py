@@ -318,7 +318,7 @@ if __name__ == "__main__":
     data=[]        
     for row in range(30):
         data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
-    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ])
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ],totals_index_from=2)
     m.setData(data)
     m.ods_sheet(ods)
     m.xlsx_sheet(xlsx)
