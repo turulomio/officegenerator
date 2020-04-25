@@ -1,7 +1,8 @@
 from datetime import datetime,  timedelta
 from logging import warning
-from officegenerator.commons import Coord
-from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column
+from officegenerator.commons import Coord, index2column
+from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column, lor_get_column
+from officegenerator.libodfgenerator import guess_ods_style
 
 class ModelStyles:
     hh=0# Only horizontal header
@@ -14,6 +15,8 @@ class Model:
     def __init__(self):
         self.hh=None
         self.vh=None
+        self.ht_definition=None
+        self.vt_definition=None
 
     def setTitle(self, title):
         self.title=title
@@ -47,6 +50,14 @@ class Model:
         for arg in self.hh_sizes:
                 r.append(arg*factor)
         return r
+        
+    ## Returns the number of rows in data
+    def numDataRows(self):
+        return len(self.data)
+
+    ## Returns the number of rows in data
+    def numDataColumns(self):
+        return len(self.data[0])
         
     ## Converts self.hh_sizes in cm to xlsx sizes
     def columnSizes_for_xlsx(self):
@@ -136,12 +147,37 @@ class Model:
             for number, row in enumerate(self.data):
                 for letter,  field in enumerate(row):
                     s.add(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
-            s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(number).addColumn(letter))
+                    
+            #Fills horizontal 
+            if self.ht_definition is not None:
+                for letter, definition in enumerate(self.ht_definition):
+                    s.add(self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(letter), self.__calculate_horizontal_total("ods", letter), guess_ods_style("GrayLight", self.data[0][letter]))
+                s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(self.numDataColumns()-1))
+            else:
+                s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(self.numDataRows()-1).addColumn(self.numDataColumns()-1))
+            
+    ## @param type can be "ods","xlsx","odt","value"
+    ## See setHorizontalTotalDefinition doc for available keys
+    def __calculate_horizontal_total(self, type, column_index):
+        key=self.ht_definition[column_index]
+        column=index2column(column_index)
+        r=key
+        if type=="ods":
+            if key=="#SUM":
+                r= "=SUM({0}2:{0}{1})".format(column, self.numDataRows()+1)
+            elif key=="#AVG":
+                r= "=AVERAGE({0}2:{0}{1})".format(column, self.numDataRows()+1)
+            elif key=="#MEDIAN":
+                r= "=MEDIAN({0}2:{0}{1})".format(column, self.numDataRows()+1)
+        elif type=="value":
+            if key=="#SUM":
+                r= sum(lor_get_column(self.data, column))
+        return r
 
     ## Generates a odt table object from model
     ## @param doc odt document
     ## @param tablesize float in cm where the table is going to be placed in the paper(document)
-    ## @param fontsize int withe the size of the font in the document
+    ## @param fontsiz1e int withe the size of the font in the document
     ## @param after officegenerator after parameter
     def odt_table(self, doc, tablesize, fontsize, after=True):
         if self.vh is not None:
@@ -171,11 +207,28 @@ class Model:
         if self.hh is not None and self.vh is not None:
             return True
         return False
+        
+    
+    ## Available keys:
+    ## - #SUM
+    ## - #AVG
+    ## - #COUNT
+    ## - #MEDIAN
+    ## @param definition_list List with strings and keys
+    def setHorizontalTotalDefinition(self, definition_list):
+        self.ht_definition=definition_list
+        
+    ## See setHorizontalTotalDefinition doc for available keys
+    ## @param definition_list List with strings and keys
+    def setVerticalTotalDefinition(self, definition_list):
+        self.vt_definition=definition_list
 
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write
     from officegenerator.libodfgenerator import ODT_Standard
     from officegenerator.libxlsxgenerator import XLSX_Write
+    from officegenerator.objects.currency import Currency
+    from officegenerator.objects.percentage import Percentage
     filename="standard_sheets.ods"
     ods=ODS_Write("standard_sheets.ods")
     odt=ODT_Standard("standard_sheets.odt")
@@ -204,6 +257,17 @@ if __name__ == "__main__":
     m2.xlsx_sheet(xlsx)
     m2.odt_table(odt, 15, 10)
     
+    m=Model()
+    m.setTitle("Horizontal totals")
+    m.setHorizontalHeaders(["Concept", "Decimal", "Currency", "Percentage"], [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ])
+    m.setData(data)
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)
     
     xlsx.remove_sheet_by_id(0)
     ods.save()

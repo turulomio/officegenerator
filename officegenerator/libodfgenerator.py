@@ -1027,7 +1027,15 @@ class OdfSheet:
             if c.coord.string()==coord.string():
                 return c
         return None
-
+            
+    
+    ## Returns true if value is a string beginning with = or +
+    ## @param value must be a string
+    ## @return boolean
+    def isFormula(self, value):
+        if len(value)>0 and value[0] in ["=", "+"]:
+            return True
+        return False
 
     ## Adds a cell to the sheet using its coord, an object and a color or a style
     ## @param coord Coord where the cell is going to be created
