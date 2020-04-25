@@ -290,6 +290,13 @@ class Model:
         self.vt_definition=definition_list
         self.vt_index_from=totals_index_from
         
+def Model_H1_V0_TH(title, headers, data, allkeys="#SUM", sizes=5, totals_index_from=1):
+    m.setTitle(title)
+    m.setHorizontalHeaders(headers, sizes)
+    m.setData(data)
+    m.setHorizontalTotalDefinition(["Total"]+ ["#SUM"]*(m.numDataColumns()-totals_index_from), totals_index_from=totals_index_from)
+    return m
+        
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write
     from officegenerator.libodfgenerator import ODT_Standard
@@ -362,7 +369,8 @@ if __name__ == "__main__":
     m=Model()
 
     m.setTitle("HV totals")
-    m.setHorizontalHeaders(["Concept", "Decimal", "Decimal2", "Decimal3"], [5, 3, 3, 3])
+    hh=["Concept", "Decimal", "Decimal2", "Decimal3"]
+    m.setHorizontalHeaders(hh, [5, 3, 3, 3])
     data=[]        
     for row in range(30):
         data.append([f"Concept {row}", row*10, row*10, row*10 ])
@@ -372,6 +380,9 @@ if __name__ == "__main__":
     m.ods_sheet(ods)
     m.xlsx_sheet(xlsx)
     m.odt_table(odt, 15, 8)
+    
+    m=Model_H1_V0_TH("Model_H1_V0_TH", hh, data)
+    m.ods_sheet(ods)
     
     xlsx.remove_sheet_by_id(0)
     ods.save()
