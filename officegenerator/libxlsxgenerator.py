@@ -2,7 +2,6 @@
 ## @brief Este módulo permite la lectura y escritura de ficheros xlsx de Microsoft Excel
 ##
 ## You can change current sheet, with createSheet or using setCurrentSheet. After that all commands will use that sheet until you change it again
-import datetime
 import gettext
 import openpyxl
 import openpyxl.comments
@@ -15,7 +14,7 @@ from os import path, makedirs
 import pkg_resources
 
 from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone
-from officegenerator.objects.currency import Currency
+from officegenerator.objects.currency import Currency, currency_symbol
 from officegenerator.objects.percentage import Percentage
 from decimal import Decimal
 
@@ -320,18 +319,18 @@ class XLSX_Write(XLSX_Commons):
     def __setNumberFormat(self, cell, value, style, decimals):     
         if style==None:
             return
-        if value.__class__ in (int, ):#Un solo valor
+        if value.__class__.__name__ in ("int", ):#Un solo valor
             cell.number_format='#,##0;[RED]-#,##0'
-        elif value.__class__ in (float, Decimal):#Un solo valor
+        elif value.__class__.__name__ in ("float", "Decimal"):#Un solo valor
             zeros=decimals*"0"
             cell.number_format="#,##0.{0};[RED]-#,##0.{0}".format(zeros)
-        elif value.__class__ in (datetime.datetime, ):
+        elif value.__class__.__name__ in ("datetime", ):
             cell.number_format="YYYY-MM-DD HH:mm"
-        elif value.__class__ in (datetime.date, ):
+        elif value.__class__.__name__ in ("date", ):
             cell.number_format="YYYY-MM-DD"
-        elif value.__class__ in (Currency, ):
-            cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(value.currency)
-        elif value.__class__ in (Percentage, ):
+        elif value.__class__.__name__ in ("Currency", "Money" ):
+            cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(currency_symbol(value.currency))
+        elif value.__class__.__name__ in ("Percentage",  ):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
 
     ## Internal function to set the number format of a formula
@@ -339,24 +338,27 @@ class XLSX_Write(XLSX_Commons):
     ## This strings are openpyxl string not libreoffice cell string
     ## @param cell is a cell object
     ## @param resultclass int, float, Decimal, datetime.datetime, datetime.date,"€","$" (Currency.symbol), Percentage
+    ##    Currency it's not used because value is a string, and I can't get value.currency. Maybe I should create a Formula object, but Iwill have to change a lot of apps
     ## @param style Color or None. If None this function it's ignored
     ## @param decimals Number of decimals
-    def __setFormulaNumberFormat(self, cell, resultclass, style, decimals):     
+    def __setFormulaNumberFormat(self, cell, value, resultclass, style, decimals):     
         if style==None:
             return
-        if resultclass in (int, ):#Un solo valor
+        if resultclass in ("int", ):#Un solo valor
             cell.number_format='#,##0;[RED]-#,##0'
-        elif resultclass in (float, Decimal):#Un solo valor
+        elif resultclass in ("float", "Decimal"):#Un solo valor
             zeros=decimals*"0"
             cell.number_format="#,##0.{0};[RED]-#,##0.{0}".format(zeros)
-        elif resultclass in (datetime.datetime, ):
+        elif resultclass in ("datetime", ):
             cell.number_format="YYYY-MM-DD HH:mm"
-        elif resultclass in (datetime.date, ):
+        elif resultclass in ("date", ):
             cell.number_format="YYYY-MM-DD"
-        elif resultclass.__class__ in (str, ):
+        elif resultclass.__class__ in ("str", ):
             cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(resultclass)
-        elif resultclass in (Percentage, ):
+        elif resultclass in ("Percentage", ):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
+        elif resultclass in ("$", "€"):
+            cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(resultclass)
 
 
 
@@ -410,8 +412,11 @@ class XLSX_Write(XLSX_Commons):
         if style==None:
             return
         if alignment==None:
-            if value.__class__ in (str, ):#Un solo valor
-                alignment='left'
+            if value.__class__.__name__ in ("str", ):#Un solo valor
+                if value.startswith("=") or value.startswith("+"):
+                    alignment='right'
+                else:
+                    alignment='left'
             else:
                 alignment='right'
         cell.alignment=openpyxl.styles.Alignment(horizontal=alignment, vertical='center')
@@ -438,7 +443,7 @@ class XLSX_Write(XLSX_Commons):
     ## Writes a formula in a cell 
     ## @param coord Can be a Coord or a string with text coord
     ## @param result Can be a value
-    ## @param resultclass int, float, Decimal, datetime.datetime, datetime.date,"€","$" (Currency.symbol), Percentage
+    ## @param resultclass string that can be: int, float, Decimal, datetime.datetime, datetime.date, Currency, Percentage
     ## @param style its a openpyxl.styles.Color object. There are several predefined stGreen, stGrayDark, stGrayLight, stOrange, stYellow, stWhite or None. None is used to preserve template cell and the value is the only thing will be changed
     ## @param decimals Integer with the number of decimals. 2 by default
     ## @param alignment String None by default. Can be "right","left","center"
@@ -450,11 +455,12 @@ class XLSX_Write(XLSX_Commons):
             print("Adding formula list is not allowed")
             return
         coord=Coord.assertCoord(coord)
-        cell=self.getCell(self.ws_current_id, coord)
+        cell=self.getCell(self.ws_current_id, coord)       
+        
         self.__setValue(cell, value, style, decimals, alignment)
         self.__setBorder(cell, style)
         self.__setAlignment(cell, value, style, alignment)
-        self.__setFormulaNumberFormat(cell, resultclass, style, decimals)      
+        self.__setFormulaNumberFormat(cell, value, resultclass, style, decimals)      
 
         if style!=None:
             cell.fill=openpyxl.styles.PatternFill("solid", fgColor=style)

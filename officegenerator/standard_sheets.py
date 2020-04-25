@@ -3,6 +3,7 @@ from logging import warning
 from officegenerator.commons import Coord, index2column
 from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column, lor_get_column
 from officegenerator.libodfgenerator import guess_ods_style
+from officegenerator.objects.currency import currency_symbol
 
 class ModelStyles:
     hh=0# Only horizontal header
@@ -123,10 +124,28 @@ class Model:
         if self.__mustFillA1()==True:
             doc.overwrite("A1", " ",  doc.stOrange)
 
-        for number, row in enumerate(self.data):
-            for letter,  field in enumerate(row):
-                doc.overwrite(self.__getFirstContentCoord().addRow(number).addColumn(letter), field)
-        doc.freezeAndSelect(self.__getFirstContentCoord(), self.__getFirstContentCoord().addRow(number).addColumn(letter))
+        if self.numDataRows()>0:
+            for number, row in enumerate(self.data):
+                for letter,  field in enumerate(row):
+                    doc.overwrite(self.__getFirstContentCoord().addRow(number).addColumn(letter), field, style=doc.stWhite)
+
+            #Fills horizontal  yoysl
+            if self.ht_definition is not None:
+                for letter, definition in enumerate(self.ht_definition):
+                    class_=self.__object_to_formula_classname(self.data[0][letter])
+                    if self.__is_total_key(definition):
+                        doc.overwrite_formula(self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(letter), self.__calculate_horizontal_total("xlsx", letter), class_,  style=doc.stGrayLight)
+                    else:
+                        doc.overwrite(self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(letter), self.__calculate_horizontal_total("xlsx", letter), style=doc.stGrayLight)
+
+        self.__setFreezeAndSelect(doc)
+
+    ## Function neeeded to change formula types, due to is a string but needs to be changed to currency symbol. to use __setFormulaNumberFormat
+    def __object_to_formula_classname(self, o):
+        if o.__class__.__name__ in ("Currency", "Money"):
+            return currency_symbol(o.currency) 
+        else:
+            return o.__class__.__name__
 
     ## @param title String with the title of the sheet
     ## @param columns_title List of Strings
@@ -152,17 +171,15 @@ class Model:
             if self.ht_definition is not None:
                 for letter, definition in enumerate(self.ht_definition):
                     s.add(self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(letter), self.__calculate_horizontal_total("ods", letter), guess_ods_style("GrayLight", self.data[0][letter]))
-                s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(self.numDataColumns()-1))
-            else:
-                s.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(self.numDataRows()-1).addColumn(self.numDataColumns()-1))
-            
+
+        self.__setFreezeAndSelect(s)
     ## @param type can be "ods","xlsx","odt","value"
     ## See setHorizontalTotalDefinition doc for available keys
     def __calculate_horizontal_total(self, type, column_index):
         key=self.ht_definition[column_index]
         column=index2column(column_index)
         r=key
-        if type=="ods":
+        if type in("ods",  "xlsx"):
             if key=="#SUM":
                 r= "=SUM({0}2:{0}{1})".format(column, self.numDataRows()+1)
             elif key=="#AVG":
@@ -173,6 +190,11 @@ class Model:
             if key=="#SUM":
                 r= sum(lor_get_column(self.data, column))
         return r
+        
+    def __is_total_key(self, s):
+        if s in ["#SUM","#AVG","#MEDIAN"]:
+            return True
+        return False
 
     ## Generates a odt table object from model
     ## @param doc odt document
@@ -200,6 +222,14 @@ class Model:
             return Coord("B2")
         elif self.hh is None and self.vh is None:
             return Coord("A1")
+        
+    ## @param ref Reference to object: ods: sheet, xlsx: doc
+    def __setFreezeAndSelect(self, ref):
+        if self.ht_definition is not None:
+            ref.freezeAndSelect(self.__getFirstContentCoord(), self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(self.numDataColumns()-1))
+        else:
+            ref.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(self.numDataRows()-1).addColumn(self.numDataColumns()-1))
+            
         
     ## Return if A1 must be filled for a better view
     ## @param bool
