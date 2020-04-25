@@ -180,8 +180,7 @@ class Model:
             if self.vt_definition is not None:
                 for number, definition in enumerate(self.vt_definition):
                     class_=self.__object_to_formula_classname(self.data[0][self.numDataColumns()-1])
-                    value=self.__calculate_vertical_total("xlsx", number)                    
-                    print(value, number)
+                    value=self.__calculate_vertical_total("xlsx", number)
                     if self.__is_total_key(definition):
                         doc.overwrite_formula(Coord("A1").addRow(number).addColumn(self.numDataColumns()), value, class_,  style=doc.stGrayLight)
                     else:
@@ -338,6 +337,20 @@ class Model:
         self.vt_definition=definition_list
         self.vt_index_from=totals_index_from
         
+    ## Generates an xlsx file from model
+    def xlsx_file(self, filename):
+        xlsx=XLSX_Write(filename)
+        self.xlsx_sheet(xlsx)
+        xlsx.remove_sheet_by_id(0)
+        xlsx.save()
+
+    ## Generates an ods file from model
+    def ods_file(self, filename):
+        ods=ODS_Write(filename)
+        self.ods_sheet(ods)
+        ods.save()
+        
+        
 ## Can show ht and vt. from an index
 ## @param title Title of the model and sheet
 ## @param hh List with Horizontal headers
@@ -362,7 +375,6 @@ def Model_Auto(title, hh, data, allkeys="#SUM", sizes=5, row_index_from=1, colum
                 hdef=hdef+[""]
             else:
                 hdef=hdef+[allkeys]
-        print(hdef)
         m.setHorizontalTotalDefinition(hdef, totals_index_from=column_index_from)
 
     if vt is True:
@@ -376,7 +388,6 @@ def Model_Auto(title, hh, data, allkeys="#SUM", sizes=5, row_index_from=1, colum
         
         if ht is True:
             vdef=vdef + [allkeys]#Crossed total
-        print(vdef)
             
         m.setVerticalTotalDefinition(vdef, totals_index_from=column_index_from)
     return m
@@ -487,7 +498,9 @@ if __name__ == "__main__":
     m.xlsx_sheet(xlsx)
     m.odt_table(odt, 15, 8)
     
-    xlsx.remove_sheet_by_id(0)
     ods.save()
     xlsx.save()
     odt.save()
+    
+    m.ods_file("directo.ods")
+    m.xlsx_file("directo.xlsx")
