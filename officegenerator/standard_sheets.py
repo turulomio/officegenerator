@@ -1,6 +1,6 @@
 from datetime import datetime,  timedelta
 from logging import warning
-from officegenerator.commons import Coord, index2column, index2row
+from officegenerator.commons import Coord, index2column, index2row, columnAdd
 from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column, lor_get_column, lor_get_row
 from officegenerator.libodfgenerator import guess_ods_style
 from officegenerator.objects.currency import currency_symbol
@@ -170,9 +170,18 @@ class Model:
             #Fills horizontal 
             if self.ht_definition is not None:
                 for letter, definition in enumerate(self.ht_definition):
-                    s.add(self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(letter), self.__calculate_horizontal_total("ods", letter), guess_ods_style("GrayLight", self.data[0][letter]))
+                    value= self.__calculate_horizontal_total("ods", letter)
+                    style=guess_ods_style("GrayLight", self.data[self.ht_index_from][letter])
+                    s.add(Coord("A1").addRow(self.numDataRows()).addColumn(letter), value, style )
+            if self.vt_definition is not None:
+                for number, definition in enumerate(self.vt_definition):
+                    value=self.__calculate_vertical_total("ods", number)
+                    style=guess_ods_style("GrayLight", self.data[self.vt_index_from][letter])
+                    s.add(Coord("A1").addRow(number).addColumn(self.numDataColumns()), value,  style)
 
         self.__setFreezeAndSelect(s)
+        return s
+
     ## @param type can be "ods","xlsx","odt","value"
     ## See setHorizontalTotalDefinition doc for available keys
     def __calculate_horizontal_total(self, type, column_index):
@@ -182,11 +191,11 @@ class Model:
         r=key
         if type in("ods",  "xlsx"):
             if key=="#SUM":
-                r= "=SUM({0}{1}:{0}{2})".format(column, total_from, self.numDataRows()+1)
+                r= "=SUM({0}{1}:{0}{2})".format(column, total_from, self.numDataRows())
             elif key=="#AVG":
-                r= "=AVERAGE({0}{1}:{0}{2})".format(column, total_from, self.numDataRows()+1)
+                r= "=AVERAGE({0}{1}:{0}{2})".format(column, total_from, self.numDataRows())
             elif key=="#MEDIAN":
-                r= "=MEDIAN({0}{1}:{0}{2})".format(column, total_from, self.numDataRows()+1)
+                r= "=MEDIAN({0}{1}:{0}{2})".format(column, total_from, self.numDataRows())
         elif type=="value":
             if key=="#SUM":
                 r= sum(lor_get_column(self.data, column))
@@ -197,18 +206,19 @@ class Model:
     def __calculate_vertical_total(self, type, row_index):
         key=self.vt_definition[row_index]
         row=index2row(row_index)
-        total_from=index2column(self.ht_index_from)
+        total_from=index2column(self.vt_index_from)
         r=key
         if type in("ods",  "xlsx"):
             if key=="#SUM":
-                r= "=SUM({0}{1}:{0}{2})".format(total_from, row, self.numDataRows()+1)
+                r= "=SUM({0}{1}:{2}{1})".format(total_from, row, columnAdd(total_from, self.numDataColumns()-self.vt_index_from-1))
             elif key=="#AVG":
-                r= "=AVERAGE({0}{1}:{0}{2})".format(total_from, row, self.numDataRows()+1)
+                r= "=AVERAGE({0}{1}:{2}{1})".format(total_from, row, columnAdd(total_from, self.numDataColumns()-self.vt_index_from-1))
             elif key=="#MEDIAN":
-                r= "=MEDIAN({0}{1}:{0}{2})".format(total_from, row, self.numDataRows()+1)
+                r= "=MEDIAN({0}{1}:{2}{1})".format(total_from, row, columnAdd(total_from, self.numDataColumns()-self.vt_index_from-1))
         elif type=="value":
             if key=="#SUM":
                 r= sum(lor_get_row(self.data, row))
+#        print(r, key, type, row, row_index, total_from)
         return r
         
         
@@ -248,6 +258,8 @@ class Model:
     def __setFreezeAndSelect(self, ref):
         if self.ht_definition is not None:
             ref.freezeAndSelect(self.__getFirstContentCoord(), self.__getFirstContentCoord().addRow(self.numDataRows()).addColumn(self.numDataColumns()-1))
+        elif self.vt_definition is not None:
+            ref.freezeAndSelect(self.__getFirstContentCoord(), self.__getFirstContentCoord().addRow(self.numDataRows()-1).addColumn(self.numDataColumns()))
         else:
             ref.freezeAndSelect(self.__getFirstContentCoord(),self.__getFirstContentCoord().addRow(self.numDataRows()-1).addColumn(self.numDataColumns()-1))
             
@@ -290,7 +302,7 @@ if __name__ == "__main__":
     xlsx=XLSX_Write("standard_sheets.xlsx")
     
     m=Model()
-    m.setTitle("Probe")
+    m.setTitle("HV")
     m.setHorizontalHeaders(["Number", "Data", "More data", "Dt"], [1, 2, 3, 4])
     m.setVerticalHeaders(["V1", "V2", "V3"]*10, 4)
     data=[]        
@@ -302,7 +314,7 @@ if __name__ == "__main__":
     m.odt_table(odt, 15, 8)
     
     m2=Model()
-    m2.setTitle("Probe 2")
+    m2.setTitle("V")
     m2.setHorizontalHeaders(None, [1, 2, 3])
     m2.setVerticalHeaders(["Number", "Data", "More data"]*10)
     m2.setData(data)
@@ -313,13 +325,50 @@ if __name__ == "__main__":
     m2.odt_table(odt, 15, 10)
     
     m=Model()
-    m.setTitle("Horizontal totals")
+    m.setTitle("H totals")
     m.setHorizontalHeaders(["Concept", "Decimal", "Currency", "Percentage"], [5, 3, 3, 3])
     data=[]        
     for row in range(30):
         data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
-    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ],totals_index_from=2)
     m.setData(data)
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ])
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)    
+    m=Model()
+
+    m.setTitle("H totals skip 2")
+    m.setHorizontalHeaders(["Concept", "Decimal", "Currency", "Percentage"], [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
+    m.setData(data)
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ],totals_index_from=2)
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)
+    
+    m=Model()
+    m.setTitle("V totals")
+    m.setHorizontalHeaders(["Concept", "Decimal", "Decimal2", "Decimal3"], [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, row*10, row*10 ])
+    m.setData(data)
+    m.setVerticalTotalDefinition(["Total"]+["#SUM"]*m.numDataRows() )
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)    
+    m=Model()
+
+    m.setTitle("HV totals")
+    m.setHorizontalHeaders(["Concept", "Decimal", "Decimal2", "Decimal3"], [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, row*10, row*10 ])
+    m.setData(data)
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ],totals_index_from=2)
+    m.setVerticalTotalDefinition(["Total"]+["#SUM"]*m.numDataRows() )
     m.ods_sheet(ods)
     m.xlsx_sheet(xlsx)
     m.odt_table(odt, 15, 8)
