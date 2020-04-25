@@ -1,7 +1,7 @@
 from datetime import datetime,  timedelta
 from logging import warning
-from officegenerator.commons import Coord, index2column
-from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column, lor_get_column
+from officegenerator.commons import Coord, index2column, index2row
+from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column, lor_get_column, lor_get_row
 from officegenerator.libodfgenerator import guess_ods_style
 from officegenerator.objects.currency import currency_symbol
 
@@ -178,18 +178,39 @@ class Model:
     def __calculate_horizontal_total(self, type, column_index):
         key=self.ht_definition[column_index]
         column=index2column(column_index)
+        total_from=index2row(self.ht_index_from)
         r=key
         if type in("ods",  "xlsx"):
             if key=="#SUM":
-                r= "=SUM({0}2:{0}{1})".format(column, self.numDataRows()+1)
+                r= "=SUM({0}{1}:{0}{2})".format(column, total_from, self.numDataRows()+1)
             elif key=="#AVG":
-                r= "=AVERAGE({0}2:{0}{1})".format(column, self.numDataRows()+1)
+                r= "=AVERAGE({0}{1}:{0}{2})".format(column, total_from, self.numDataRows()+1)
             elif key=="#MEDIAN":
-                r= "=MEDIAN({0}2:{0}{1})".format(column, self.numDataRows()+1)
+                r= "=MEDIAN({0}{1}:{0}{2})".format(column, total_from, self.numDataRows()+1)
         elif type=="value":
             if key=="#SUM":
                 r= sum(lor_get_column(self.data, column))
         return r
+
+    ## @param type can be "ods","xlsx","odt","value"
+    ## See setHorizontalTotalDefinition doc for available keys
+    def __calculate_vertical_total(self, type, row_index):
+        key=self.vt_definition[row_index]
+        row=index2row(row_index)
+        total_from=index2column(self.ht_index_from)
+        r=key
+        if type in("ods",  "xlsx"):
+            if key=="#SUM":
+                r= "=SUM({0}{1}:{0}{2})".format(total_from, row, self.numDataRows()+1)
+            elif key=="#AVG":
+                r= "=AVERAGE({0}{1}:{0}{2})".format(total_from, row, self.numDataRows()+1)
+            elif key=="#MEDIAN":
+                r= "=MEDIAN({0}{1}:{0}{2})".format(total_from, row, self.numDataRows()+1)
+        elif type=="value":
+            if key=="#SUM":
+                r= sum(lor_get_row(self.data, row))
+        return r
+        
         
     def __is_total_key(self, s):
         if s in ["#SUM","#AVG","#MEDIAN"]:
@@ -245,14 +266,18 @@ class Model:
     ## - #COUNT
     ## - #MEDIAN
     ## @param definition_list List with strings and keys
-    def setHorizontalTotalDefinition(self, definition_list):
-        self.ht_definition=definition_list
-        
+    ## @param totals_index_from Column index from with totals are generated
+    def setHorizontalTotalDefinition(self, definition_list, totals_index_from=1):
+        self.ht_definition=definition_list    ## Available keys:
+        self.ht_index_from=totals_index_from
+
     ## See setHorizontalTotalDefinition doc for available keys
     ## @param definition_list List with strings and keys
-    def setVerticalTotalDefinition(self, definition_list):
+    ## @param totals_index_from Column index from with totals are generated
+    def setVerticalTotalDefinition(self, definition_list, totals_index_from=1):
         self.vt_definition=definition_list
-
+        self.vt_index_from=totals_index_from
+        
 if __name__ == "__main__":
     from officegenerator.libodfgenerator import  ODS_Write
     from officegenerator.libodfgenerator import ODT_Standard
