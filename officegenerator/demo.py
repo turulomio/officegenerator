@@ -195,7 +195,7 @@ def demo_ods():
             sf4.add(letter + str(number), letter+str(number), "YellowLeft")
     sf4.freezeAndSelect("C3", "Z199") 
     s6=doc.createSheet("Format number")
-    s6.setColumnsWidth([ColumnWidthODS.L, ColumnWidthODS.Datetime, ColumnWidthODS.Date, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.XL, ColumnWidthODS.XXL])
+    s6.setColumnsWidth([ColumnWidthODS.L, ColumnWidthODS.Datetime, ColumnWidthODS.Date, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.XL, ColumnWidthODS.L, ColumnWidthODS.L, ColumnWidthODS.L])
 
     s6.add("A1", _("Style name"), "OrangeCenter")
     s6.add("B1", _("Date and time"), "OrangeCenter")
@@ -207,7 +207,7 @@ def demo_ods():
     s6.add("H1", _("Number with 2 decimals"), "OrangeCenter")
     s6.add("I1", _("Number with 6 decimals"), "OrangeCenter")
     s6.add("J1", _("Time"), "OrangeCenter")
-    s6.add("K1", _("Integer with '"), "OrangeCenter")
+    s6.add("K1", _("Boolean"), "OrangeCenter")
     for row, color in enumerate(doc.colors.arr):
         s6.add(Coord("A2").addRow(row), color.name, color.name + "Left")
         s6.add(Coord("B2").addRow(row), datetime.now(),  color.name +"Datetime")
@@ -219,7 +219,7 @@ def demo_ods():
         s6.add(Coord("H2").addRow(row), pow(-1, row)*123456789.121212, color.name+"Decimal2")
         s6.add(Coord("I2").addRow(row), pow(-1, row)*-12.121212, color.name+"Decimal6")
         s6.add(Coord("J2").addRow(row), (datetime.now()+timedelta(seconds=3600*12*row)).time(), color.name+"Time")
-        s6.add(Coord("K2").addRow(row), 12121212,  color.name+"Left")
+        s6.add(Coord("K2").addRow(row), bool(row%2),  color.name+"Left")
 
     s6.setComment("B2", _("This is a comment"))
     
