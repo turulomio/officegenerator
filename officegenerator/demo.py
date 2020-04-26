@@ -43,7 +43,7 @@ def main(arguments=None):
     group.add_argument('--create', help="Create demo files", action="store_true",default=False)
     group.add_argument('--remove', help="Remove demo files", action="store_true", default=False)
     args=parser.parse_args(arguments)
-    
+
     addDebugSystem(args.debug)
 
     if args.remove==True:
@@ -57,8 +57,8 @@ def main(arguments=None):
         remove_without_errors("officegenerator_xlsx_readonly.txt")
         remove_without_errors("officegenerator_ods_readonly.txt")
         remove_without_errors("officegenerator_standard_sheets.ods")
-        remove_without_errors("officegenerator_standard_sheets.ods")
-        remove_without_errors("officegenerator_standard_sheets.ods")
+        remove_without_errors("officegenerator_standard_sheets.odt")
+        remove_without_errors("officegenerator_standard_sheets.xlsx")
         remove_without_errors("officegenerator_standard_sheets_direct.ods")
         remove_without_errors("officegenerator_standard_sheets_direct.xlsx")
 
