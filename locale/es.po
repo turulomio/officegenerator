@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TooManyFiles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-25 01:21+0200\n"
+"POT-Creation-Date: 2020-04-26 11:47+0200\n"
 "PO-Revision-Date: 2020-04-03 08:54+0200\n"
 "Last-Translator: trabajo <turulomio@yahoo.es>\n"
 "Language-Team: Spanish <kde-i18n-doc@kde.org>\n"
@@ -22,41 +22,14 @@ msgstr ""
 msgid "Developed by Mariano Muñoz 2015-{}"
 msgstr "Desarrollado por Mariano Muñoz 2015-{}"
 
+msgid "Error deleting: {} -> {}"
+msgstr "Error al borrar: {} -> {}"
+
 msgid "Create example files using officegenerator module"
 msgstr "Crea ficheros de ejemplo usando el módulo officegenerator"
 
-msgid "Generating example files"
-msgstr "Generando ficheros de ejemplo"
-
-msgid "ODS Generated"
-msgstr "ODS generado"
-
-msgid "ODS updated"
-msgstr ""
-
-msgid "ODT Generated"
-msgstr "ODT generado"
-
-msgid "ODT (Search and replace) Generated"
-msgstr "ODT (Buscar y remplazar) Generado"
-
-msgid "ODT Generated from Manual Styles"
-msgstr "ODT Generado con estilos manuales"
-
-msgid "XLSX Generated"
-msgstr "XLSX generado"
-
-msgid "XLSX updated"
-msgstr ""
-
-msgid "ODS Readonly extractions"
-msgstr ""
-
-msgid "XLSX Readonly extractions"
-msgstr ""
-
 msgid "This cell has been updated and modified"
-msgstr ""
+msgstr "Esta celda ha sido actualizada y modificada"
 
 msgid "Created cell"
 msgstr "Celda creada"
@@ -103,8 +76,8 @@ msgstr "Número con 6 decimales"
 msgid "Time"
 msgstr "Tiempo"
 
-msgid "Integer with '"
-msgstr "Entero con '"
+msgid "Boolean"
+msgstr "Booleano"
 
 msgid "This cell is going to be merged with B13 a F14"
 msgstr "Esta celda va a unir el rango B13 y F14"
@@ -244,9 +217,6 @@ msgstr "Ademas, puedes añadir páginas horizontales A4 predefinidas, como puede
 msgid "Styles"
 msgstr "Estilos"
 
-msgid "Boolean"
-msgstr ""
-
 msgid "This is a custom cell"
 msgstr "Esto es una celda modificada"
 
@@ -255,6 +225,12 @@ msgstr "Esta celda va a ser unida desde con B13 y C13"
 
 msgid "This cell is going to be merged and aligned"
 msgstr "Esta celda va a ser unida y alineada"
+
+msgid "This are booleans"
+msgstr "Estos son booleanos"
+
+msgid "These are formulas returning booleans"
+msgstr "Estas son fórmulas devolviendo booleanos"
 
 msgid "This sheet max rows are {} and max columns {}"
 msgstr "El número máximo de filas de esta celda es {} y el de columnas {}"
@@ -306,6 +282,27 @@ msgstr "Fichero XLSX a convertir"
 
 msgid "officegenerator_xlsx2xml only works on Linux"
 msgstr "officegenerator_xlsx2xml sólo funciona en Linux"
+
+#~ msgid "Generating example files"
+#~ msgstr "Generando ficheros de ejemplo"
+
+#~ msgid "ODS Generated"
+#~ msgstr "ODS generado"
+
+#~ msgid "ODT Generated"
+#~ msgstr "ODT generado"
+
+#~ msgid "ODT (Search and replace) Generated"
+#~ msgstr "ODT (Buscar y remplazar) Generado"
+
+#~ msgid "ODT Generated from Manual Styles"
+#~ msgstr "ODT Generado con estilos manuales"
+
+#~ msgid "XLSX Generated"
+#~ msgstr "XLSX generado"
+
+#~ msgid "Integer with '"
+#~ msgstr "Entero con '"
 
 #~ msgid "ODS Readed and regenerated"
 #~ msgstr "ODS leído y regenerado"

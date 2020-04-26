@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-25 01:21+0200\n"
+"POT-Creation-Date: 2020-04-26 11:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,37 +20,10 @@ msgstr ""
 msgid "Developed by Mariano Muñoz 2015-{}"
 msgstr ""
 
+msgid "Error deleting: {} -> {}"
+msgstr ""
+
 msgid "Create example files using officegenerator module"
-msgstr ""
-
-msgid "Generating example files"
-msgstr ""
-
-msgid "ODS Generated"
-msgstr ""
-
-msgid "ODS updated"
-msgstr ""
-
-msgid "ODT Generated"
-msgstr ""
-
-msgid "ODT (Search and replace) Generated"
-msgstr ""
-
-msgid "ODT Generated from Manual Styles"
-msgstr ""
-
-msgid "XLSX Generated"
-msgstr ""
-
-msgid "XLSX updated"
-msgstr ""
-
-msgid "ODS Readonly extractions"
-msgstr ""
-
-msgid "XLSX Readonly extractions"
 msgstr ""
 
 msgid "This cell has been updated and modified"
@@ -101,7 +74,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-msgid "Integer with '"
+msgid "Boolean"
 msgstr ""
 
 msgid "This cell is going to be merged with B13 a F14"
@@ -242,9 +215,6 @@ msgstr ""
 msgid "Styles"
 msgstr ""
 
-msgid "Boolean"
-msgstr ""
-
 msgid "This is a custom cell"
 msgstr ""
 
@@ -252,6 +222,12 @@ msgid "This cell is going to be merged with B13 and C13"
 msgstr ""
 
 msgid "This cell is going to be merged and aligned"
+msgstr ""
+
+msgid "This are booleans"
+msgstr ""
+
+msgid "These are formulas returning booleans"
 msgstr ""
 
 msgid "This sheet max rows are {} and max columns {}"

@@ -27,6 +27,17 @@ Known issues
 
 Changelog
 =========
+1.22.0
+------
+  * Added Model and XLSX_Read to module visibility.
+  * Added Model totals to xlsx and ods files.
+  * [XLSX] overwrite_formula class type parameter is now a string to avoid innecesary imports.
+  * Improved formula styles and types (Money, Currency, bool).
+  * Added Model_Auto method for fast sheets.
+  * You can now generate a file from a Model method.
+  * Faster demo generation.
+  * Added standard sheets demos.
+
 1.21.0
 ------
   * Refactorized OpenPyXL to XLSX_Write.
