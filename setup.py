@@ -19,10 +19,11 @@ class Reusing(Command):
         from sys import path
         path.append("officegenerator")
         from github import download_from_github
-        download_from_github('turulomio','reusingcode','python/libmanagers.py', 'officegenerator')
         download_from_github('turulomio','reusingcode','python/github.py', 'officegenerator')
         download_from_github('turulomio','reusingcode','python/casts.py', 'officegenerator')
         download_from_github('turulomio','reusingcode','python/datetime_functions.py', 'officegenerator')
+        download_from_github('turulomio','reusingcode','python/decorators.py', 'officegenerator')
+        download_from_github('turulomio','reusingcode','python/libmanagers.py', 'officegenerator')
         download_from_github('turulomio','reusingcode','python/objects/percentage.py', 'officegenerator/objects/')
         download_from_github('turulomio','reusingcode','python/objects/currency.py', 'officegenerator/objects/')
 

@@ -332,6 +332,8 @@ class XLSX_Write(XLSX_Commons):
             cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(currency_symbol(value.currency))
         elif value.__class__.__name__ in ("Percentage",  ):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
+        elif value.__class__.__name__ =="bool":
+            cell.number_format="BOOLEAN"
 
     ## Internal function to set the number format of a formula
     ##
@@ -359,8 +361,8 @@ class XLSX_Write(XLSX_Commons):
             cell.number_format="#.##0,00 %;[RED]-#.##0,00 %"
         elif resultclass in ("$", "€"):
             cell.number_format='#,##0.00 "{0}";[RED]-#,##0.00 "{0}"'.format(resultclass)
-
-
+        elif resultclass=="bool":
+            cell.number_format="BOOLEAN"
 
     ## Returns true if value is a string beginning with = or +
     ## @param value must be a string
@@ -369,19 +371,18 @@ class XLSX_Write(XLSX_Commons):
         if len(value)>0 and value[0] in ["=", "+"]:
             return True
         return False
-        
-
-
 
     ## Internat function to set a cell. All properties except border that it's setted in overwrite functions (merged and no merged)
     ## @param cell is a cell object
     def __setValue(self, cell, value, style, decimals, alignment):     
         if value==None:
             return
-        elif value.__class__ in (Currency, ):
+        elif value.__class__.__name__ in ("Currency", "Money" ):
             cell.value=value.amount
-        elif value.__class__ in (Percentage, ):
+        elif value.__class__.__name__ in ("Percentage", ):
             cell.value=value.value
+        elif value.__class__.__name__ == "bool":
+            cell.value=value
         else:
             cell.value=value
 

@@ -5,7 +5,7 @@
 ## You have to use list objects if you are going to make selections and secuential access.
 
 from datetime import datetime, timedelta, date
-from logging import critical
+from logging import critical, debug
 from .datetime_functions import dtaware_day_end_from_date, dtaware_day_start_from_date, dtnaive_day_end_from_date, dtnaive_day_start_from_date
 
 ## Defines who self.selected is managed
@@ -25,12 +25,21 @@ class ObjectManager(object):
     def __repr__(self):
         return "{} with {} objects".format(self.__class__.__name__, self.length())
 
+    ## Method to iterate self.arr iterating object
+    def __iter__(self):
+        return iter(self.arr)
+
     ## Store constructor params to allow create new instances of this managers
     def setConstructorParameters(self, *params):
         self.initparams=params
 
     def append(self,  obj):
         self.arr.append(obj)
+
+    ## Appends and object if it isn't in array. Array will act as a set()
+    def append_distinct(self, obj):
+        if obj not in self.arr:
+            self.append(obj)
 
     def remove(self, obj):
         self.arr.remove(obj)
@@ -205,14 +214,23 @@ class ObjectManager_With_Id(ObjectManager):
     def __init__(self):
         ObjectManager.__init__(self)
         self._find_dict={}
+        self._use_dict_to_find=False
+
+    ## If set to True enables the use of a dict to find by id
+    def setUseDictToFind(self, value):
+        self._use_dict_to_find=value
 
     def append(self,  obj):
         self.arr.append(obj)
-        self._find_dict[obj.id]=obj
+        if self._use_dict_to_find==True:
+            if obj.id is None:
+                debug("You have added a key None to self._find_dict, perhaps you need to append it when object.id is set")
+            self._find_dict[obj.id]=obj
 
     def remove(self, obj):
         self.arr.remove(obj)
-        del self._find_dict[obj.id]
+        if self._use_dict_to_find==True:
+            del self._find_dict[obj.id]
 
 
     def arr_position(self, id):
@@ -230,10 +248,19 @@ class ObjectManager_With_Id(ObjectManager):
         return r
 
     ## Search by id iterating array
-    def find_by_id(self, id):
-        try:
-            return self._find_dict[id]
-        except:
+    def find_by_id(self, id, logging=False):
+        if self._use_dict_to_find==True:
+            try:
+                return self._find_dict[id]
+            except:
+                return None
+        else:
+            start=datetime.now()
+            for o in self.arr:
+                if o.id==id:
+                    if logging==True:
+                        debug("{} took {} to find by id {} with list".format(self.__class__.__name__, datetime.now()-start, id))
+                    return o
             return None
 
     def order_by_id(self, reverse=False, none_at_top=True):
@@ -616,3 +643,7 @@ if __name__ == "__main__":
     find_name.print()
     find_name=manager.find_by_name("CD")
     find_name.print()
+
+    print("Iterating an object")
+    for o in manager:
+        print(o)

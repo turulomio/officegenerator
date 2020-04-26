@@ -3,11 +3,14 @@
 
 import argparse
 import gettext
-import os
 import pkg_resources
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import timedelta, datetime, date
 from decimal import Decimal
+from multiprocessing import cpu_count
+
 from officegenerator.commons import __version__, addDebugSystem
+#from officegenerator.decorators import timeit
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT
 from officegenerator.libxlsxgenerator import XLSX_Write, XLSX_Read
 from officegenerator.commons import argparse_epilog, Coord, Range
@@ -15,6 +18,7 @@ from officegenerator.objects.currency import Currency
 from officegenerator.objects.percentage import Percentage
 from odf.text import P
 import openpyxl.styles
+from os import remove
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -22,6 +26,11 @@ try:
 except:
     _=str
 
+def remove_without_errors(filename):
+    try:
+        remove(filename)
+    except OSError as e:
+        print(_("Error deleting: {} -> {}".format(filename, e.strerror)))
 ## If arguments is None, launches with sys.argc parameters. Entry point is toomanyfiles:main
 ## You can call with main(['--pretend']). It's equivalento to os.system('program --pretend')
 ## @param arguments is an array with parser arguments. For example: ['--argument','9']. 
@@ -37,59 +46,59 @@ def main(arguments=None):
     addDebugSystem(args.debug)
 
     if args.remove==True:
-        os.remove("officegenerator.ods")
-        os.remove("officegenerator.odt")
-        os.remove("officegenerator_manual_styles.odt")
-        os.remove("officegenerator_updated.ods")
-        os.remove("officegenerator.xlsx")
-        os.remove("officegenerator_updated.xlsx")
+        remove_without_errors("officegenerator.ods")
+        remove_without_errors("officegenerator.odt")
+        remove_without_errors("officegenerator_manual_styles.odt")
+        remove_without_errors("officegenerator_search_and_replace.odt")
+        remove_without_errors("officegenerator_updated.ods")
+        remove_without_errors("officegenerator.xlsx")
+        remove_without_errors("officegenerator_updated.xlsx")
+        remove_without_errors("officegenerator_xlsx_readonly.txt")
+        remove_without_errors("officegenerator_ods_readonly.txt")
 
     if args.create==True:
+        start=datetime.now()
+        futures=[]
+        with ProcessPoolExecutor(max_workers=cpu_count()+1) as executor:
+            futures.append(executor.submit(demo_ods))
+            futures.append(executor.submit(demo_odt_standard))
+            futures.append(executor.submit(demo_odt_manual_styles))
+            futures.append(executor.submit(demo_xlsx))
 
-        
-        print(_("Generating example files"))
-        demo_ods()
-        print("  * " + _("ODS Generated"))
+        for future in as_completed(futures):
+            print(future.result())
+            
+        ## This process depend of above files
+        futures=[]
+        with ProcessPoolExecutor(max_workers=cpu_count()+1) as executor:
+            futures.append(executor.submit(demo_ods_updated))
+            futures.append(executor.submit(demo_ods_readonly))
+            futures.append(executor.submit(demo_odt_search_and_replace))
+            futures.append(executor.submit(demo_xlsx_updated))
+            futures.append(executor.submit(demo_xlsx_readonly))
 
-
-        demo_ods_updated()
-        print("  * " + _("ODS updated"))
-
-        demo_odt_standard()
-        print("  * " + _("ODT Generated"))
-        
-        demo_odt_search_and_replace()
-        print("  * " + _("ODT (Search and replace) Generated"))
-
-        demo_odt_manual_styles()
-        print("  * " + _("ODT Generated from Manual Styles"))
-
-        
-        demo_xlsx()
-        print("  * " + _("XLSX Generated"))
-
-        demo_xlsx_updated()
-        print("  * " + _("XLSX updated"))
-
-        print("  * " + _("ODS Readonly extractions"))
-        demo_ods_readonly()
-
-        print("  * " + _("XLSX Readonly extractions"))
-        demo_xlsx_readonly()
+        for future in as_completed(futures):
+            print(future.result())
+        print("All process took {}".format(datetime.now()-start))
 
 def demo_ods_readonly():
+    start=datetime.now()
     doc=ODS_Read("officegenerator.ods")
+    output=open("officegenerator_ods_readonly.txt", "w")
     
     range=Range("A2:K2")
     for coord in range.coords()[0]:
-        print(coord,  doc.getCellValue(9, coord))
+        output.write("{} {}\n".format(coord,  doc.getCellValue(9, coord)))
         
-    print(doc.getColumnValues(1, "J", skip=3))
-    print(doc.getRowValues(1, "100", skip=3))
+    output.write("{}\n".format(doc.getColumnValues(1, "J", skip=3)))
+    output.write("{}\n".format(doc.getRowValues(1, "100", skip=3)))
         
-    print(doc.values(9, range))   
+    output.write("{}\n".format(doc.values(9, range))   )
+    output.close()
+    return "demo_ods_readonly took {}".format(datetime.now()-start)
 
 def demo_ods_updated():
+    start=datetime.now()
     doc=ODS_Read("officegenerator.ods")
 
     #Sustituye celda
@@ -105,8 +114,10 @@ def demo_ods_updated():
     doc.setCell(0, "B10", odfcell )
 
     doc.save("officegenerator_updated.ods")
+    return "demo_ods_updated took {}".format(datetime.now()-start)
 
 def demo_ods():
+    start=datetime.now()
     doc=ODS_Write("officegenerator.ods")
     doc.setMetadata(_("OfficeGenerator ODS example"),  _("Demo with ODS_Write class"), "Turulomio", _("This file have been generated with OfficeGenerator-{}. You can see OfficeGenerator main page in http://github.com/turulomio/officegenerator").format(__version__), "officegenerator demo files")
     s1=doc.createSheet("Example")
@@ -226,11 +237,7 @@ def demo_ods():
 
     doc.setActiveSheet(s6)
     doc.save()
-    
-    # Create A1 small example to debug.. You must set the wanted position and saved another one with a1.bueno.ods, and compare it with odf2xml
-    #doc=ODS_Write("a3.ods")
-    #doc.sheets.append(sf2)
-    #doc.save()#Remove to debug
+    return "demo_ods took {}".format(datetime.now()-start)
    
 def demo_odt_commands(doc):
     doc.setMetadata("OfficeGenerator title",  "OfficeGenerator subject", "Turulomio")
@@ -352,23 +359,30 @@ def demo_odt_commands(doc):
     doc.header("XLSX", 1)
     
 def demo_odt_search_and_replace():
+    start=datetime.now()
     doc=ODT("officegenerator_search_and_replace.odt", template="officegenerator.odt")
     doc.search_and_replace("_DELETEME__", "")
     doc.search_and_replace("__REPLACEME__",  "This text has been replaced programatically")
     doc.save()
+    return "demo_odt_search_and_replace took {}".format(datetime.now()-start)
 
     
 def demo_odt_standard():
+    start=datetime.now()
     doc=ODT_Standard("officegenerator.odt")
     demo_odt_commands(doc)
     doc.save()
+    return "demo_odt_standard took {}".format(datetime.now()-start)
     
 def demo_odt_manual_styles():
+    start=datetime.now()
     doc=ODT_Manual_Styles("officegenerator_manual_styles.odt")
     demo_odt_commands(doc)
     doc.save()
+    return "demo_odt_manual_styles took {}".format(datetime.now()-start)
 
 def demo_xlsx():
+    start=datetime.now()
     xlsx=XLSX_Write("officegenerator.xlsx")
     xlsx.setCurrentSheet(0)
 
@@ -406,6 +420,8 @@ def demo_xlsx():
     xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)
     xlsx.overwrite_and_merge("A18:G18", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
 
+    xlsx.overwrite("A16", [[_("This are booleans"), False, True]], style=xlsx.stWhite, alignment='right')
+    xlsx.overwrite("D16", _("These are formulas returning booleans"), style=xlsx.stGreen)
 
     xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
     xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.max_rows(), xlsx.max_columns()), style=xlsx.stYellow,  alignment="center")
@@ -477,8 +493,10 @@ def demo_xlsx():
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("C3","Z199")
     xlsx.save()
+    return "demo_xlsx took {}".format(datetime.now()-start)
 
 def demo_xlsx_updated():
+    start=datetime.now()
     xlsx=XLSX_Write("officegenerator_updated.xlsx", "officegenerator.xlsx")
     xlsx.setCurrentSheet(0)
     
@@ -491,18 +509,23 @@ def demo_xlsx_updated():
     xlsx.overwrite_and_merge("A17:G17", _("This cell is going to be merged and aligned"),style=xlsx.stGrayDark, alignment="right")
 
     xlsx.save()
+    return "demo_xlsx_updated took {}".format(datetime.now()-start)
     
 def demo_xlsx_readonly(): 
+    start=datetime.now()
     doc=XLSX_Read("officegenerator.xlsx")
+    output=open("officegenerator_xlsx_readonly.txt", "w")
     
     range_=Range("A2:J2")
     for coord in range_.coords()[0]:
-        print(coord,  doc.getCellValue(0, coord))
+        output.write("{} {}\n".format(coord,  doc.getCellValue(0, coord)))
         
-    print(doc.getColumnValues(0, "J", skip=0))
-    print(doc.getRowValues(1, "100", skip=3))
+    output.write("{}\n".format(doc.getColumnValues(0, "J", skip=0)))
+    output.write("{}\n".format(doc.getRowValues(1, "100", skip=3)))
         
-    print(doc.values(0, range_) )
+    output.write("{}\n".format(doc.values(0, range_) ))
+    output.close()
+    return "demo_xlsx_readonly took {}".format(datetime.now()-start)
 
 if __name__ == "__main__":
     main()
