@@ -13,6 +13,7 @@ from officegenerator.commons import __version__, addDebugSystem
 #from officegenerator.decorators import timeit
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT
 from officegenerator.libxlsxgenerator import XLSX_Write, XLSX_Read
+from officegenerator.standard_sheets import Model, Model_Auto
 from officegenerator.commons import argparse_epilog, Coord, Range
 from officegenerator.objects.currency import Currency
 from officegenerator.objects.percentage import Percentage
@@ -55,6 +56,11 @@ def main(arguments=None):
         remove_without_errors("officegenerator_updated.xlsx")
         remove_without_errors("officegenerator_xlsx_readonly.txt")
         remove_without_errors("officegenerator_ods_readonly.txt")
+        remove_without_errors("officegenerator_standard_sheets.ods")
+        remove_without_errors("officegenerator_standard_sheets.ods")
+        remove_without_errors("officegenerator_standard_sheets.ods")
+        remove_without_errors("officegenerator_standard_sheets_direct.ods")
+        remove_without_errors("officegenerator_standard_sheets_direct.xlsx")
 
     if args.create==True:
         start=datetime.now()
@@ -64,6 +70,7 @@ def main(arguments=None):
             futures.append(executor.submit(demo_odt_standard))
             futures.append(executor.submit(demo_odt_manual_styles))
             futures.append(executor.submit(demo_xlsx))
+            futures.append(executor.submit(demo_standard_sheets))
 
         for future in as_completed(futures):
             print(future.result())
@@ -90,7 +97,7 @@ def demo_ods_readonly():
     for coord in range.coords()[0]:
         output.write("{} {}\n".format(coord,  doc.getCellValue(9, coord)))
         
-    output.write("{}\n".format(doc.getColumnValues(1, "J", skip=3)))
+    output.write("{}\n".format(doc.getColumnValues(1, "J", skip=150)))
     output.write("{}\n".format(doc.getRowValues(1, "100", skip=3)))
         
     output.write("{}\n".format(doc.values(9, range))   )
@@ -439,57 +446,30 @@ def demo_xlsx():
     xlsx.overwrite_formula("C25", "=Amount*Price", "€", style=xlsx.stWhite, alignment='right')
 
     xlsx.freezeAndSelect("A9","B11", "A9")
-
-    #To text split and cur position
-    xlsx.createSheet("Freeze A1")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
-            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-    xlsx.freezeAndSelect("A1","Z199", "I168")
-    #To text split and cur position
-    xlsx.createSheet("Freeze A3")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
-            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-    xlsx.freezeAndSelect("A3","Z199", "I168")
-    #To text split and cur position
-    xlsx.createSheet("Freeze C1")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
-            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-    xlsx.freezeAndSelect("C1","Z199", "I168")
-    #To text split and cur position
-    xlsx.createSheet("Freeze C3")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
-            xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
-    xlsx.freezeAndSelect("C3","Z199", "I168")
-    xlsx.save()
-    
-    
+   
     
     #To text split and cur position
     xlsx.createSheet("Freeze A1 None")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
+    for letter in "ABCDEFGHIJKLMNOPQ":
+        for number in range(1, 100):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("A1","Z199")
     #To text split and cur position
     xlsx.createSheet("Freeze A3 None")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
+    for letter in "ABCDEFGHIJKLMNOPQ":
+        for number in range(1, 100):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("A3","Z199")
     #To text split and cur position
     xlsx.createSheet("Freeze C1 None")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
+    for letter in "ABCDEFGHIJKLMNOPQ":
+        for number in range(1, 100):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("C1","Z199")
     #To text split and cur position
     xlsx.createSheet("Freeze C3 None")
-    for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-        for number in range(1, 200):
+    for letter in "ABCDEFGHIJKLMNOPQ":
+        for number in range(1, 100):
             xlsx.overwrite(letter + str(number), letter+str(number), style=xlsx.stYellow)
     xlsx.freezeAndSelect("C3","Z199")
     xlsx.save()
@@ -526,6 +506,116 @@ def demo_xlsx_readonly():
     output.write("{}\n".format(doc.values(0, range_) ))
     output.close()
     return "demo_xlsx_readonly took {}".format(datetime.now()-start)
+    
+def demo_standard_sheets():
+    start=datetime.now()
+    ods=ODS_Write("officegenerator_standard_sheets.ods")
+    odt=ODT_Standard("officegenerator_standard_sheets.odt")
+    xlsx=XLSX_Write("officegenerator_standard_sheets.xlsx")
+    
+    m=Model()
+    m.setTitle("HV")
+    m.setHorizontalHeaders(["Number", "Data", "More data", "Dt"], [1, 2, 3, 4])
+    m.setVerticalHeaders(["V1", "V2", "V3"]*10, 4)
+    data=[]        
+    for row in range(30):
+        data.append([row, "Data", "Data++", datetime.now()+timedelta(days=row)])
+    m.setData(data)
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)
+    
+    m2=Model()
+    m2.setTitle("V")
+    m2.setHorizontalHeaders(None, [1, 2, 3])
+    m2.setVerticalHeaders(["Number", "Data", "More data"]*10)
+    m2.setData(data)
+    m2.removeColumns([1, 2, ])
+    m2.removeRows([1, 2, ])
+    m2.ods_sheet(ods)
+    m2.xlsx_sheet(xlsx)
+    m2.odt_table(odt, 15, 10)
+    
+    m=Model()
+    m.setTitle("H totals")
+    m.setHorizontalHeaders(["Concept", "Decimal", "Currency", "Percentage"], [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
+    m.setData(data)
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ])
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)    
+    m=Model()
+
+    m.setTitle("H totals skip 2")
+    m.setHorizontalHeaders(["Concept", "Decimal", "Currency", "Percentage"], [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
+    m.setData(data)
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ],totals_index_from=2)
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)
+    
+    m=Model()
+    m.setTitle("V totals")
+    m.setHorizontalHeaders(["Concept", "Decimal", "Decimal2", "Decimal3"], [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, row*10, row*10 ])
+    m.setData(data)
+    m.setVerticalTotalDefinition(["Total"]+["#SUM"]*m.numDataRows() )
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)    
+    m=Model()
+
+    m.setTitle("HV totals")
+    hh=["Concept", "Decimal", "Decimal2", "Decimal3"]
+    m.setHorizontalHeaders(hh, [5, 3, 3, 3])
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, row*10, row*10 ])
+    m.setData(data)
+    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ])
+    m.setVerticalTotalDefinition(["Total"]+["#SUM"]*(m.numDataRows() +1))
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)
+    
+    #Model auto
+    hh=["Concept", "Decimal", "Decimal2", "Decimal3"]
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", row*10, -row*10, row*10 ])
+    m=Model_Auto("Model_Auto", hh, data)
+    m.order_with_none(1, reverse=True)
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)
+    
+    
+    #Model auto
+    hh=["Concept", "Concept2", "Decimal", "Decimal2", "Decimal3"]
+    data=[]        
+    for row in range(30):
+        data.append([f"Concept {row}", datetime.now(),  Currency(row*10, 'EUR'), Currency(-row*10, 'EUR'), Currency(row*10, 'EUR') ])
+    m=Model_Auto("Model_Auto skip 2", hh, data, column_index_from=2)
+    m.ods_sheet(ods)
+    m.xlsx_sheet(xlsx)
+    m.odt_table(odt, 15, 8)
+    
+    ods.save()
+    xlsx.save()
+    odt.save()
+    
+    m.ods_file("officegenerator_standard_sheets_direct.ods")
+    m.xlsx_file("officegenerator_standard_sheets_direct.xlsx")
+    return "demo_standard_sheets took {}".format(datetime.now()-start)
+
 
 if __name__ == "__main__":
     main()

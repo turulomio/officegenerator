@@ -1,8 +1,8 @@
-from datetime import datetime,  timedelta
 from logging import warning
 from officegenerator.commons import Coord, index2column, index2row, columnAdd
 from officegenerator.casts import lor_remove_columns, lor_remove_rows,  list_remove_positions, lor_add_column, lor_get_column, lor_get_row
-from officegenerator.libodfgenerator import guess_ods_style
+from officegenerator.libodfgenerator import guess_ods_style, ODS_Write
+from officegenerator.libxlsxgenerator import XLSX_Write
 from officegenerator.objects.currency import currency_symbol
 
 ## Models are used to generate standard sheets
@@ -363,6 +363,7 @@ class Model:
 ## @param skip_ht List of index column to skip some totals
 ## @param skip_vt List of index rows to skip some totals
 def Model_Auto(title, hh, data, allkeys="#SUM", sizes=5, row_index_from=1, column_index_from=1, ht=True, vt=True, skip_ht=[],skip_vt=[]):
+    m=Model()
     m.setTitle(title)
     m.setHorizontalHeaders(hh, sizes)
     m.setData(data)
@@ -391,116 +392,3 @@ def Model_Auto(title, hh, data, allkeys="#SUM", sizes=5, row_index_from=1, colum
             
         m.setVerticalTotalDefinition(vdef, totals_index_from=column_index_from)
     return m
-        
-if __name__ == "__main__":
-    from officegenerator.libodfgenerator import  ODS_Write
-    from officegenerator.libodfgenerator import ODT_Standard
-    from officegenerator.libxlsxgenerator import XLSX_Write
-    from officegenerator.objects.currency import Currency
-    from officegenerator.objects.percentage import Percentage
-    filename="standard_sheets.ods"
-    ods=ODS_Write("standard_sheets.ods")
-    odt=ODT_Standard("standard_sheets.odt")
-    xlsx=XLSX_Write("standard_sheets.xlsx")
-    
-    m=Model()
-    m.setTitle("HV")
-    m.setHorizontalHeaders(["Number", "Data", "More data", "Dt"], [1, 2, 3, 4])
-    m.setVerticalHeaders(["V1", "V2", "V3"]*10, 4)
-    data=[]        
-    for row in range(30):
-        data.append([row, "Data", "Data++", datetime.now()+timedelta(days=row)])
-    m.setData(data)
-    m.ods_sheet(ods)
-    m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 15, 8)
-    
-    m2=Model()
-    m2.setTitle("V")
-    m2.setHorizontalHeaders(None, [1, 2, 3])
-    m2.setVerticalHeaders(["Number", "Data", "More data"]*10)
-    m2.setData(data)
-    m2.removeColumns([1, 2, ])
-    m2.removeRows([1, 2, ])
-    m2.ods_sheet(ods)
-    m2.xlsx_sheet(xlsx)
-    m2.odt_table(odt, 15, 10)
-    
-    m=Model()
-    m.setTitle("H totals")
-    m.setHorizontalHeaders(["Concept", "Decimal", "Currency", "Percentage"], [5, 3, 3, 3])
-    data=[]        
-    for row in range(30):
-        data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
-    m.setData(data)
-    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ])
-    m.ods_sheet(ods)
-    m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 15, 8)    
-    m=Model()
-
-    m.setTitle("H totals skip 2")
-    m.setHorizontalHeaders(["Concept", "Decimal", "Currency", "Percentage"], [5, 3, 3, 3])
-    data=[]        
-    for row in range(30):
-        data.append([f"Concept {row}", row*10, Currency(row*10/7, "EUR"), Percentage(row, 12) ])
-    m.setData(data)
-    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ],totals_index_from=2)
-    m.ods_sheet(ods)
-    m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 15, 8)
-    
-    m=Model()
-    m.setTitle("V totals")
-    m.setHorizontalHeaders(["Concept", "Decimal", "Decimal2", "Decimal3"], [5, 3, 3, 3])
-    data=[]        
-    for row in range(30):
-        data.append([f"Concept {row}", row*10, row*10, row*10 ])
-    m.setData(data)
-    m.setVerticalTotalDefinition(["Total"]+["#SUM"]*m.numDataRows() )
-    m.ods_sheet(ods)
-    m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 15, 8)    
-    m=Model()
-
-    m.setTitle("HV totals")
-    hh=["Concept", "Decimal", "Decimal2", "Decimal3"]
-    m.setHorizontalHeaders(hh, [5, 3, 3, 3])
-    data=[]        
-    for row in range(30):
-        data.append([f"Concept {row}", row*10, row*10, row*10 ])
-    m.setData(data)
-    m.setHorizontalTotalDefinition(["Total", "#SUM","#AVG","#MEDIAN" ])
-    m.setVerticalTotalDefinition(["Total"]+["#SUM"]*(m.numDataRows() +1))
-    m.ods_sheet(ods)
-    m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 15, 8)
-    
-    #Model auto
-    hh=["Concept", "Decimal", "Decimal2", "Decimal3"]
-    data=[]        
-    for row in range(30):
-        data.append([f"Concept {row}", row*10, -row*10, row*10 ])
-    m=Model_Auto("Model_Auto", hh, data)
-    m.order_with_none(1, reverse=True)
-    m.ods_sheet(ods)
-    m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 15, 8)
-    
-    
-    #Model auto
-    hh=["Concept", "Concept2", "Decimal", "Decimal2", "Decimal3"]
-    data=[]        
-    for row in range(30):
-        data.append([f"Concept {row}", datetime.now(),  row*10, -row*10, row*10 ])
-    m=Model_Auto("Model_Auto skip 2", hh, data, column_index_from=2)
-    m.ods_sheet(ods)
-    m.xlsx_sheet(xlsx)
-    m.odt_table(odt, 15, 8)
-    
-    ods.save()
-    xlsx.save()
-    odt.save()
-    
-    m.ods_file("directo.ods")
-    m.xlsx_file("directo.xlsx")
