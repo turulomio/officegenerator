@@ -22,6 +22,7 @@ import odf.element
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
 from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone
+from officegenerator.decorators import timeit
 from officegenerator.objects.currency import Currency
 from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
@@ -106,9 +107,10 @@ class ODS_Read:
     ## @param column_letter Letter of the column to get values
     ## @param skip Integer Number of top rows to skip in the result
     ## @return List of values
-    def getColumnValues(self, sheet_index, column_letter, skip=0):
+    @timeit
+    def getColumnValues(self, sheet_index, column_letter, skip_up=0, skip_down=0):
         r=[]
-        for row in range(skip, self.rowNumber(sheet_index)):
+        for row in range(skip_up, self.rowNumber(sheet_index)-skip_down):
             r.append(self.getCellValue(sheet_index, Coord(column_letter+"1").addRow(row)))
         return r    
 
@@ -116,9 +118,10 @@ class ODS_Read:
     ## @param row_number String Number of the row to get values
     ## @param skip Integer Number of top rows to skip in the result
     ## @return List of values
-    def getRowValues(self, sheet_index, row_number, skip=0):
+    @timeit
+    def getRowValues(self, sheet_index, row_number, skip_left=0, skip_right=0):
         r=[]
-        for column in range(skip, self.columnNumber(sheet_index)):
+        for column in range(skip_left, self.columnNumber(sheet_index)-skip_right):
             r.append(self.getCellValue(sheet_index, Coord("A"+row_number).addColumn(column)))
         return r
 
