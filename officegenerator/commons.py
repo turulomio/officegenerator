@@ -3,7 +3,7 @@
 from datetime import datetime
 from gettext import translation
 from pkg_resources import resource_filename
-from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig
+from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig, error
 from odf.opendocument import  __version__ as __odfpy_version__
 
 __version__ = '1.22.0'
@@ -87,6 +87,12 @@ class Coord:
     def __repr__(self):
         return "Coord <{}>".format(self.string())
 
+    def __eq__(self, b):
+        b=Coord.assertCoord(b)
+        if self.letter==b.letter and self.number==b.number:
+            return True
+        return False
+        
     def __extract(self, strcoord):
         if strcoord.find(":")!=-1:
             print("I can't manage range coord")
@@ -167,6 +173,8 @@ class Coord:
             return o
         elif o.__class__==str:
             return Coord(o)
+        else:
+            error("{} is not a coord".format(o))
 
 
 ## Class that manages spreadsheet Ranges for ods and xlsx
@@ -176,7 +184,16 @@ class Range:
         
     def __repr__(self):
         return "Range <{}>".format(self.string())
-        
+
+    ##Return the outcome of the test b in a. Note the reversed operands.
+    def __contains__(self, b):
+        if (    b.letterIndex()>=self.start.letterIndex() and 
+                b.letterIndex()<=self.end.letterIndex() and 
+                b.numberIndex()>=self.start.numberIndex() and 
+                b.numberIndex()<=self.end.numberIndex())==True:
+            return True
+        return False
+
     ## Returns a list of rows of all Coord objects in the range
     def coords(self):
         r=[]
@@ -269,3 +286,11 @@ def topLeftCellNone(freeze_coord, selected_coord):
         else:
             number=minus_coord.number
         return Coord(letter+number)
+
+## Creates a Coord object from spreadsheet letters
+def Coord_from_letters(column, letter):
+    return Coord(column+letter)
+
+## Creates a Coord object from spreadsheet index coords
+def Coord_from_index(column_index, row_index):
+    return Coord(index2column(column_index)+index2row(row_index))

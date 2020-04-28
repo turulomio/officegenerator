@@ -21,8 +21,7 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone
-from officegenerator.decorators import timeit
+from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index
 from officegenerator.objects.currency import Currency
 from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
@@ -73,7 +72,7 @@ class ODS_Read:
         
     ## @param sheet_index Integer index of the sheet
     ## @param range_ Range object to get OdfCell. If None returns all OdfCell from sheet
-    ## @return Returns a list of rows of object values
+    ## @return Returns a list of rows of officegenerator OdfCell obejcts
     def cells(self, sheet_index, range_=None):
         if range_ is None:
             range_=self.getSheetRange(sheet_index)
@@ -87,43 +86,57 @@ class ODS_Read:
             r.append(tmprow)
         return r
         
+  
     ## @param sheet_index Integer index of the sheet
     ## @param range_ Range object to get values. If None returns all values from sheet
     ## @return Returns a list of rows of object values
     def values(self, sheet_index, range_=None):
-        if range_ is None:
-            range_=self.getSheetRange(sheet_index)
-        else:
-            range_=Range.assertRange(range_)
+        sheet_element=self.getSheetElementByIndex(sheet_index)        
+        rows=sheet_element.getElementsByType(TableRow) #Uses ODFPY cell to boost performance
         r=[]
-        for row in range(range_.numRows()):
-            tmprow=[]
-            for column in range(range_.numColumns()):
-                tmprow.append(self.getCellValue(sheet_index, range_.start.addRowCopy(row).addColumnCopy(column)))
-            r.append(tmprow)
-        return r
+        if range_ is None: #All sheet. This method is faster than using self.getSheetRange
+            for row in rows:
+                tmprow=[]
+                for cell in row.getElementsByType(TableCell):
+                    tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
+                r.append(tmprow)
+            return r
+        else: # A range
+            range_=Range.assertRange(range_)
+            for number_index, row in enumerate(rows):
+                tmprow=[]
+                for letter_index, cell in enumerate(row.getElementsByType(TableCell)):
+                    if Coord_from_index(letter_index, number_index) in range_:
+                        tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
+                r.append(tmprow)
+            return r
     
     ## @param sheet_index Integer index of the sheet
     ## @param column_letter Letter of the column to get values
     ## @param skip Integer Number of top rows to skip in the result
     ## @return List of values
-    @timeit
     def getColumnValues(self, sheet_index, column_letter, skip_up=0, skip_down=0):
         r=[]
-        for row in range(skip_up, self.rowNumber(sheet_index)-skip_down):
-            r.append(self.getCellValue(sheet_index, Coord(column_letter+"1").addRow(row)))
+        sheet_element=self.getSheetElementByIndex(sheet_index)        
+        rows=sheet_element.getElementsByType(TableRow) #Uses ODFPY cell to boost performance
+        for row in rows[skip_up:len(rows)-skip_down]:
+            cell=row.getElementsByType(TableCell)[column2index(column_letter)]
+            r.append(self.__getCellValue_from_odfpy_cell(cell))
         return r    
 
     ## @param sheet_index Integer index of the sheet
     ## @param row_number String Number of the row to get values
     ## @param skip Integer Number of top rows to skip in the result
     ## @return List of values
-    @timeit
     def getRowValues(self, sheet_index, row_number, skip_left=0, skip_right=0):
         r=[]
-        for column in range(skip_left, self.columnNumber(sheet_index)-skip_right):
-            r.append(self.getCellValue(sheet_index, Coord("A"+row_number).addColumn(column)))
-        return r
+        sheet_element=self.getSheetElementByIndex(sheet_index)        
+        #Uses ODFPY cell to boost performance
+        row=sheet_element.getElementsByType(TableRow)[row2index(row_number)]
+        cells=row.getElementsByType(TableCell)
+        for cell in cells[skip_left:len(cells)-skip_right]:
+            r.append(self.__getCellValue_from_odfpy_cell(cell))
+        return r    
 
     ## Return a Range object with the limits of the index sheet
     def getSheetRange(self, sheet_index):
@@ -144,12 +157,19 @@ class ODS_Read:
         sheet_element=self.getSheetElementByIndex(sheet_index)
         return len(sheet_element.getElementsByType(TableColumn))
         
-    ## Returns the cell value
-    def getCellValue(self, sheet_index, coord):
+    def getOdfPyCell(self, sheet_index, coord):
         coord=Coord.assertCoord(coord)
         sheet_element=self.getSheetElementByIndex(sheet_index)
         row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
-        cell=row.getElementsByType(TableCell)[coord.letterIndex()]
+        return row.getElementsByType(TableCell)[coord.letterIndex()]
+        
+    ## Returns the cell value
+    def getCellValue(self, sheet_index, coord):
+        cell=self.getOdfPyCell(sheet_index, coord)
+        return self.__getCellValue_from_odfpy_cell(cell)
+        
+    ## Used to improve performance avoiding searching cells
+    def __getCellValue_from_odfpy_cell(self, cell):
         r=None
         if cell.getAttribute('valuetype')=='string':
             r=str(cell)
@@ -179,11 +199,8 @@ class ODS_Read:
 
     ## Returns an odfcell object
     def getCell(self, sheet_index,  coord):
-        coord=Coord.assertCoord(coord)
-        sheet_element=self.getSheetElementByIndex(sheet_index)
-        row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
-        cell=row.getElementsByType(TableCell)[coord.letterIndex()]
-        object=self.getCellValue(sheet_index, coord)
+        cell=self.getOdfPyCell(sheet_index, coord)
+        object=self.__getCellValue_from_odfpy_cell(cell)
         #Get spanning
         spanning_columns=cell.getAttribute('numbercolumnsspanned')
         if spanning_columns==None:
@@ -205,8 +222,9 @@ class ODS_Read:
         r.setSpanning(spanning_columns, spanning_rows)
         return r
         
-    def setCell(self, sheet_index,  coord, cell):
+    def setCell(self, sheet_index,  coord, odfcell):
         """
+            odfcell is a officegenerator.OdfCell object
             Updates a cell
             insertBefore(newchild, refchild) – Inserts the node newchild before the existing child node refchild.
 appendChild(newchild) – Adds the node newchild to the end of the list of children.
@@ -220,7 +238,8 @@ removeChild(oldchild) – Re
         sheet_element=self.getSheetElementByIndex(sheet_index)
         row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
         oldcell=row.getElementsByType(TableCell)[coord.letterIndex()]
-        row.insertBefore(cell.generate(), oldcell)
+        oldcell=self.getOdfPyCell(sheet_index, coord)
+        row.insertBefore(odfcell.generate(), oldcell)
         row.removeChild(oldcell)
 
     def save(self, filename):

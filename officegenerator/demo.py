@@ -92,15 +92,12 @@ def demo_ods_readonly():
     start=datetime.now()
     doc=ODS_Read("officegenerator.ods")
     output=open("officegenerator_ods_readonly.txt", "w")
-    
-    range=Range("A2:K2")
-    for coord in range.coords()[0]:
-        output.write("{} {}\n".format(coord,  doc.getCellValue(9, coord)))
-        
+
+    output.write("{} {}\n".format("A1",  doc.getCellValue(9, "A1")))        
     output.write("{}\n".format(doc.getColumnValues(1, "J", skip_up=150)))
     output.write("{}\n".format(doc.getRowValues(1, "100", skip_left=3)))
         
-    output.write("{}\n".format(doc.values(9, range))   )
+    output.write("{}\n".format(doc.values(9, "A2:K2"))   )
     output.close()
     return "demo_ods_readonly took {}".format(datetime.now()-start)
 
@@ -501,7 +498,7 @@ def demo_xlsx_readonly():
         output.write("{} {}\n".format(coord,  doc.getCellValue(0, coord)))
         
     output.write("{}\n".format(doc.getColumnValues(0, "J", skip_up=0)))
-    output.write("{}\n".format(doc.getRowValues(1, "100", skip_up=3)))
+    output.write("{}\n".format(doc.getRowValues(1, "100", skip_left=3)))
         
     output.write("{}\n".format(doc.values(0, range_) ))
     output.close()
