@@ -27,6 +27,12 @@ Known issues
 
 Changelog
 =========
+1.23.0
+------
+  * Huge performance improvement reading ODS files.
+  * Added skip_down to getColumnValues method and skip_right to getRowValues method.
+  * Fixed bug getting string cells in ods.
+
 1.22.0
 ------
   * Added Model and XLSX_Read to module visibility.
