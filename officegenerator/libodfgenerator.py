@@ -148,9 +148,8 @@ class ODS_Read:
         row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
         cell=row.getElementsByType(TableCell)[coord.letterIndex()]
         r=None
-        
         if cell.getAttribute('valuetype')=='string':
-            r=cell.getAttribute('value')
+            r=str(cell)
         elif cell.getAttribute('valuetype')=='float':
             r=Decimal(cell.getAttribute('value'))
         elif cell.getAttribute('valuetype')=='percentage':
