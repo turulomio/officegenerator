@@ -179,14 +179,17 @@ class XLSX_Commons:
         return self.ws_current[coord.string()]
 
 class XLSX_Write(XLSX_Commons):
-    def __init__(self,filename,template=None):
+    ## @param filename
+    ## @param template
+    ## @param data_only load_workbook now accepts data_only to allow extracting values only from formulae. Default is false
+    def __init__(self,filename, template=None, data_only=False, keep_vba=True):
         XLSX_Commons.__init__(self)
         self.filename=filename
         self.template=template
-        if template==None:
+        if template is None:
             self.wb=openpyxl.Workbook()
         else:
-            self.wb=openpyxl.load_workbook(self.template, keep_vba=True)
+            self.wb=openpyxl.load_workbook(self.template, keep_vba=keep_vba, data_only=data_only)
 
         self.ws_current=self.wb.active
         self.setCurrentSheet(self.ws_current.title)
@@ -530,9 +533,12 @@ class XLSX_Write(XLSX_Commons):
 
 
 class XLSX_Read(XLSX_Commons):
-    def __init__(self, filename):
+    ## @param filename
+    ## @param data_only load_workbook now accepts data_only to allow extracting values only from formulae. Default is False to avoid lose information
+    ## @param keep_vba. Default is True
+    def __init__(self, filename, data_only=False, keep_vba=True):
         XLSX_Commons.__init__(self)
         self.filename=filename
-        self.wb=openpyxl.load_workbook(self.filename, keep_vba=True)
+        self.wb=openpyxl.load_workbook(self.filename, keep_vba=keep_vba, data_only=data_only)
         self.ws_current=self.wb.active
         self.setCurrentSheet(self.ws_current.title)
