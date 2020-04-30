@@ -27,6 +27,12 @@ Known issues
 
 Changelog
 =========
+1.24.0
+------
+  * Added skip_up and skip_down parameters in ODS_Read and XLSX_Read 'values()' methods to skip rows as necessary.
+  * Added method 'values_by_range' in XLSX_Read and ODS_Read.
+  * XLSX_Write and XLSX_Read have a new constructor paramter 'data_only' to show last save values of each cell instead of formulas.
+
 1.23.0
 ------
   * Huge performance improvement reading ODS files.
