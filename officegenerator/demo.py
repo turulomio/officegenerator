@@ -92,7 +92,7 @@ def demo_ods_readonly():
     start=datetime.now()
     doc=ODS_Read("officegenerator.ods")
     output=open("officegenerator_ods_readonly.txt", "w")
-
+    
     output.write("{} {}\n".format("A1",  doc.getCellValue(9, "A1")))        
     output.write("{}\n".format(doc.getColumnValues(1, "J", skip_up=150)))
     output.write("{}\n".format(doc.getRowValues(1, "100", skip_left=3)))
@@ -428,7 +428,7 @@ def demo_xlsx():
     xlsx.overwrite("D16", _("These are formulas returning booleans"), style=xlsx.stGreen)
 
     xlsx.overwrite("A20",  [["Una fila"]*3], style=xlsx.stGrayDark)
-    xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.max_rows(), xlsx.max_columns()), style=xlsx.stYellow,  alignment="center")
+    xlsx.overwrite_and_merge("E13:G13", _("This sheet max rows are {} and max columns {}").format(xlsx.rowNumber(xlsx.ws_current_id), xlsx.columnNumber(xlsx.ws_current_id)), style=xlsx.stYellow,  alignment="center")
 
     #Named cells
     xlsx.overwrite_and_merge("A23:B23", _("Cell B23 has a name 'Amount"), style=xlsx.stWhite)
@@ -492,7 +492,7 @@ def demo_xlsx_readonly():
     start=datetime.now()
     doc=XLSX_Read("officegenerator.xlsx")
     output=open("officegenerator_xlsx_readonly.txt", "w")
-    
+        
     range_=Range("A2:J2")
     for coord in range_.coords()[0]:
         output.write("{} {}\n".format(coord,  doc.getCellValue(0, coord)))

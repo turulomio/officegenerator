@@ -44,17 +44,6 @@ class XLSX_Commons:
                 return id
         return None
 
-    ## Returns the number of columns with data of the current sheet. Returns the number not the index
-    ## @return int
-    def max_columns(self):
-        return self.ws_current.max_column
-        
-    ## Returns the number of rows with data of the current sheet. Returns the number not the index
-    ## @return int
-    def max_rows(self):
-        return self.ws_current.max_row
-        
-
     ## Function that establishes current worksheet. Updates self.ws_current and self.ws_current_id
     ##
     ## id Is a integer beginning with 0
@@ -83,12 +72,19 @@ class XLSX_Commons:
             r.append(tmprow)
         return r
         
+    ## Returns a list of rows with the values of the sheet
     ## @param sheet_index Integer index of the sheet
-    ## @param range_ Range object to get values. If None returns all values from sheet
+    ## @param skip_up int. Number of rows to skip at the begining of the list of rows (lor)
+    ## @param skip_down int. Number of rows to skip at the end of the list of rows (lor)
     ## @return Returns a list of rows of object values
-    def values(self, sheet_index):
-        range_=self.getSheetRange(sheet_index)
-        return self.values_by_range(sheet_index, range_)
+    def values(self, sheet_index, skip_up=0, skip_down=0):
+        r=[]
+        for row in range(skip_up, self.rowNumber(sheet_index)-skip_down):
+            tmprow=[]
+            for column in range(self.columnNumber(sheet_index)):
+                tmprow.append(self.getCellValue(sheet_index, Coord("A1").addRow(row).addColumn(column)))
+            r.append(tmprow)
+        return r
  
     ## @param sheet_index Integer index of the sheet
     ## @param range_ Range object to get values. If None returns all values from sheet

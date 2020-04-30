@@ -87,14 +87,16 @@ class ODS_Read:
         return r
         
   
+    ## Returns a list of rows with the values of the sheet
     ## @param sheet_index Integer index of the sheet
-    ## @param range_ Range object to get values. If None returns all values from sheet
+    ## @param skip_up int. Number of rows to skip at the begining of the list of rows (lor)
+    ## @param skip_down int. Number of rows to skip at the end of the list of rows (lor)
     ## @return Returns a list of rows of object values
-    def values(self, sheet_index):
+    def values(self, sheet_index, skip_up=0, skip_down=0):
         sheet_element=self.getSheetElementByIndex(sheet_index)        
         rows=sheet_element.getElementsByType(TableRow) #Uses ODFPY cell to boost performance
         r=[]
-        for row in rows:
+        for row in rows[skip_up:len(rows)-skip_down]:
             tmprow=[]
             for cell in row.getElementsByType(TableCell):
                 tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
