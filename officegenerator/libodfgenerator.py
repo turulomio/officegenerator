@@ -90,26 +90,32 @@ class ODS_Read:
     ## @param sheet_index Integer index of the sheet
     ## @param range_ Range object to get values. If None returns all values from sheet
     ## @return Returns a list of rows of object values
-    def values(self, sheet_index, range_=None):
+    def values(self, sheet_index):
         sheet_element=self.getSheetElementByIndex(sheet_index)        
         rows=sheet_element.getElementsByType(TableRow) #Uses ODFPY cell to boost performance
         r=[]
-        if range_ is None: #All sheet. This method is faster than using self.getSheetRange
-            for row in rows:
-                tmprow=[]
-                for cell in row.getElementsByType(TableCell):
+        for row in rows:
+            tmprow=[]
+            for cell in row.getElementsByType(TableCell):
+                tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
+            r.append(tmprow)
+        return r
+
+    ## @param sheet_index Integer index of the sheet
+    ## @param range_ Range object to get values. If None returns all values from sheet
+    ## @return Returns a list of rows of object values
+    def values_by_range(self, sheet_index, range_):
+        sheet_element=self.getSheetElementByIndex(sheet_index)        
+        rows=sheet_element.getElementsByType(TableRow) #Uses ODFPY cell to boost performance
+        r=[]
+        range_=Range.assertRange(range_)
+        for number_index, row in enumerate(rows):
+            tmprow=[]
+            for letter_index, cell in enumerate(row.getElementsByType(TableCell)):
+                if Coord_from_index(letter_index, number_index) in range_:
                     tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
-                r.append(tmprow)
-            return r
-        else: # A range
-            range_=Range.assertRange(range_)
-            for number_index, row in enumerate(rows):
-                tmprow=[]
-                for letter_index, cell in enumerate(row.getElementsByType(TableCell)):
-                    if Coord_from_index(letter_index, number_index) in range_:
-                        tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
-                r.append(tmprow)
-            return r
+            r.append(tmprow)
+        return r
     
     ## @param sheet_index Integer index of the sheet
     ## @param column_letter Letter of the column to get values

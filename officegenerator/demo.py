@@ -97,7 +97,7 @@ def demo_ods_readonly():
     output.write("{}\n".format(doc.getColumnValues(1, "J", skip_up=150)))
     output.write("{}\n".format(doc.getRowValues(1, "100", skip_left=3)))
         
-    output.write("{}\n".format(doc.values(9, "A2:K2"))   )
+    output.write("{}\n".format(doc.values_by_range(9, "A2:K2"))   )
     output.close()
     return "demo_ods_readonly took {}".format(datetime.now()-start)
 
@@ -500,7 +500,7 @@ def demo_xlsx_readonly():
     output.write("{}\n".format(doc.getColumnValues(0, "J", skip_up=0)))
     output.write("{}\n".format(doc.getRowValues(1, "100", skip_left=3)))
         
-    output.write("{}\n".format(doc.values(0, range_) ))
+    output.write("{}\n".format(doc.values_by_range(0, range_) ))
     output.close()
     return "demo_xlsx_readonly took {}".format(datetime.now()-start)
     

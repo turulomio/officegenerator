@@ -86,11 +86,15 @@ class XLSX_Commons:
     ## @param sheet_index Integer index of the sheet
     ## @param range_ Range object to get values. If None returns all values from sheet
     ## @return Returns a list of rows of object values
-    def values(self, sheet_index, range_=None):
-        if range_ is None:
-            range_=self.getSheetRange(sheet_index)
-        else:
-            range_=Range.assertRange(range_)
+    def values(self, sheet_index):
+        range_=self.getSheetRange(sheet_index)
+        return self.values_by_range(sheet_index, range_)
+ 
+    ## @param sheet_index Integer index of the sheet
+    ## @param range_ Range object to get values. If None returns all values from sheet
+    ## @return Returns a list of rows of object values
+    def values_by_range(self, sheet_index, range_):
+        range_=Range.assertRange(range_)
         r=[]
         for row in range(range_.numRows()):
             tmprow=[]
