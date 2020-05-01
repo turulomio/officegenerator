@@ -5,7 +5,7 @@ from gettext import translation
 from pkg_resources import resource_filename
 from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig, error
 from odf.opendocument import  __version__ as __odfpy_version__
-from subprocess import run, STDOUT, PIPE
+from subprocess import run, PIPE
 
 __version__ = '1.24.0'
 __versiondatetime__=datetime(2020, 4, 30, 21, 38)
