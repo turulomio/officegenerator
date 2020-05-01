@@ -5,6 +5,7 @@ from gettext import translation
 from pkg_resources import resource_filename
 from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig, error
 from odf.opendocument import  __version__ as __odfpy_version__
+from subprocess import run, STDOUT, PIPE
 
 __version__ = '1.24.0'
 __versiondatetime__=datetime(2020, 4, 30, 21, 38)
@@ -295,4 +296,11 @@ def Coord_from_letters(column, letter):
 def Coord_from_index(column_index, row_index):
     return Coord(index2column(column_index)+index2row(row_index))
 
+
+## This command has problems with concurrency seems that three is a hidden lock. Do not use with concurrency
+def convert_command(filename, ouput_dir, to_format):
+    command="loffice --nolockcheck --headless --convert-to {} --outdir '{}' '{}'".format(to_format, ouput_dir, filename)
+    r=run(command, shell=True, stdout=PIPE)
+    if r.returncode!=0:
+        print ("Error with command: {}".format(command))
 

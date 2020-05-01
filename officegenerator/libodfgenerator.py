@@ -21,13 +21,13 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index
+from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index, convert_command
 from officegenerator.objects.currency import Currency
 from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
-from os import system, path, remove, makedirs
+from os import path, remove, makedirs
 from pkg_resources import resource_filename
-from shutil import move
+from shutil import copyfile
 from tempfile import TemporaryDirectory
 
 try:
@@ -521,7 +521,7 @@ class ODT(ODF):
             s_outdir=""
         else:
             s_outdir="--outdir '{}'".format(output_dir)
-        system("lowriter --headless --convert-to pdf '{}' {}".format(self.filename, s_outdir))
+        convert_command(self.filename, s_outdir, "pdf")
 
     def __setCursor(self, e):
         self.cursor=e
@@ -1499,14 +1499,12 @@ def guess_ods_style(color_or_style, object):
     else:
         return color_or_style
 
-
-
 ## Gets a ODS file and rewrites it with libreoffice convert-to command
 ## Can be used to assign data values formulas to file. Or to fix ploblems on specific files.
-def rewrite_ods_through_libreoffice(filename, newfilename=None):   
+def create_rewritten_ods(filename):   
     with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
         temporal_path="{}/{}".format(tmp_name, filename)
-        system("localc --headless --convert-to ods --outdir '{}' {}".format(tmp_name, filename))
-        if newfilename is None:
-            newfilename=filename
-        move(temporal_path, newfilename)
+        output_path=filename+".rewritten.ods"
+        convert_command(filename, tmp_name, "ods")
+        copyfile(temporal_path, output_path)
+    return output_path
