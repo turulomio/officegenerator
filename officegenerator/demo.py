@@ -67,15 +67,6 @@ def main(arguments=None):
         remove_without_errors("officegenerator_standard_sheets_direct.xlsx")
 
     if args.create==True:       
-#        
-#        rewrite_xlsx_through_libreoffice("officegenerator.xlsx", "officegenerator.rewritten.xlsx")
-#        rewrite_ods_through_libreoffice("officegenerator.ods", "officegenerator.rewritten.ods")
-#        demo_ods_rewritten()
-#        demo_xlsx_data_only()
-#        demo_xlsx_rewritten()
-#        
-#        from sys import exit
-#        exit(0)
         start=datetime.now()
         futures=[]
         with ProcessPoolExecutor(max_workers=cpu_count()+1) as executor:
@@ -97,8 +88,6 @@ def main(arguments=None):
             futures.append(executor.submit(demo_xlsx_updated))
             futures.append(executor.submit(demo_xlsx_readonly))
             futures.append(executor.submit(demo_xlsx_data_only))
-#            futures.append(executor.submit(demo_xlsx_rewritten))
-#            futures.append(executor.submit(demo_ods_rewritten))
 
         for future in as_completed(futures):
             print(future.result())

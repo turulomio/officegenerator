@@ -13,11 +13,12 @@ import openpyxl.formatting.rule
 import pkg_resources
 
 from decimal import Decimal
-from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, temporal_directory
+from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone
 from officegenerator.objects.currency import Currency, currency_symbol
 from officegenerator.objects.percentage import Percentage
 from os import path, makedirs, system, remove
-from shutil import move, rmtree
+from shutil import copyfile
+from tempfile import TemporaryDirectory
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -548,16 +549,14 @@ class XLSX_Read(XLSX_Commons):
 
 ## Gets a XLSX file and rewrites it with libreoffice convert-to command
 ## Can be used to assign data values formulas to file. Or to fix ploblems on specific files.
+## I had problems with concurrency due to convrert-to opens a file and locks it. I should not use convert-to with concurrency
 def rewrite_xlsx_through_libreoffice(filename, newfilename=None):   
-    tmp_name=temporal_directory()
-    temporal_path="{}/{}".format(tmp_name, filename)
-    system("localc --headless --convert-to xlsx --outdir '{}' {}".format(tmp_name, filename))
-    if newfilename is None:
-        newfilename=filename
-    makedirs(tmp_name, exist_ok=True)
-    move(temporal_path, newfilename)
-    print(tmp_name)
-    rmtree(tmp_name)
+    with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
+        temporal_path="{}/{}".format(tmp_name, filename)
+        system("localc --headless --convert-to xlsx --outdir '{}' {}".format(tmp_name, filename))
+        if newfilename is None:
+            newfilename=filename
+        copyfile(temporal_path, newfilename)
 
 ## Creates a new file with data_only cells (formulas converted to numbers).
 ## Returns the name of the recently created file
