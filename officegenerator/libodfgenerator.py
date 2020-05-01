@@ -21,12 +21,13 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index
+from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index, temporal_directory
 from officegenerator.objects.currency import Currency
 from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
 from os import system, path, remove, makedirs
 from pkg_resources import resource_filename
+from shutil import move, rmtree
 
 try:
     t=gettext.translation('officegenerator', resource_filename("officegenerator","locale"))
@@ -1496,3 +1497,18 @@ def guess_ods_style(color_or_style, object):
             return "NormalLeft"
     else:
         return color_or_style
+
+
+
+## Gets a ODS file and rewrites it with libreoffice convert-to command
+## Can be used to assign data values formulas to file. Or to fix ploblems on specific files.
+def rewrite_ods_through_libreoffice(filename, newfilename=None):   
+    tmp_name=temporal_directory()
+    temporal_path="{}/{}".format(tmp_name, filename)
+    system("localc --headless --convert-to ods --outdir '{}' {}".format(tmp_name, filename))
+    if newfilename is None:
+        newfilename=filename
+    makedirs(tmp_name, exist_ok=True)
+    move(temporal_path, newfilename)
+    print(tmp_name)
+    rmtree(tmp_name)

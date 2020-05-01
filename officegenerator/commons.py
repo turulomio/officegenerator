@@ -294,3 +294,9 @@ def Coord_from_letters(column, letter):
 ## Creates a Coord object from spreadsheet index coords
 def Coord_from_index(column_index, row_index):
     return Coord(index2column(column_index)+index2row(row_index))
+    
+## I tried to use tempfile but with conurrency it crashes
+def temporal_directory():
+    from uuid import uuid4
+    return "officegenerator_"+uuid4().hex[0:10]
+

@@ -10,13 +10,14 @@ import openpyxl.styles
 import openpyxl.worksheet
 import openpyxl.worksheet.worksheet
 import openpyxl.formatting.rule
-from os import path, makedirs
 import pkg_resources
 
-from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone
+from decimal import Decimal
+from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, temporal_directory
 from officegenerator.objects.currency import Currency, currency_symbol
 from officegenerator.objects.percentage import Percentage
-from decimal import Decimal
+from os import path, makedirs, system, remove
+from shutil import move, rmtree
 
 try:
     t=gettext.translation('officegenerator',pkg_resources.resource_filename("officegenerator","locale"))
@@ -31,7 +32,6 @@ class ColumnWidthXLSX:
 class XLSX_Commons:
     def __init__(self):
         pass
-
 
     ## It returns a sheet object with the index id
     def get_sheet_by_id(self, id):
@@ -142,11 +142,13 @@ class XLSX_Commons:
         #----------------------
         self.setCurrentSheet(sheet_index)
         cell=self.getCell(sheet_index, coord)
-#        print(cell.number_format, cell.value, cell.data_type)
+        #print(cell.number_format, cell.value, cell.data_type)
         #print(dir(cell))
         has_currency=hasCurrency(cell)
         if has_currency is not None:
             return has_currency
+        elif cell.data_type=="f":#Formula
+            return cell.value
         elif "%" in cell.number_format:
             return Percentage(cell.value, 1)
         elif cell.data_type=="d" and "H" not in cell.number_format.upper():#Date
@@ -542,3 +544,29 @@ class XLSX_Read(XLSX_Commons):
         self.wb=openpyxl.load_workbook(self.filename, keep_vba=keep_vba, data_only=data_only)
         self.ws_current=self.wb.active
         self.setCurrentSheet(self.ws_current.title)
+
+
+## Gets a XLSX file and rewrites it with libreoffice convert-to command
+## Can be used to assign data values formulas to file. Or to fix ploblems on specific files.
+def rewrite_xlsx_through_libreoffice(filename, newfilename=None):   
+    tmp_name=temporal_directory()
+    temporal_path="{}/{}".format(tmp_name, filename)
+    system("localc --headless --convert-to xlsx --outdir '{}' {}".format(tmp_name, filename))
+    if newfilename is None:
+        newfilename=filename
+    makedirs(tmp_name, exist_ok=True)
+    move(temporal_path, newfilename)
+    print(tmp_name)
+    rmtree(tmp_name)
+
+## Creates a new file with data_only cells (formulas converted to numbers).
+## Returns the name of the recently created file
+def create_data_only_xlsx( filename):
+    rewritten_file="{}.rewritten.xlsx".format(filename)
+    data_only_file="{}.data_only.xlsx".format(filename)
+    rewrite_xlsx_through_libreoffice(filename, rewritten_file)
+    xlsx=XLSX_Write(data_only_file, template=rewritten_file, data_only=True)
+    xlsx.save()
+    remove(rewritten_file)
+    return data_only_file
+        
