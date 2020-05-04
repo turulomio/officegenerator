@@ -27,6 +27,11 @@ Known issues
 
 Changelog
 =========
+1.25.0
+------
+  * Added methods 'create_rewritten_ods' and 'create_rewritten_xlsx' to get quickly a document rewriten by libreoffice with calcs added automatically.
+  * Added method 'create_data_only_xlsx' to get quickly a xlsx file with formulas converted to calculated data.
+
 1.24.0
 ------
   * Added skip_up and skip_down parameters in ODS_Read and XLSX_Read 'values()' methods to skip rows as necessary.
