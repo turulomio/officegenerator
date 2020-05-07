@@ -7,8 +7,8 @@ from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig, er
 from odf.opendocument import  __version__ as __odfpy_version__
 from subprocess import run, PIPE
 
-__version__ = '1.25.0'
-__versiondatetime__=datetime(2020, 5, 4, 7, 58)
+__version__ = '1.26.0'
+__versiondatetime__=datetime(2020, 5, 7, 18, 58)
 __versiondate__=__versiondatetime__.date()
 
 try:

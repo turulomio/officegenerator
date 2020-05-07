@@ -27,6 +27,10 @@ Known issues
 
 Changelog
 =========
+1.26.0
+------
+  * Added horizontal and vertical totals fast method to ODS and XLSX formats
+
 1.25.0
 ------
   * Added methods 'create_rewritten_ods' and 'create_rewritten_xlsx' to get quickly a document rewriten by libreoffice with calcs added automatically.
