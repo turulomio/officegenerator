@@ -250,6 +250,34 @@ def demo_ods():
     s6.add("G20",  "=2+3.3", "GreenDatetime")
     s6.add("H20",  "=0.9/23", "WhitePercentage")
 
+
+    s7=doc.createSheet("Add totals example")
+    s7.add("A1", _("Style name"), "OrangeCenter")
+    s7.add("B1", _("Date and time"), "OrangeCenter")
+    s7.add("C1", _("Date"), "OrangeCenter")
+    s7.add("D1", _("Integer"), "OrangeCenter")
+    s7.add("E1", _("Euros"), "OrangeCenter")
+    s7.add("F1", _("Dollars"), "OrangeCenter")
+    s7.add("G1", _("Percentage"), "OrangeCenter")
+    s7.add("H1", _("Number with 2 decimals"), "OrangeCenter")
+    s7.add("I1", _("Number with 6 decimals"), "OrangeCenter")
+    s7.add("J1", _("Time"), "OrangeCenter")
+    s7.add("K1", _("Boolean"), "OrangeCenter")
+    for row, color in enumerate(doc.colors.arr):
+        s7.add(Coord("A2").addRow(row), color.name, color.name + "Left")
+        s7.add(Coord("B2").addRow(row), datetime.now(),  color.name +"Datetime")
+        s7.add(Coord("C2").addRow(row), date.today(), color.name + "Date")
+        s7.add(Coord("D2").addRow(row), pow(-1, row)*-10000000, color.name+ "Integer")
+        s7.add(Coord("E2").addRow(row), Currency(pow(-1, row)*12.56, "EUR"), color.name + "EUR")
+        s7.add(Coord("F2").addRow(row), Currency(pow(-1, row)*12345.56, "USD"), color.name + "USD")
+        s7.add(Coord("G2").addRow(row), Percentage(pow(-1, row)*1, 3), color.name+"Percentage")
+        s7.add(Coord("H2").addRow(row), pow(-1, row)*123456789.121212, color.name+"Decimal2")
+        s7.add(Coord("I2").addRow(row), pow(-1, row)*-12.121212, color.name+"Decimal6")
+        s7.add(Coord("J2").addRow(row), (datetime.now()+timedelta(seconds=3600*12*row)).time(), color.name+"Time")
+        s7.add(Coord("K2").addRow(row), bool(row%2),  color.name+"Left")
+    s7.addTotalsHorizontal("C11", ["Total", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN"])
+    
+
     doc.setActiveSheet(s6)
     doc.save()
 

@@ -1055,10 +1055,12 @@ class OdfSheet:
     def getCell(self, coord):
         coord=Coord.assertCoord(coord)
         for c in self.arr:
-            if c.coord.string()==coord.string():
+            if c.coord==coord:
                 return c
         return None
             
+    def getCellValue(self, coord):
+        return self.getCell(coord).object
     
     ## Returns true if value is a string beginning with = or +
     ## @param value must be a string
@@ -1095,6 +1097,38 @@ class OdfSheet:
         self.add(range.start, result, style)      
         c=self.getCell(range.start)
         c.setSpanning(range.numColumns(), range.numRows())
+            
+    ## @param cood Coord from we are going to add totals
+    ## @param list_of_totals List with strings or keys. Example: ["Total", "#SUM", "#AVG"]...
+    ## @param list_of_styles List with string styles or None. If none tries to guest from top column object. List example: ["GrayLightPercentage", "GrayLightInteger"]
+    ## @param string with the row where th3e total begins
+    ## @param string with the rew where the formula ends. If None it's a coord.row -1
+    def addTotalsHorizontal(self, coord, list_of_totals, list_of_styles=None, formula_row_from="2", formula_row_to=None):
+        coord=Coord.assertCoord(coord)
+        for letter, total in enumerate(list_of_totals):
+            coord_total=coord.addColumnCopy(letter)
+            coord_total_from=Coord(coord_total.letter+formula_row_from)
+            if formula_row_to is None:
+                coord_total_to=coord_total.addRowCopy(-1)# row above
+            else:
+                coord_total=Coord(coord_total.letter+formula_row_to)
+
+            if list_of_styles is None:
+                style=guess_ods_style("GrayLight", self.getCellValue(coord_total_from))
+            else:
+                style=list_of_styles[letter]
+
+            if total == "#SUM":
+                s="=SUM({}:{})".format(coord_total_from.string(), coord_total_to.string())
+            elif total == "#AVG":
+                s="=AVERAGE({}:{})".format(coord_total_from.string(), coord_total_to.string())
+            elif total == "#MEDIAN":
+                s="=MEDIAN({}:{})".format(coord_total_from.string(), coord_total_to.string())
+            else:
+                s=total
+
+            self.add(coord_total, s,  style)
+
 
     ## Generates the sheet in self.doc Opendocument varianble
     def generate(self, ods):
