@@ -1103,15 +1103,15 @@ class OdfSheet:
     ## @param list_of_styles List with string styles or None. If none tries to guest from top column object. List example: ["GrayLightPercentage", "GrayLightInteger"]
     ## @param string with the row where th3e total begins
     ## @param string with the rew where the formula ends. If None it's a coord.row -1
-    def addTotalsHorizontal(self, coord, list_of_totals, list_of_styles=None, formula_row_from="2", formula_row_to=None):
+    def addTotalsHorizontal(self, coord, list_of_totals, list_of_styles=None, row_from="2", row_to=None):
         coord=Coord.assertCoord(coord)
         for letter, total in enumerate(list_of_totals):
             coord_total=coord.addColumnCopy(letter)
-            coord_total_from=Coord(coord_total.letter+formula_row_from)
-            if formula_row_to is None:
+            coord_total_from=Coord(coord_total.letter+row_from)
+            if row_to is None:
                 coord_total_to=coord_total.addRowCopy(-1)# row above
             else:
-                coord_total=Coord(coord_total.letter+formula_row_to)
+                coord_total=Coord(coord_total.letter+row_to)
 
             if list_of_styles is None:
                 style=guess_ods_style("GrayLight", self.getCellValue(coord_total_from))
@@ -1128,7 +1128,38 @@ class OdfSheet:
                 s=total
 
             self.add(coord_total, s,  style)
+            
+    ## @param cood Coord from we are going to add totals
+    ## @param list_of_totals List with strings or keys. Example: ["Total", "#SUM", "#AVG"]...
+    ## @param list_of_styles List with string styles or None. If none tries to guest from top column object. List example: ["GrayLightPercentage", "GrayLightInteger"]
+    ## @param string with the row where th3e total begins
+    ## @param string with the rew where the formula ends. If None it's a coord.row -1
+    def addTotalsVertical(self, coord, list_of_totals, list_of_styles=None, column_from="B", column_to=None):
+        coord=Coord.assertCoord(coord)
+        for i, total in enumerate(list_of_totals):
+            coord_total=coord.addRowCopy(i)
+            coord_total_from=Coord(column_from+coord_total.number)
+            if column_to is None:
+                coord_total_to=coord_total.addColumnCopy(-1)# row above
+            else:
+                coord_total=Coord(column_to+coord_total.number)
 
+            if list_of_styles is None:
+                print("guessing", coord_total, coord_total_from, coord_total_to)
+                style=guess_ods_style("GrayLight", self.getCellValue(coord_total_from))
+            else:
+                style=list_of_styles[i]
+
+            if total == "#SUM":
+                s="=SUM({}:{})".format(coord_total_from.string(), coord_total_to.string())
+            elif total == "#AVG":
+                s="=AVERAGE({}:{})".format(coord_total_from.string(), coord_total_to.string())
+            elif total == "#MEDIAN":
+                s="=MEDIAN({}:{})".format(coord_total_from.string(), coord_total_to.string())
+            else:
+                s=total
+
+            self.add(coord_total, s,  style)
 
     ## Generates the sheet in self.doc Opendocument varianble
     def generate(self, ods):
