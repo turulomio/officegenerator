@@ -176,6 +176,8 @@ class Coord:
             return Coord(o)
         else:
             error("{} is not a coord".format(o))
+            
+
 
 
 ## Class that manages spreadsheet Ranges for ods and xlsx
@@ -304,3 +306,13 @@ def convert_command(filename, ouput_dir, to_format):
     if r.returncode!=0:
         print ("Error with command: {}".format(command))
 
+def generate_formula_total_string(key, coord_from, coord_to):
+    if key == "#SUM":
+        s="=SUM({}:{})".format(coord_from.string(), coord_to.string())
+    elif key == "#AVG":
+        s="=AVERAGE({}:{})".format(coord_from.string(), coord_to.string())
+    elif key == "#MEDIAN":
+        s="=MEDIAN({}:{})".format(coord_from.string(), coord_to.string())
+    else:
+        s=key
+    return s

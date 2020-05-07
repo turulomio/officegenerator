@@ -21,7 +21,7 @@ import odf.element
 
 from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, ConfigItemMapNamed,  ConfigItemSet
 from odf.office import Annotation
-from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index, convert_command
+from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index, convert_command, generate_formula_total_string
 from officegenerator.objects.currency import Currency
 from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
@@ -1118,16 +1118,7 @@ class OdfSheet:
             else:
                 style=list_of_styles[letter]
 
-            if total == "#SUM":
-                s="=SUM({}:{})".format(coord_total_from.string(), coord_total_to.string())
-            elif total == "#AVG":
-                s="=AVERAGE({}:{})".format(coord_total_from.string(), coord_total_to.string())
-            elif total == "#MEDIAN":
-                s="=MEDIAN({}:{})".format(coord_total_from.string(), coord_total_to.string())
-            else:
-                s=total
-
-            self.add(coord_total, s,  style)
+            self.add(coord_total, generate_formula_total_string(total, coord_total_from, coord_total_to),  style)
             
     ## @param cood Coord from we are going to add totals
     ## @param list_of_totals List with strings or keys. Example: ["Total", "#SUM", "#AVG"]...
@@ -1145,21 +1136,11 @@ class OdfSheet:
                 coord_total=Coord(column_to+coord_total.number)
 
             if list_of_styles is None:
-                print("guessing", coord_total, coord_total_from, coord_total_to)
                 style=guess_ods_style("GrayLight", self.getCellValue(coord_total_from))
             else:
                 style=list_of_styles[i]
 
-            if total == "#SUM":
-                s="=SUM({}:{})".format(coord_total_from.string(), coord_total_to.string())
-            elif total == "#AVG":
-                s="=AVERAGE({}:{})".format(coord_total_from.string(), coord_total_to.string())
-            elif total == "#MEDIAN":
-                s="=MEDIAN({}:{})".format(coord_total_from.string(), coord_total_to.string())
-            else:
-                s=total
-
-            self.add(coord_total, s,  style)
+            self.add(coord_total, generate_formula_total_string(total, coord_total_from, coord_total_to),  style)
 
     ## Generates the sheet in self.doc Opendocument varianble
     def generate(self, ods):

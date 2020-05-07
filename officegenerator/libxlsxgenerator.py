@@ -13,7 +13,7 @@ import openpyxl.formatting.rule
 import pkg_resources
 
 from decimal import Decimal
-from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, convert_command
+from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, convert_command, generate_formula_total_string
 from officegenerator.objects.currency import Currency, currency_symbol
 from officegenerator.objects.percentage import Percentage
 from os import path, makedirs
@@ -473,6 +473,62 @@ class XLSX_Write(XLSX_Commons):
             cell.fill=openpyxl.styles.PatternFill("solid", fgColor=style)
             bold=False if style==self.stWhite else True
             cell.font=openpyxl.styles.Font(name='Arial', size=10, bold=bold)
+            
+            
+    ## @param cood Coord from we are going to add totals
+    ## @param list_of_totals List with strings or keys. Example: ["Total", "#SUM", "#AVG"]...
+    ## @param list_of_styles List with string styles or None. If none tries to guest from top column object. List example: ["GrayLightPercentage", "GrayLightInteger"]
+    ## @param string with the row where th3e total begins
+    ## @param string with the rew where the formula ends. If None it's a coord.row -1
+    def overwriteTotalsHorizontal(self, coord, list_of_totals, list_of_styles=None, row_from="2", row_to=None,  list_of_decimals=2):
+        coord=Coord.assertCoord(coord)
+        for letter, total in enumerate(list_of_totals):
+            coord_total=coord.addColumnCopy(letter)
+            coord_total_from=Coord(coord_total.letter+row_from)
+            if row_to is None:
+                coord_total_to=coord_total.addRowCopy(-1)# row above
+            else:
+                coord_total=Coord(coord_total.letter+row_to)
+
+            if list_of_styles is None:
+                style=self.stGrayLight
+            else:
+                style=list_of_styles[letter]
+                
+            if list_of_decimals.__class__.__name__=="int":
+                decimals=2
+            else:
+                decimals=list_of_decimals[letter]
+
+            self.overwrite(coord_total, generate_formula_total_string(total, coord_total_from, coord_total_to),  style, decimals)
+            
+    ## @param cood Coord from we are going to add totals
+    ## @param list_of_totals List with strings or keys. Example: ["Total", "#SUM", "#AVG"]...
+    ## @param list_of_styles List with string styles or None. If none tries to guest from top column object. List example: ["GrayLightPercentage", "GrayLightInteger"]
+    ## @param string with the row where th3e total begins
+    ## @param string with the rew where the formula ends. If None it's a coord.row -1
+    def overwriteTotalsVertical(self, coord, list_of_totals, list_of_styles=None, column_from="B", column_to=None,  list_of_decimals=2):
+        coord=Coord.assertCoord(coord)
+        for i, total in enumerate(list_of_totals):
+            coord_total=coord.addRowCopy(i)
+            coord_total_from=Coord(column_from+coord_total.number)
+            if column_to is None:
+                coord_total_to=coord_total.addColumnCopy(-1)# row above
+            else:
+                coord_total=Coord(column_to+coord_total.number)
+
+            if list_of_styles is None:
+                style=self.stGrayLight
+            else:
+                style=list_of_styles[i]
+
+            if list_of_decimals.__class__.__name__=="int":
+                decimals=2
+            else:
+                decimals=list_of_decimals[i]
+
+
+            self.overwrite(coord_total, generate_formula_total_string(total, coord_total_from, coord_total_to),  style, decimals)
 
 
     ##Sets border to a cell not merged
