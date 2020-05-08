@@ -1060,7 +1060,11 @@ class OdfSheet:
         return None
             
     def getCellValue(self, coord):
-        return self.getCell(coord).object
+        cell=self.getCell(coord)
+        if cell==None:
+            return None
+        else:
+            return self.getCell(coord).object
     
     ## Returns true if value is a string beginning with = or +
     ## @param value must be a string

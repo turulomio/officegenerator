@@ -590,7 +590,6 @@ class XLSX_Write(XLSX_Commons):
     def setComment(self, coord_string, comment):
         self.ws_current[coord_string].comment=openpyxl.comments.Comment(comment, "PySGAE")
 
-
 class XLSX_Read(XLSX_Commons):
     ## @param filename
     ## @param data_only load_workbook now accepts data_only to allow extracting values only from formulae. Default is False to avoid lose information
