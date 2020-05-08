@@ -277,6 +277,7 @@ def demo_ods():
         s7.add(Coord("K2").addRow(row), 1, color.name+ "Integer")
     s7.addTotalsHorizontal("A11", ["Total", "#SUM", "#SUM", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM", "#SUM"])
     s7.addTotalsVertical("L1", ["Total", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM", "#SUM", "#SUM", "#SUM"])
+    s7.freezeAndSelect("B2") 
     
 
     doc.setActiveSheet(s6)
@@ -537,6 +538,7 @@ def demo_xlsx():
         xlsx.overwrite(Coord("K2").addRow(row), 1, style=style, decimals=6)
     xlsx.overwriteTotalsHorizontal("A9", ["Total", "#SUM", "#SUM", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM", "#SUM"])
     xlsx.overwriteTotalsVertical("L1", ["Total", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM","#SUM"])
+    xlsx.freezeAndSelect("B2") 
     
     xlsx.save()
     return "demo_xlsx took {}".format(datetime.now()-start)

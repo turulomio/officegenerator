@@ -974,8 +974,11 @@ class OdfSheet:
     ## @param freeze_coord, Cell where panels are frrozen. Can be a string or a Coord object.
     ## @param selected_coord. Cell selected opening sheet. Can be a string or a Coord object.
     ## @param topLeftCell, topleftcell to show in sheet after opening. Can be a string or a Coord object.
-    def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord=None):
-        if topleftcell_coord==None:
+    def freezeAndSelect(self, freeze_coord, selected_coord=None, topleftcell_coord=None):
+        if selected_coord is None:
+            selected_coord=Coord(self.lastColumn()+self.lastRow())
+        
+        if topleftcell_coord is None:
             topleftcell_coord=topLeftCellNone(freeze_coord, selected_coord)
         # Creates Coord objects
         freeze_coord=Coord.assertCoord(freeze_coord)

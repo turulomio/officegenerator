@@ -13,7 +13,7 @@ import openpyxl.formatting.rule
 import pkg_resources
 
 from decimal import Decimal
-from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, convert_command, generate_formula_total_string
+from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, convert_command, generate_formula_total_string, Coord_from_index
 from officegenerator.objects.currency import Currency, currency_symbol
 from officegenerator.objects.percentage import Percentage
 from os import path, makedirs
@@ -229,9 +229,13 @@ class XLSX_Write(XLSX_Commons):
     ## @param freeze_coord, Cell where panels are frrozen. Can be a string or a Coord object.
     ## @param selected_coord. Cell selected opening sheet. Can be a string or a Coord object.
     ## @param topLeftCell, topleftcell to show in sheet after opening. Can be a string or a Coord object.
-    def freezeAndSelect(self, freeze_coord, selected_coord, topleftcell_coord=None):
-        if topleftcell_coord==None:
+    def freezeAndSelect(self, freeze_coord, selected_coord=None, topleftcell_coord=None):
+        if selected_coord is None:
+            selected_coord=Coord_from_index(self.columnNumber(self.ws_current_id)-1, self.rowNumber(self.ws_current_id)-1)
+
+        if topleftcell_coord is None:
             topleftcell_coord=topLeftCellNone(freeze_coord, selected_coord)
+
         freeze_coord=Coord.assertCoord(freeze_coord)
         selected_coord=Coord.assertCoord(selected_coord)
         topleftcell_coord=Coord.assertCoord(topleftcell_coord)
@@ -281,7 +285,6 @@ class XLSX_Write(XLSX_Commons):
         self.wb.create_sheet(title=name)
         self.setCurrentSheet(name)
 
-
     def setColorScale(self, range):
         self.ws_current.conditional_formatting.add(range, 
                             openpyxl.formatting.rule.ColorScaleRule(
@@ -296,8 +299,6 @@ class XLSX_Write(XLSX_Commons):
             id=self.ws_current_id
         return self.wb.sheetnames[id]
 
-
-        
     ## After removing it sets current sheet to 0 index
     def remove_sheet_by_id(self, id):
         ws=self.get_sheet_by_id(id)
@@ -313,7 +314,6 @@ class XLSX_Write(XLSX_Commons):
 
         if path.exists(filename)==False:
             print(_("*** ERROR: File wasn't generated ***"))
-
 
     ## Internal function to set the number format
     ##
@@ -391,7 +391,6 @@ class XLSX_Write(XLSX_Commons):
             cell.value=value
         else:
             cell.value=value
-
 
     ## Internal method to set a not merged cell
     ## @param cell is a cell object
