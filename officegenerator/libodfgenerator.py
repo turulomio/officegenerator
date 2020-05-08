@@ -1547,9 +1547,9 @@ def guess_ods_style(color_or_style, object):
 
 ## Gets a ODS file and rewrites it with libreoffice convert-to command
 ## Can be used to assign data values formulas to file. Or to fix ploblems on specific files.
-def create_rewritten_ods(filename):   
+def create_rewritten_ods(filename):
     with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
-        temporal_path="{}/{}".format(tmp_name, filename)
+        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
         output_path=filename+".rewritten.ods"
         convert_command(filename, tmp_name, "ods")
         copyfile(temporal_path, output_path)

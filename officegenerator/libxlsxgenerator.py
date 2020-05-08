@@ -608,7 +608,7 @@ class XLSX_Read(XLSX_Commons):
 ## I had problems with concurrency due to convrert-to opens a file and locks it. I should not use convert-to with concurrency
 def create_rewritten_xlsx(filename):   
     with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
-        temporal_path="{}/{}".format(tmp_name, filename)
+        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
         output_path=filename+".rewritten.xlsx"
         convert_command(filename, tmp_name, "xlsx")
         copyfile(temporal_path, output_path)
@@ -618,7 +618,7 @@ def create_rewritten_xlsx(filename):
 ## Returns the name of the recently created file
 def create_data_only_xlsx( filename):
     with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
-        temporal_path="{}/{}".format(tmp_name, filename)
+        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
         output_path=filename+".data_only.xlsx"
         convert_command(filename, tmp_name, "xlsx")
         xlsx=XLSX_Write(output_path, template=temporal_path, data_only=True)
