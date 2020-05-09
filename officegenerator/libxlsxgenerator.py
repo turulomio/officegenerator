@@ -15,6 +15,7 @@ import pkg_resources
 from decimal import Decimal
 from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, convert_command, generate_formula_total_string, Coord_from_index
 from officegenerator.objects.currency import Currency, currency_symbol
+from officegenerator.objects.formula import isFormula
 from officegenerator.objects.percentage import Percentage
 from os import path, makedirs
 from shutil import copyfile
@@ -370,14 +371,6 @@ class XLSX_Write(XLSX_Commons):
         elif resultclass=="bool":
             cell.number_format="BOOLEAN"
 
-    ## Returns true if value is a string beginning with = or +
-    ## @param value must be a string
-    ## @return boolean
-    def isFormula(self, value):
-        if len(value)>0 and value[0] in ["=", "+"]:
-            return True
-        return False
-
     ## Internat function to set a cell. All properties except border that it's setted in overwrite functions (merged and no merged)
     ## @param cell is a cell object
     def __setValue(self, cell, value, style, decimals, alignment):     
@@ -454,7 +447,7 @@ class XLSX_Write(XLSX_Commons):
     ## @param decimals Integer with the number of decimals. 2 by default
     ## @param alignment String None by default. Can be "right","left","center"
     def overwrite_formula(self, coord, value, resultclass=None, style=None, decimals=2, alignment=None):
-        if self.isFormula(value)==False:
+        if isFormula(value)==False:
             print(_("This is not a formula. You can't use overwrite_formula"))
             return
         if value.__class__==list:

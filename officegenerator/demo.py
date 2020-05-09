@@ -10,7 +10,7 @@ from decimal import Decimal
 from multiprocessing import cpu_count
 
 from officegenerator.commons import __version__, addDebugSystem
-from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT, create_rewritten_ods
+from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT, create_rewritten_ods, create_data_only_ods
 from officegenerator.libxlsxgenerator import XLSX_Write, XLSX_Read, create_data_only_xlsx, create_rewritten_xlsx
 from officegenerator.standard_sheets import Model, Model_Auto
 from officegenerator.commons import argparse_epilog, Coord, Range
@@ -83,6 +83,7 @@ def main(arguments=None):
         create_rewritten_xlsx("officegenerator.xlsx")
         create_data_only_xlsx("officegenerator.xlsx")
         create_rewritten_ods("officegenerator.ods")
+        create_data_only_ods("officegenerator.ods")
             
             
         ## This process depend of above files

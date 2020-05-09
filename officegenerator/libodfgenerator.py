@@ -23,6 +23,7 @@ from odf.config import ConfigItem, ConfigItemMapEntry, ConfigItemMapIndexed, Con
 from odf.office import Annotation
 from officegenerator.commons import number2column,  number2row,  Coord, Range, topLeftCellNone, column2index, Coord_from_index, row2index, convert_command, generate_formula_total_string
 from officegenerator.objects.currency import Currency
+from officegenerator.objects.formula import Formula_from_OdfpyCell, isFormula, Formula
 from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
 from os import path, remove, makedirs
@@ -71,24 +72,35 @@ class ODS_Read:
             return self.doc.spreadsheet.getElementsByType(Table)[index]
         except:
             return None
+#        
+#    ## Returns a list of rows with the odfcells of the sheet
+#    ## @param sheet_index Integer index of the sheet
+#    ## @param skip_up int. Number of rows to skip at the begining of the list of rows (lor)
+#    ## @param skip_down int. Number of rows to skip at the end of the list of rows (lor)
+#    ## @return Returns a list of rows of object values
+#    def cells(self, sheet_index, skip_up=0, skip_down=0):
+#        sheet_element=self.getSheetElementByIndex(sheet_index)        
+#        rows=sheet_element.getElementsByType(TableRow) #Uses ODFPY cell to boost performance
+#        r=[]
+#        for row in rows[skip_up:len(rows)-skip_down]:
+#            tmprow=[]
+#            for cell in row.getElementsByType(TableCell):
+#                tmprow.append(self._getCellValue_from_odfpy_cell(cell))
+#            r.append(tmprow)
+#        return r
+
         
-    ## @param sheet_index Integer index of the sheet
-    ## @param range_ Range object to get OdfCell. If None returns all OdfCell from sheet
-    ## @return Returns a list of rows of officegenerator OdfCell obejcts
-    def cells(self, sheet_index, range_=None):
-        if range_ is None:
-            range_=self.getSheetRange(sheet_index)
-        else:
-            range_=Range.assertRange(range_)
-        r=[]
-        for row in range(range_.numRows()):
-            tmprow=[]
-            for column in range(range_.numColumns()):
-                tmprow.append(self.getCell(sheet_index, range_.start.addRowCopy(row).addColumnCopy(column)))
-            r.append(tmprow)
-        return r
-        
-  
+#    ## REturns a lor of odfpy cells
+#    def cellsOdfPy(self, sheet_index):
+#        r=[]
+#        sheet_element=self.getSheetElementByIndex(sheet_index)
+#        for row in sheet_element.getElementsByType(TableRow):
+#            r_row=[]
+#            for cell in row.getElementsByType(TableCell):
+#                r_row.append(cell)
+#            r.append(r_row)
+#        return r
+
     ## Returns a list of rows with the values of the sheet
     ## @param sheet_index Integer index of the sheet
     ## @param skip_up int. Number of rows to skip at the begining of the list of rows (lor)
@@ -101,7 +113,7 @@ class ODS_Read:
         for row in rows[skip_up:len(rows)-skip_down]:
             tmprow=[]
             for cell in row.getElementsByType(TableCell):
-                tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
+                tmprow.append(self._getCellValue_from_odfpy_cell(cell))
             r.append(tmprow)
         return r
 
@@ -117,7 +129,7 @@ class ODS_Read:
             tmprow=[]
             for letter_index, cell in enumerate(row.getElementsByType(TableCell)):
                 if Coord_from_index(letter_index, number_index) in range_:
-                    tmprow.append(self.__getCellValue_from_odfpy_cell(cell))
+                    tmprow.append(self._getCellValue_from_odfpy_cell(cell))
             r.append(tmprow)
         return r
     
@@ -131,7 +143,7 @@ class ODS_Read:
         rows=sheet_element.getElementsByType(TableRow) #Uses ODFPY cell to boost performance
         for row in rows[skip_up:len(rows)-skip_down]:
             cell=row.getElementsByType(TableCell)[column2index(column_letter)]
-            r.append(self.__getCellValue_from_odfpy_cell(cell))
+            r.append(self._getCellValue_from_odfpy_cell(cell))
         return r    
 
     ## @param sheet_index Integer index of the sheet
@@ -145,7 +157,7 @@ class ODS_Read:
         row=sheet_element.getElementsByType(TableRow)[row2index(row_number)]
         cells=row.getElementsByType(TableCell)
         for cell in cells[skip_left:len(cells)-skip_right]:
-            r.append(self.__getCellValue_from_odfpy_cell(cell))
+            r.append(self._getCellValue_from_odfpy_cell(cell))
         return r    
 
     ## Return a Range object with the limits of the index sheet
@@ -176,19 +188,19 @@ class ODS_Read:
     ## Returns the cell value
     def getCellValue(self, sheet_index, coord):
         cell=self.getOdfPyCell(sheet_index, coord)
-        return self.__getCellValue_from_odfpy_cell(cell)
+        return self._getCellValue_from_odfpy_cell(cell)
         
     ## Used to improve performance avoiding searching cells
-    def __getCellValue_from_odfpy_cell(self, cell):
+    def _getCellValue_from_odfpy_cell(self, cell):
         r=None
-        if cell.getAttribute('valuetype')=='string':
+        if cell.getAttribute('formula') is not None:
+            r=Formula_from_OdfpyCell(cell)
+        elif cell.getAttribute('valuetype')=='string':
             r=str(cell)
         elif cell.getAttribute('valuetype')=='float':
             r=Decimal(cell.getAttribute('value'))
         elif cell.getAttribute('valuetype')=='percentage':
             r=Percentage(Decimal(cell.getAttribute('value')), Decimal(1))
-        elif cell.getAttribute('formula')!=None:
-            r=str(cell.getAttribute('formula'))[3:]
         elif cell.getAttribute('valuetype')=='currency':
             r=Currency(Decimal(cell.getAttribute('value')), cell.getAttribute('currency'))
         elif cell.getAttribute('valuetype')=='date':
@@ -210,7 +222,7 @@ class ODS_Read:
     ## Returns an odfcell object
     def getCell(self, sheet_index,  coord):
         cell=self.getOdfPyCell(sheet_index, coord)
-        object=self.__getCellValue_from_odfpy_cell(cell)
+        object=self._getCellValue_from_odfpy_cell(cell)
         #Get spanning
         spanning_columns=cell.getAttribute('numbercolumnsspanned')
         if spanning_columns==None:
@@ -248,14 +260,25 @@ removeChild(oldchild) – Re
         sheet_element=self.getSheetElementByIndex(sheet_index)
         row=sheet_element.getElementsByType(TableRow)[coord.numberIndex()]
         oldcell=row.getElementsByType(TableCell)[coord.letterIndex()]
-        oldcell=self.getOdfPyCell(sheet_index, coord)
         row.insertBefore(odfcell.generate(), oldcell)
-        row.removeChild(oldcell)
+        row.removeChild(oldcell)        
 
-    def save(self, filename):
+
+
+    def save(self, filename, data_only=False):
         if  filename==self.filename:
             print(_("You can't overwrite a readed ods"))
             return        
+        if data_only is True:# Converts all Formula objects to its value
+            for sheet_index, sheet in  enumerate(self.doc.spreadsheet.getElementsByType(Table)):
+                print(sheet_index)
+                for number_index,  row in enumerate(self.values(sheet_index)):
+                    for letter_index, value in enumerate(row):
+                        coord=Coord_from_index(letter_index, number_index)
+                        if value.__class__.__name__=="Formula":
+                            odfcell=self.getCell(sheet_index, coord)
+                            odfcell.object=value.object#Asigna el objeti de la formula al objeto de la celda
+                            self.setCell(sheet_index, coord, odfcell)
         self.doc.save( filename)
 
 
@@ -897,40 +920,36 @@ class OdfCell:
         if self.object==None:
             self.object=" - "
         if self.object.__class__.__name__ in ["Currency", "Money"]:
-            odfcell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
+            odfpycell = TableCell(valuetype="currency", currency=self.object.currency, value=self.object.amount, stylename=self.style)
         elif self.object.__class__.__name__=="Percentage":
-            odfcell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
+            odfpycell = TableCell(valuetype="percentage", value=self.object.value, stylename=self.style)
         elif self.object.__class__.__name__=="datetime":
-            odfcell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
+            odfpycell = TableCell(valuetype="date", datevalue=self.object.strftime("%Y-%m-%dT%H:%M:%S"), stylename=self.style)
         elif self.object.__class__.__name__=="time":
-            odfcell = TableCell(valuetype="time", timevalue=self.object.strftime("PT%HH%MM%SS"), stylename=self.style)
+            odfpycell = TableCell(valuetype="time", timevalue=self.object.strftime("PT%HH%MM%SS"), stylename=self.style)
         elif self.object.__class__.__name__=="date":
-            odfcell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
+            odfpycell = TableCell(valuetype="date", datevalue=str(self.object), stylename=self.style)
         elif self.object.__class__.__name__ in ("Decimal", "float", "int"):
-            odfcell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
+            odfpycell= TableCell(valuetype="float", value=self.object,  stylename=self.style)
         elif self.object.__class__.__name__ =="bool":
-            odfcell= TableCell(valuetype="boolean", booleanvalue=self.object, stylename=self.style)
+            odfpycell= TableCell(valuetype="boolean", booleanvalue=self.object, stylename=self.style)
+        elif self.object.__class__.__name__ =="Formula":
+            odfpycell = TableCell(formula="of:"+self.object.string_formula,  stylename=self.style)
         else:#strings
-            if len(self.object)>0:
-                if self.object[:1]=="=":#Formula
-                    odfcell = TableCell(formula="of:"+self.object,  stylename=self.style)
-                else:
-                    odfcell = TableCell(valuetype="string", value=self.object,  stylename=self.style)
-                    odfcell.addElement(P(text = self.object))
-            else:#Cadena
-                odfcell = TableCell(valuetype="string", value=self.object,  stylename=self.style)
-                odfcell.addElement(P(text = self.object))
+            odfpycell = TableCell(valuetype="string", value=self.object,  stylename=self.style)
+            odfpycell.addElement(P(text = self.object))
+
         if self.spannedRows!=1 or self.spannedColumns!=1:
-            odfcell.setAttribute("numberrowsspanned", str(self.spannedRows))
-            odfcell.setAttribute("numbercolumnsspanned", str(self.spannedColumns))
+            odfpycell.setAttribute("numberrowsspanned", str(self.spannedRows))
+            odfpycell.setAttribute("numbercolumnsspanned", str(self.spannedColumns))
         if self.comment!=None:
             a=Annotation(textstylename="Right")
             d=Date()
             d.addText(datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
             a.addElement(d)
             a.addElement(P(stylename="Right", text=self.comment))
-            odfcell.addElement(a)
-        return odfcell
+            odfpycell.addElement(a)
+        return odfpycell
 
     ## Manage cell spannning 
     ##
@@ -1083,6 +1102,9 @@ class OdfSheet:
     ## @param color_or_style String with a color: Normal, White, Yellow, Orange, Blue, Red, GrayLight, GrayDark. Or a style WhiteInteger, YellowLeft, OrangeCenter, OrangeEUR, RedPercentage...
     def add(self, coord, result, color_or_style="Normal"):
         coord=Coord.assertCoord(coord)
+        if isFormula(result):
+            result=Formula(result)
+        
 
         if result.__class__ in (list,):#Una lista
             for i,row in enumerate(result):
@@ -1170,7 +1192,7 @@ class OdfSheet:
             table.addElement(tr)
             for i in range(columns):#Create cells
                 cell=grid[j][i]
-                if cell!=None:
+                if cell is not None:
                     tr.addElement(cell.generate())
                 else:
                     tr.addElement(TableCell())
@@ -1561,3 +1583,15 @@ def create_rewritten_ods(filename):
         convert_command(filename, tmp_name, "ods")
         copyfile(temporal_path, output_path)
     return output_path
+
+## Creates a new file with data_only cells (formulas converted to numbers).
+## Returns the name of the recently created file
+def create_data_only_ods( filename):
+    with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
+        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
+        output_path=filename+".data_only.ods"
+        convert_command(filename, tmp_name, "ods")
+        ods=ODS_Read(temporal_path)
+        ods.save(output_path, data_only=True)
+    return output_path
+        
