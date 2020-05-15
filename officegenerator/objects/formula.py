@@ -38,7 +38,8 @@ def Formula_from_OdfpyCell(odfpycell, string_type=None):
         r.setObject(float(textvalue))
     elif odfpycell.getAttribute('valuetype')=="percentage":
         r.setObject(Percentage(Decimal(textvalue), 1))
-    elif odfpycell.getAttribute('valuetype')=="officecurrency":
+    elif odfpycell.getAttribute('valuetype')=="currency":
+        print(odfpycell.getAttribute("currency"))
         r.setObject(Currency(Decimal(textvalue), odfpycell.getAttribute("currency")))
     else:
         r.setObject(textvalue)
