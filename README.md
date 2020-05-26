@@ -27,6 +27,12 @@ Known issues
 
 Changelog
 =========
+1.27.0
+------
+  * Now it's not necesary to set selected coord in freezeAndSelect method. Bottom Right cell is selected by default.
+  * Fixed rewritten and data only conversion with absolute and relative paths.
+  * Now you can generate data_only files from ods and xlsx files from other ods and xlsx files, mixing them.
+
 1.26.0
 ------
   * Added horizontal and vertical totals fast method to ODS and XLSX formats

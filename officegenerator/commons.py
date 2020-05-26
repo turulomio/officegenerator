@@ -10,8 +10,8 @@ from shutil import copyfile
 from subprocess import run, PIPE
 from tempfile import TemporaryDirectory
 
-__version__ = '1.26.0'
-__versiondatetime__=datetime(2020, 5, 7, 18, 58)
+__version__ = '1.27.0'
+__versiondatetime__=datetime(2020, 5, 26, 18, 58)
 __versiondate__=__versiondatetime__.date()
 
 try:
