@@ -3,9 +3,12 @@
 from datetime import datetime
 from gettext import translation
 from pkg_resources import resource_filename
-from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig, error
+from logging import info, ERROR, WARNING, INFO, DEBUG, CRITICAL, basicConfig, error, debug
 from odf.opendocument import  __version__ as __odfpy_version__
+from os import path
+from shutil import copyfile
 from subprocess import run, PIPE
+from tempfile import TemporaryDirectory
 
 __version__ = '1.26.0'
 __versiondatetime__=datetime(2020, 5, 7, 18, 58)
@@ -299,12 +302,30 @@ def Coord_from_index(column_index, row_index):
     return Coord(index2column(column_index)+index2row(row_index))
 
 
+### This command has problems with concurrency seems that three is a hidden lock. Do not use with concurrency
+#def convert_command(filename, ouput_dir, to_format):
+#    command="loffice --nolockcheck --headless --convert-to {} --outdir '{}' '{}'".format(to_format, ouput_dir, filename)
+#    r=run(command, shell=True, stdout=PIPE)
+#    if r.returncode!=0:
+#        print ("Error with command: {}".format(command))
+#        return None
+        
+        
+        
 ## This command has problems with concurrency seems that three is a hidden lock. Do not use with concurrency
-def convert_command(filename, ouput_dir, to_format):
-    command="loffice --nolockcheck --headless --convert-to {} --outdir '{}' '{}'".format(to_format, ouput_dir, filename)
-    r=run(command, shell=True, stdout=PIPE)
-    if r.returncode!=0:
-        print ("Error with command: {}".format(command))
+def convert_command(filename_from, filename_to):
+    filename_from_name, filename_from_extension = path.splitext(path.basename(filename_from))    
+    filename_to_name, filename_to_extension = path.splitext(path.basename(filename_to))    
+    with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
+        command="loffice --nolockcheck --headless --convert-to {} --outdir '{}' '{}'".format(filename_to_extension[1:], tmp_name, filename_from)
+        r=run(command, shell=True, stdout=PIPE)
+        if r.returncode!=0:
+            error("Error with command: {}".format(command))
+            return None            
+        tmp_converted_filename="{}/{}{}".format(tmp_name, filename_from_name, filename_to_extension)
+        debug("Libreoffice conversion from '{}' to '{}'".format(filename_from, filename_to))
+        copyfile(tmp_converted_filename, filename_to)
+    return filename_to
 
 def generate_formula_total_string(key, coord_from, coord_to):
     if key == "#SUM":

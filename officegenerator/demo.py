@@ -84,6 +84,7 @@ def main(arguments=None):
         create_data_only_xlsx("officegenerator.xlsx")
         create_rewritten_ods("officegenerator.ods")
         create_data_only_ods("officegenerator.ods")
+        #create_data_only_xlsx("officegenerator.ods", "officegenerator_from_ods.data_only.xlsx")
             
             
         ## This process depend of above files

@@ -26,9 +26,8 @@ from officegenerator.objects.currency import Currency
 from officegenerator.objects.formula import Formula_from_OdfpyCell, isFormula, Formula
 from officegenerator.datetime_functions import dtnaive2string
 from officegenerator.objects.percentage import Percentage
-from os import path, remove, makedirs
+from os import path, remove, makedirs, sep
 from pkg_resources import resource_filename
-from shutil import copyfile
 from tempfile import TemporaryDirectory
 
 try:
@@ -265,20 +264,10 @@ removeChild(oldchild) – Re
 
 
 
-    def save(self, filename, data_only=False):
+    def save(self, filename):
         if  filename==self.filename:
             print(_("You can't overwrite a readed ods"))
             return        
-        if data_only is True:# Converts all Formula objects to its value
-            for sheet_index, sheet in  enumerate(self.doc.spreadsheet.getElementsByType(Table)):
-                print(sheet_index)
-                for number_index,  row in enumerate(self.values(sheet_index)):
-                    for letter_index, value in enumerate(row):
-                        coord=Coord_from_index(letter_index, number_index)
-                        if value.__class__.__name__=="Formula":
-                            odfcell=self.getCell(sheet_index, coord)
-                            odfcell.object=value.object#Asigna el objeti de la formula al objeto de la celda
-                            self.setCell(sheet_index, coord, odfcell)
         self.doc.save( filename)
 
 
@@ -1569,29 +1558,33 @@ def guess_ods_style(color_or_style, object):
         elif object.__class__.__name__=="bool":
             return color_or_style + "Boolean"
         else:
-            info("guess_ods_style not guessed",  object.__class__)
+            info("guess_ods_style not guessed {}".format( object.__class__))
             return "NormalLeft"
     else:
         return color_or_style
 
 ## Gets a ODS file and rewrites it with libreoffice convert-to command
 ## Can be used to assign data values formulas to file. Or to fix ploblems on specific files.
-def create_rewritten_ods(filename):
-    with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
-        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
-        output_path=filename+".rewritten.ods"
-        convert_command(filename, tmp_name, "ods")
-        copyfile(temporal_path, output_path)
-    return output_path
+## @param filename_from canbe an ods or a xlsx file.
+## @param filename_to Must be a ods file path
+## Returns the name of the recently created file
+def create_rewritten_ods(filename_from, filename_to=None):  
+    if filename_to is None:
+        filename_to=filename_from + ".rewritten.ods"
+    convert_command(filename_from, filename_to)
+    return filename_to
 
 ## Creates a new file with data_only cells (formulas converted to numbers).
 ## Returns the name of the recently created file
-def create_data_only_ods( filename):
+## 1 Transforms to xlsx (temporal_xlsx_rewriten)
+## 2 Transforms to data_only xlsx (temporal_xlsx_data_only)
+def create_data_only_ods( filename_from, filename_to=None):
+    if filename_to is None:
+        filename_to=filename_from + ".data_only.ods"
     with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
-        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
-        output_path=filename+".data_only.ods"
-        convert_command(filename, tmp_name, "ods")
-        ods=ODS_Read(temporal_path)
-        ods.save(output_path, data_only=True)
-    return output_path
+        from officegenerator.libxlsxgenerator import create_data_only_xlsx
+        temporal_xlsx=tmp_name+ sep + path.basename(filename_from+".xlsx")
+        create_data_only_xlsx(filename_from, temporal_xlsx)
+        convert_command(temporal_xlsx, filename_to)
+    return filename_to
         

@@ -18,7 +18,6 @@ from officegenerator.objects.currency import Currency, currency_symbol
 from officegenerator.objects.formula import isFormula
 from officegenerator.objects.percentage import Percentage
 from os import path, makedirs
-from shutil import copyfile
 from tempfile import TemporaryDirectory
 
 try:
@@ -597,22 +596,26 @@ class XLSX_Read(XLSX_Commons):
 ## Gets a XLSX file and rewrites it with libreoffice convert-to command
 ## Can be used to assign data values formulas to file. Or to fix ploblems on specific files.
 ## I had problems with concurrency due to convrert-to opens a file and locks it. I should not use convert-to with concurrency
-def create_rewritten_xlsx(filename):   
-    with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
-        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
-        output_path=filename+".rewritten.xlsx"
-        convert_command(filename, tmp_name, "xlsx")
-        copyfile(temporal_path, output_path)
-    return output_path
-
-## Creates a new file with data_only cells (formulas converted to numbers).
+## @param filename_from canbe an ods or a xlsx file.
+## @param filename_to Must be a xlsx file path
 ## Returns the name of the recently created file
-def create_data_only_xlsx( filename):
+def create_rewritten_xlsx(filename_from, filename_to=None):
+    if filename_to is None:
+        filename_to=filename_from + ".rewritten.xlsx"
+    convert_command(filename_from, filename_to)
+    return filename_to
+
+
+## @param filename_from canbe an ods or a xlsx file.
+## @param filename_to Must be a xlsx file path
+## Returns the name of the recently created file
+def create_data_only_xlsx(filename_from, filename_to=None):
+    if filename_to is None:
+        filename_to=filename_from + ".data_only.xlsx"
     with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
-        temporal_path="{}/{}".format(tmp_name, path.basename(filename))
-        output_path=filename+".data_only.xlsx"
-        convert_command(filename, tmp_name, "xlsx")
-        xlsx=XLSX_Write(output_path, template=temporal_path, data_only=True)
+        temporal_path="{}/{}.rewritten.xlsx".format(tmp_name, path.basename(filename_to))
+        convert_command(filename_from, temporal_path)
+        xlsx=XLSX_Write(filename_to, template=temporal_path, data_only=True)
         xlsx.save()
-    return output_path
+    return filename_to
         
