@@ -17,7 +17,7 @@ from officegenerator.commons import columnAdd, Coord, Range, topLeftCellNone, co
 from officegenerator.objects.currency import Currency, currency_symbol
 from officegenerator.objects.formula import isFormula
 from officegenerator.objects.percentage import Percentage
-from os import path, makedirs
+from os import path, makedirs,  sep
 from tempfile import TemporaryDirectory
 
 try:
@@ -135,14 +135,18 @@ class XLSX_Commons:
         
     ## Returns the cell value
     def getCellValue(self, sheet_index, coord):
+        self.setCurrentSheet(sheet_index)
+        cell=self.getCell(sheet_index, coord)
+        return self.getCellValue_from_openpyxl_cell(cell)
+
+    ## Returns the cell value
+    def getCellValue_from_openpyxl_cell(self, cell):
         def hasCurrency(cell):
             for currency in ["EUR", "USD","GBP"]:
                 if currency in cell.number_format and cell.data_type=="n":
                     return Currency(cell.value, currency)
             return None
         #----------------------
-        self.setCurrentSheet(sheet_index)
-        cell=self.getCell(sheet_index, coord)
         #print(cell.number_format, cell.value, cell.data_type)
         #print(dir(cell))
         has_currency=hasCurrency(cell)
@@ -175,7 +179,6 @@ class XLSX_Commons:
             except:
                 return str(cell.value)
 
-    ## Returns an odfcell object
     def getCell(self, sheet_index,  coord):
         self.setCurrentSheet(sheet_index)
         coord=Coord.assertCoord(coord)
@@ -618,4 +621,34 @@ def create_data_only_xlsx(filename_from, filename_to=None):
         xlsx=XLSX_Write(filename_to, template=temporal_path, data_only=True)
         xlsx.save()
     return filename_to
+
+## Creates a new file, from another file. It automatically rewrites it to obtein values, and sorts a sheet.
+## @param filename_from canbe an ods or a xlsx file.
+## @param filename_to Must be a xlsx file path
+## @param sheet_index
+## @param column_index
+## @param reverse
+## @param skip_up, to skip headers by default 1
+## @param skip_down to skip headers by default 0
+## Returns the name of the recently created file
+def create_sorting_sheet(filename_from, filename_to, sheet_index, column_index, reverse=False,  skip_up=1, skip_down=0):
+    with TemporaryDirectory(prefix="officegenerator_") as tmp_name:
+        create_rewritten_xlsx(filename_from , tmp_name + sep + "rewritten.xlsx")
+        xlsx_read=XLSX_Read(tmp_name + sep + "rewritten.xlsx")
+        rows=xlsx_read.cells(sheet_index)
+        value_rows=rows[skip_up:len(rows)-skip_down]
+        value_rows=sorted(value_rows, key=lambda c: xlsx_read.getCellValue_from_openpyxl_cell(c[column_index]), reverse=reverse)
+        
+        xlsx_write=XLSX_Write(tmp_name + sep + "sorted.xlsx", template=tmp_name + sep + "rewritten.xlsx")
+        xlsx_write.setCurrentSheet(sheet_index)
+        for number_index, row in enumerate(value_rows):
+            for letter_index, cell in enumerate(row):
+                xlsx_write.ws_current.cell(row=1+number_index+skip_up, column=1+ letter_index).value=xlsx_read.getCellValue_from_openpyxl_cell(cell)
+                xlsx_write.ws_current.cell(row=1+number_index+skip_up, column=1+letter_index).style=cell.style               
+        xlsx_write.save()        
+        
+        from os import system
+        
+        system("ls -la {}".format(tmp_name))
+        convert_command(tmp_name + sep + "sorted.xlsx", filename_to)
         

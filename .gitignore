@@ -11,3 +11,10 @@ cur/
 tmp/
 __pycache__/
 *.DS_Store
+
+dist/
+doc/html/
+doc/officegenerator.tag
+officegenerator.e4p
+officegenerator.egg-info/
+officegenerator/objects/locale/

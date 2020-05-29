@@ -11,7 +11,7 @@ from multiprocessing import cpu_count
 
 from officegenerator.commons import __version__, addDebugSystem
 from officegenerator.libodfgenerator import ODS_Read, ODS_Write, ODT_Manual_Styles, ODT_Standard,  OdfCell, ColumnWidthODS, ODT, create_rewritten_ods, create_data_only_ods
-from officegenerator.libxlsxgenerator import XLSX_Write, XLSX_Read, create_data_only_xlsx, create_rewritten_xlsx
+from officegenerator.libxlsxgenerator import XLSX_Write, XLSX_Read, create_data_only_xlsx, create_rewritten_xlsx, create_sorting_sheet
 from officegenerator.standard_sheets import Model, Model_Auto
 from officegenerator.commons import argparse_epilog, Coord, Range
 from officegenerator.objects.currency import Currency
@@ -84,6 +84,7 @@ def main(arguments=None):
         create_data_only_xlsx("officegenerator.xlsx")
         create_rewritten_ods("officegenerator.ods")
         create_data_only_ods("officegenerator.ods")
+        create_sorting_sheet("officegenerator.xlsx", "officegenerator.sorted.xlsx", 5, 11)
         #create_data_only_xlsx("officegenerator.ods", "officegenerator_from_ods.data_only.xlsx")
             
             
@@ -541,7 +542,7 @@ def demo_xlsx():
     xlsx.overwriteTotalsHorizontal("A9", ["Total", "#SUM", "#SUM", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM", "#SUM"])
     xlsx.overwriteTotalsVertical("L1", ["Total", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM","#SUM"])
     xlsx.freezeAndSelect("B2") 
-    
+
     xlsx.save()
     return "demo_xlsx took {}".format(datetime.now()-start)
 
