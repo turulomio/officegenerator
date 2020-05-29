@@ -541,6 +541,7 @@ def demo_xlsx():
         xlsx.overwrite(Coord("K2").addRow(row), 1, style=style, decimals=6)
     xlsx.overwriteTotalsHorizontal("A9", ["Total", "#SUM", "#SUM", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM", "#SUM"])
     xlsx.overwriteTotalsVertical("L1", ["Total", "#SUM", "#AVG","#MEDIAN","#SUM", "#AVG","#MEDIAN", "#SUM","#SUM"])
+    xlsx.setColorScale("L2:L8")
     xlsx.freezeAndSelect("B2") 
 
     xlsx.save()

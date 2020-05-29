@@ -643,12 +643,8 @@ def create_sorting_sheet(filename_from, filename_to, sheet_index, column_index, 
         xlsx_write.setCurrentSheet(sheet_index)
         for number_index, row in enumerate(value_rows):
             for letter_index, cell in enumerate(row):
-                xlsx_write.ws_current.cell(row=1+number_index+skip_up, column=1+ letter_index).value=xlsx_read.getCellValue_from_openpyxl_cell(cell)
-                xlsx_write.ws_current.cell(row=1+number_index+skip_up, column=1+letter_index).style=cell.style               
+                xlsx_write.ws_current.cell(row=1+number_index+skip_up, column=1+ letter_index).value=xlsx_read.getCellValue_from_openpyxl_cell(cell)         
         xlsx_write.save()        
         
-        from os import system
-        
-        system("ls -la {}".format(tmp_name))
         convert_command(tmp_name + sep + "sorted.xlsx", filename_to)
         
