@@ -27,6 +27,11 @@ Known issues
 
 Changelog
 =========
+1.28.0
+------
+  * Changed default parameter keep_vba to False. Thanks Jorge Pachón.
+  * [Beta] First sorting methods
+
 1.27.0
 ------
   * Now it's not necesary to set selected coord in freezeAndSelect method. Bottom Right cell is selected by default.
