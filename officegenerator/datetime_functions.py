@@ -291,6 +291,16 @@ def epochms2dtaware(n, tz="UTC"):
     utc_aware=utc_unaware.replace(tzinfo=timezone('UTC'))#Due to epoch is in UTC
     return dtaware_changes_tz(utc_aware, tz)
 
+## epoch is the time from 1,1,1970 in UTC
+## return now(timezone(self.name))
+def dtaware2epochmicros(d):
+    return int(d.timestamp()*1000000)
+## Return a UTC datetime aware
+def epochmicros2dtaware(n, tz="UTC"):
+    utc_unaware=datetime.utcfromtimestamp(n/1000000)
+    utc_aware=utc_unaware.replace(tzinfo=timezone('UTC'))#Due to epoch is in UTC
+    return dtaware_changes_tz(utc_aware, tz)
+
 
 ## Returns a formated string of a dtaware string formatting with a zone name
 ## @param dt datetime aware object
@@ -327,7 +337,7 @@ def dtnaive2string(dt, format):
 ## - libcaloriestrackerfunctions.dtaware_changes_tz(a,"Europe/London")
 ## - datetime.datetime(2018, 5, 18, 7, 12, tzinfo=<DstTzInfo 'Europe/London' BST+1:00:00 DST>)
 ## @param dt datetime aware object
-## @tzname String with datetime zone. For example: "Europe/Madrid"
+## @param tzname String with datetime zone. For example: "Europe/Madrid"
 ## @return datetime aware object
 def dtaware_changes_tz(dt,  tzname):
     if dt==None:
@@ -336,17 +346,38 @@ def dtaware_changes_tz(dt,  tzname):
     tarjet=tzt.normalize(dt.astimezone(tzt))
     return tarjet
 
+## Returns a list of tuples (year, month) from a month to another month, both included
+## @param year_from Integer
+## @param month_from Integer
+## @param year_to Integer If none uses current year
+## @param month_to Integer If none uses current month
+def months(year_from, month_from, year_to=None, month_to=None):
+    if year_to is None or month_to is None:
+        year_to=date.today().year
+        month_to=date.today().month
+    r=[]
+    end=date_first_of_the_month(year_to, month_to)
+    current=date_first_of_the_month(year_from, month_from)
+    while True:
+        if current>end:
+            break
+        r.append((current.year,current.month))
+        current=date_first_of_the_next_x_months(current.year, current.month, 1)
+    return r
 
 if __name__ == "__main__":
     tz="Europe/Madrid"
-    now=datetime.now()
+    now=dtnaive_now()
     print("Current localzone is", tz)
     print ("DtNaive:",  now)
     now_aware=dtaware(now.date(), now.time(), tz)
-    print("DtAware:", now_aware)
+    print("DtAware:", now_aware, "With dtaware_now", dtaware_now(tz))
     epochms=dtaware2epochms(now_aware)
     print("Epoch in miliseconds:", epochms)
     print("Dtaware reconverting epoch {}".format(epochms2dtaware(epochms, tz)) )
+    epochmicros=dtaware2epochmicros(now_aware)
+    print("Epoch in microseconds:", epochmicros)
+    print("Dtaware reconverting epoch in microseconds {}".format(epochmicros2dtaware(epochmicros, tz)) )
     now_aware_in_utc=dtaware_changes_tz(now_aware, 'UTC')
     print("Datetime '{}' changes to UTC '{}'".format(now_aware, now_aware_in_utc))
     print()
