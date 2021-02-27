@@ -463,7 +463,7 @@ def demo_xlsx():
     
     ##To write a custom cell
     cell=xlsx.wb.active['B12']
-    cell.font=openpyxl.styles.Font(name='Arial', size=16, bold=True, color=openpyxl.styles.colors.RED)
+    cell.font=openpyxl.styles.Font(name='Arial', size=16, bold=True, color='00FF0000')#Red
     cell.value=_("This is a custom cell")
     #Merge cells
     xlsx.overwrite_and_merge("A13:C14", _("This cell is going to be merged with B13 and C13"),style=xlsx.stOrange)

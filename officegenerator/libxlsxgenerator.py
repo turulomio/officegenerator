@@ -188,7 +188,7 @@ class XLSX_Write(XLSX_Commons):
     ## @param filename
     ## @param template
     ## @param data_only load_workbook now accepts data_only to allow extracting values only from formulae. Default is false
-    def __init__(self,filename, template=None, data_only=False, keep_vba=True):
+    def __init__(self,filename, template=None, data_only=False, keep_vba=False):
         XLSX_Commons.__init__(self)
         self.filename=filename
         self.template=template
