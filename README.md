@@ -1,3 +1,9 @@
+Proyect Archived
+================
+
+This project has been archived because I've developed a new one called [Unogenerator](https://github.com/turulomio/unogenerator/), that tries to solve problems with OpenPyXl and odfpy libraries limitations, working directly with Libreoffice through UNO api with python, and getting better and more stable results. Give it a try ;)
+
+
 Links
 =====
 
